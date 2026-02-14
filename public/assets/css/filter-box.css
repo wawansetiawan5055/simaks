@@ -1,0 +1,60 @@
+/* Filter Box Styling for Report Forms */
+.filter-box {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    border: 1px solid #1976D2;
+    border-radius: 15px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+}
+
+.filter-box .form-group {
+    margin-bottom: 10px;
+}
+
+.filter-box label {
+    color: #1565C0;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.filter-box .form-control {
+    border-radius: 20px;
+    border: 1px solid #90CAF9;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-box .form-control:focus {
+    border-color: #1976D2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+}
+
+.filter-box .btn-primary {
+    border-radius: 20px;
+    padding: 8px 25px;
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+}
+
+.filter-box .btn-primary:hover {
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+    box-shadow: 0 4px 10px rgba(25, 118, 210, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filter-box {
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .filter-box .form-control {
+        border-radius: 15px;
+    }
+}

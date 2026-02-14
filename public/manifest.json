@@ -1,0 +1,21 @@
+{
+  "name": "SIMAKS Mobile",
+  "short_name": "SIMAKS",
+  "start_url": "index.php?mod=dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/img/AdminLTELogo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/img/AdminLTELogo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
