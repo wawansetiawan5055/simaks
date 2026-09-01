@@ -90,7 +90,7 @@ class JadwalModel {
                         dm.id_jadwal_mengajar, dm.id_guru_mapel, dm.id_kelas, dm.hari_kbm, dm.mode_kbm,
                         k.tingkat, k.nama_kelas, k.jenis_kelas,
                         m.nama_mapel,
-                        g.nama AS nama_guru, g.jenis_guru,
+                        gm.id_guru, g.nama AS nama_guru, g.jenis_guru,
                         NULLIF(jp.nama_kegiatan_custom, '') AS nama_kegiatan_custom
                     FROM jam_pelajaran jp
                     LEFT JOIN master_kegiatan mk ON jp.id_kegiatan = mk.id_kegiatan

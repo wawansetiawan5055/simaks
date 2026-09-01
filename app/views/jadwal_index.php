@@ -255,7 +255,9 @@
 
     <div class="col-md-12">
         <div class="row" id="jadwalCardsContainer">
-            <?php foreach ($all_days as $hari_ini): 
+            <?php 
+            $rendered_days_count = 0;
+            foreach ($all_days as $hari_ini): 
                 $theme = $day_colors[$hari_ini] ?? ['color' => '#0284c7', 'bg_header' => '#f8fafc', 'icon' => 'fas fa-calendar'];
                 $raw_day_rows = $result[$hari_ini] ?? [];
                 
@@ -263,12 +265,17 @@
                 if ($view_type === 'guru') {
                     $day_rows = array_values(array_filter($raw_day_rows, function($r) {
                         $is_kbm = ($r['jenis_jam_pelajaran'] == 'KBM' || $r['jenis_master_kegiatan'] == 'KBM');
-                        return $is_kbm && !empty($r['id_guru']);
+                        return $is_kbm && !empty($r['id_jadwal_mengajar']);
                     }));
+                    // Card hari yang tampil HANYA yang ada jadwal guru mengajar saja
+                    if (empty($day_rows)) {
+                        continue;
+                    }
                 } else {
                     $day_rows = $raw_day_rows;
                 }
 
+                $rendered_days_count++;
                 $total_slots = count($day_rows);
                 $total_jp = 0;
                 foreach ($day_rows as $r) {
@@ -513,6 +520,24 @@
                 </div>
             </div>
             <?php endforeach; ?>
+
+            <?php if ($rendered_days_count === 0): ?>
+                <?php
+                $find_g = array_filter($guru_list, function($x) use($id_guru_filter) { return $x['id_guru'] == $id_guru_filter; });
+                $cur_g = !empty($find_g) ? reset($find_g) : null;
+                ?>
+                <div class="col-12 py-3">
+                    <div class="card shadow-sm border-0 py-5 text-center" style="border-radius: 14px; background: #ffffff;">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="fas fa-chalkboard-teacher fa-3x text-muted" style="opacity: 0.35;"></i>
+                            </div>
+                            <h5 class="font-weight-bold text-dark mb-1">Tidak Ada Jadwal Mengajar</h5>
+                            <p class="text-muted small mb-0">Guru <strong><?= htmlspecialchars($cur_g['nama_guru'] ?? 'yang dipilih') ?></strong> belum memiliki jadwal mengajar KBM pada tahun ajaran ini.</p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
