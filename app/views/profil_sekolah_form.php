@@ -641,7 +641,7 @@
                                     </div>
 
                                     <!-- GAYA GARIS PEMBATAS -->
-                                    <div class="form-group mb-0 pt-2 border-top">
+                                    <div class="form-group mb-3 pt-2 border-top">
                                         <label class="font-weight-bold text-dark small mb-1">
                                             <i class="fas fa-minus text-dark mr-1"></i> Gaya Garis Pembatas Kop:
                                         </label>
@@ -651,6 +651,32 @@
                                             <option value="single" <?= ($profil['style_garis'] ?? '') === 'single' ? 'selected' : '' ?>>Garis Tunggal Sedang (1.5px)</option>
                                             <option value="none" <?= ($profil['style_garis'] ?? '') === 'none' ? 'selected' : '' ?>>Tanpa Garis</option>
                                         </select>
+                                    </div>
+
+                                    <!-- MARGIN DOKUMEN CETAK DINAMIS -->
+                                    <div class="form-group mb-0 pt-2 border-top">
+                                        <label class="font-weight-bold text-dark small mb-2 d-block">
+                                            <i class="fas fa-ruler-combined text-primary mr-1"></i> Pengaturan Margin Kertas Dokumen Cetak (PDF):
+                                        </label>
+                                        <div class="row">
+                                            <div class="col-6 col-sm-3 mb-2">
+                                                <label class="small text-muted mb-0">Atas (mm)</label>
+                                                <input type="number" name="margin_atas" class="form-control font-weight-bold text-center" value="<?= htmlspecialchars($profil['margin_atas'] ?? 15) ?>" min="5" max="50">
+                                            </div>
+                                            <div class="col-6 col-sm-3 mb-2">
+                                                <label class="small text-muted mb-0">Bawah (mm)</label>
+                                                <input type="number" name="margin_bawah" class="form-control font-weight-bold text-center" value="<?= htmlspecialchars($profil['margin_bawah'] ?? 15) ?>" min="5" max="50">
+                                            </div>
+                                            <div class="col-6 col-sm-3 mb-2">
+                                                <label class="small text-muted mb-0">Kiri (mm)</label>
+                                                <input type="number" name="margin_kiri" class="form-control font-weight-bold text-center" value="<?= htmlspecialchars($profil['margin_kiri'] ?? 20) ?>" min="5" max="50">
+                                            </div>
+                                            <div class="col-6 col-sm-3 mb-2">
+                                                <label class="small text-muted mb-0">Kanan (mm)</label>
+                                                <input type="number" name="margin_kanan" class="form-control font-weight-bold text-center" value="<?= htmlspecialchars($profil['margin_kanan'] ?? 15) ?>" min="5" max="50">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted"><i class="fas fa-info-circle mr-1"></i> Standar dinas: Atas 15mm, Bawah 15mm, Kiri 20mm (ruang jilid), Kanan 15mm.</small>
                                     </div>
 
                                 </div>

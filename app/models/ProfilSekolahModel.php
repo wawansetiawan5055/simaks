@@ -53,7 +53,11 @@ class ProfilSekolahModel {
                     logo_kanan = ?,
                     show_logo_kiri = ?,
                     show_logo_kanan = ?,
-                    style_garis = ?
+                    style_garis = ?,
+                    margin_atas = ?,
+                    margin_bawah = ?,
+                    margin_kiri = ?,
+                    margin_kanan = ?
                 WHERE id = 1";
         
         $stmt = $pdo->prepare($sql);
@@ -85,7 +89,11 @@ class ProfilSekolahModel {
             $logo_kanan,
             isset($data['show_logo_kiri']) ? (int)$data['show_logo_kiri'] : 1,
             isset($data['show_logo_kanan']) ? (int)$data['show_logo_kanan'] : 1,
-            $data['style_garis'] ?? 'double'
+            $data['style_garis'] ?? 'double',
+            isset($data['margin_atas']) ? (int)$data['margin_atas'] : 15,
+            isset($data['margin_bawah']) ? (int)$data['margin_bawah'] : 15,
+            isset($data['margin_kiri']) ? (int)$data['margin_kiri'] : 20,
+            isset($data['margin_kanan']) ? (int)$data['margin_kanan'] : 15
         ]);
     }
 }

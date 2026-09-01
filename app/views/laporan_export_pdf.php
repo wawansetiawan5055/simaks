@@ -4,68 +4,34 @@
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($judul ?? 'Laporan') ?></title>
     
+    <?php
+    $margin_top    = !empty($kop['margin_atas']) ? (int)$kop['margin_atas'] : 15;
+    $margin_bottom = !empty($kop['margin_bawah']) ? (int)$kop['margin_bawah'] : 15;
+    $margin_left   = !empty($kop['margin_kiri']) ? (int)$kop['margin_kiri'] : 20;
+    $margin_right  = !empty($kop['margin_kanan']) ? (int)$kop['margin_kanan'] : 15;
+    ?>
+    
     <style>
-        /* CSS Reset Sederhana */
+        @page {
+            margin: <?= $margin_top ?>mm <?= $margin_right ?>mm <?= $margin_bottom ?>mm <?= $margin_left ?>mm;
+        }
+        
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica', Arial, sans-serif; /* Dompdf lebih baik dengan font dasar */
-            font-size: 10pt; 
-        }
-        
-        /* --- KOP SURAT (Menggunakan data $kop Anda) --- */
-        .kop-surat {
-            border-bottom: 3px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        /* Menggunakan tabel untuk layout kop surat agar kompatibel dengan Dompdf */
-        .kop-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .kop-table td {
-            padding: 0;
-            vertical-align: top;
-        }
-        .kop-logo {
-            width: 100px;
-            text-align: left;
-        }
-        .kop-logo img {
-            width: 90px; /* Sesuaikan ukuran logo */
-            height: auto;
-        }
-        .kop-text {
-            text-align: center;
-            line-height: 1.4;
-        }
-        .kop-text h1 {
-            font-size: 14pt;
-            font-weight: bold;
-            margin: 0;
-            padding: 0;
-            text-transform: uppercase;
-        }
-        .kop-text h2 {
-            font-size: 16pt;
-            font-weight: bold;
-            margin: 5px 0;
-            text-transform: uppercase;
-        }
-        .kop-text p {
-            font-size: 9pt;
-            margin: 0;
+            font-family: 'Helvetica', Arial, sans-serif;
+            font-size: 9.5pt;
+            color: #111;
         }
         
         /* Judul Laporan */
         .report-title {
             text-align: center;
-            font-size: 14pt;
+            font-size: 12.5pt;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin: 12px 0 16px 0;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* --- TABEL DATA UTAMA --- */
@@ -76,37 +42,39 @@
         }
         .main-table th,
         .main-table td {
-            border: 1px solid #000;
-            padding: 5px 6px; /* Padding lebih kecil untuk PDF */
-            text-align: left;
-            word-wrap: break-word; 
+            border: 1px solid #333;
+            padding: 5px 6px;
+            vertical-align: middle;
+            font-size: 9pt;
         }
         .main-table th {
-            background-color: #f2f2f2; 
+            background-color: #f1f5f9;
             font-weight: bold;
             text-align: center;
+            text-transform: uppercase;
         }
-        
-        /* Fix untuk Dompdf agar tidak memotong baris tabel di antara halaman */
+        .main-table thead {
+            display: table-header-group;
+        }
         .main-table tbody tr {
             page-break-inside: avoid;
         }
 
         /* --- TANDA TANGAN --- */
         .signature-section {
-            margin-top: 40px;
+            margin-top: 25px;
             width: 100%;
+            page-break-inside: avoid;
         }
         .signature-box {
-            width: 250px; 
+            width: 260px; 
             text-align: center;
-            line-height: 1.5;
-            float: right; /* Pindahkan ke kanan */
+            line-height: 1.35;
+            float: right;
+            font-size: 9.5pt;
         }
         .signature-box .signature-placeholder {
-            height: 60px; 
-            margin-top: 10px;
-            margin-bottom: 5px;
+            height: 55px; 
         }
         .signature-box .nama-kepsek {
             font-weight: bold;
@@ -116,16 +84,15 @@
         /* --- FOOTER HALAMAN (Dompdf) --- */
         footer {
             position: fixed; 
-            bottom: -20px; /* Sesuaikan jika terpotong */
+            bottom: -10mm;
             left: 0px; 
             right: 0px;
-            height: 50px; 
-            
-            border-top: 1px solid #000;
-            padding-top: 5px;
+            height: 8mm; 
+            border-top: 0.5px solid #ccc;
+            padding-top: 2px;
             text-align: center;
-            font-size: 8pt;
-            color: #555;
+            font-size: 7.5pt;
+            color: #666;
         }
     </style>
 </head>
