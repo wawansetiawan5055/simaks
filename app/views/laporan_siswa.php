@@ -1,5 +1,5 @@
 <?php
-// app/views/laporan_siswa.php - Fullscreen In-Body PDF Preview with Top Action Bar
+// app/views/laporan_siswa.php - Unified Seamless In-Body PDF Preview Studio
 include __DIR__ . '/partials/header.php'; 
 
 $nama_ta = $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'Tahun Ajaran Aktif';
@@ -19,6 +19,88 @@ if (!empty($_GET['kelas'])) {
     }
 }
 ?>
+
+<style>
+/* --- UNIFIED PREVIEW STUDIO STYLING --- */
+.preview-unified-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #323639;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid #45494d;
+    margin-bottom: 20px;
+}
+
+.preview-unified-header {
+    background: #2a2e33;
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #3f4448;
+}
+
+.preview-unified-title {
+    color: #f1f5f9;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-icon-studio {
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-icon-studio:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-icon-studio-danger {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-icon-studio-danger:hover {
+    color: #ffffff;
+    background: #ef4444;
+    border-color: #ef4444;
+}
+
+.preview-unified-body {
+    height: calc(100vh - 120px);
+    min-height: 680px;
+    width: 100%;
+    position: relative;
+    background-color: #525659;
+}
+.preview-unified-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+</style>
 
 <!-- ================================================================= -->
 <!-- SECTION 1: HEADER & DATA VIEW (JUDUL, FILTER, TABEL DATA) -->
@@ -154,44 +236,55 @@ if (!empty($_GET['kelas'])) {
 
 
 <!-- ================================================================= -->
-<!-- SECTION 2: DEDICATED FULLSCREEN IN-BODY PREVIEW (DIRECTLY UNDER NAVBAR) -->
+<!-- SECTION 2: DEDICATED UNIFIED IN-BODY PREVIEW (CARD MENYATU RAPI) -->
 <!-- ================================================================= -->
 <div id="sectionPreviewStudio" style="display: none;" class="pt-2">
   <div class="container-fluid">
     
-    <!-- Sleek Top Action Bar (Toolbar Pratinjau) -->
-    <div class="card shadow-sm border-0 mb-2" style="border-radius: 10px; background: #ffffff;">
-      <div class="card-body p-2 d-flex justify-content-between align-items-center flex-wrap">
+    <!-- SINGLE UNIFIED CARD (HEADER & PDF IFRAME MENYATU) -->
+    <div class="preview-unified-card">
+      
+      <!-- Integrated Top Action Toolbar -->
+      <div class="preview-unified-header">
         
-        <!-- Tombol Kembali / Tutup -->
+        <!-- Left Side: Back / Close & Title -->
         <div class="d-flex align-items-center">
-          <button type="button" onclick="closeFullscreenPreview()" class="btn btn-outline-secondary font-weight-bold px-3 mr-2 shadow-sm">
-            <i class="fas fa-arrow-left mr-1"></i> Kembali
+          <button type="button" onclick="closeFullscreenPreview()" class="btn-icon-studio mr-2" title="Kembali ke Tabel Data">
+            <i class="fas fa-arrow-left"></i>
+            <span>Kembali</span>
           </button>
-          <button type="button" onclick="closeFullscreenPreview()" class="btn btn-danger font-weight-bold px-3 shadow-sm">
-            <i class="fas fa-times mr-1"></i> Tutup
+          
+          <button type="button" onclick="closeFullscreenPreview()" class="btn-icon-studio-danger mr-3" title="Tutup Pratinjau">
+            <i class="fas fa-times"></i>
+            <span>Tutup</span>
           </button>
-          <span class="ml-3 font-weight-bold text-dark d-none d-md-inline">
-            <i class="fas fa-file-invoice text-primary mr-1"></i> Pratinjau Dokumen Cetak: <u>Laporan Data Siswa (<?= htmlspecialchars($selected_kelas_name) ?>)</u>
-          </span>
+          
+          <div class="preview-unified-title d-none d-md-flex">
+            <i class="fas fa-file-pdf text-info"></i>
+            <span>Pratinjau: Laporan Data Siswa (<?= htmlspecialchars($selected_kelas_name) ?>)</span>
+          </div>
         </div>
 
-        <!-- Tombol Print & Download -->
-        <div class="btn-group shadow-sm mt-2 mt-md-0">
-          <button type="button" onclick="printPreviewFrame()" class="btn btn-success font-weight-bold px-4">
-            <i class="fas fa-print mr-1"></i> Print / Cetak
+        <!-- Right Side: Print & Download Icons -->
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" onclick="printPreviewFrame()" class="btn-icon-studio mr-2" title="Cetak Dokumen">
+            <i class="fas fa-print text-success"></i>
+            <span>Cetak</span>
           </button>
-          <a href="<?= $pdf_url ?>" class="btn btn-primary font-weight-bold px-3" target="_blank">
-            <i class="fas fa-download mr-1"></i> Download PDF
+          
+          <a href="<?= $pdf_url ?>" class="btn-icon-studio" target="_blank" title="Unduh File PDF">
+            <i class="fas fa-download text-primary"></i>
+            <span>Unduh PDF</span>
           </a>
         </div>
 
       </div>
-    </div>
 
-    <!-- Full-Height Native PDF Frame Directly Under Navbar -->
-    <div class="card shadow-sm border-0 overflow-hidden mb-3" style="height: calc(100vh - 140px); min-height: 650px; border-radius: 12px; background: #525659;">
-      <iframe id="pdfStudioFrame" src="" style="width: 100%; height: 100%; border: none; display: block;" title="Pratinjau Cetak Lembar Dokumen"></iframe>
+      <!-- Native PDF Frame Directly Inside the Card Body -->
+      <div class="preview-unified-body">
+        <iframe id="pdfStudioFrame" src="" class="preview-unified-frame" title="Pratinjau Cetak Lembar Dokumen"></iframe>
+      </div>
+
     </div>
 
   </div>
@@ -208,7 +301,7 @@ function openFullscreenPreview() {
     }
     // Sembunyikan bagian judul, filter, dan tabel data
     document.getElementById('sectionMainData').style.display = 'none';
-    // Tampilkan lembar preview fullscreen di dalam body tepat di bawah navbar
+    // Tampilkan lembar preview satu kartu terpadu tepat di bawah navbar
     document.getElementById('sectionPreviewStudio').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
