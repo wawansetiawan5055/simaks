@@ -297,7 +297,7 @@ var pdfReportUrl = <?= json_encode($pdf_url) ?>;
 function openFullscreenPreview() {
     var frame = document.getElementById('pdfStudioFrame');
     if (!frame.src || frame.src === 'about:blank' || frame.src === window.location.href) {
-        frame.src = pdfReportUrl;
+        frame.src = pdfReportUrl + (pdfReportUrl.indexOf('?') !== -1 ? '&' : '?') + '_t=' + new Date().getTime();
     }
     // Sembunyikan bagian judul, filter, dan tabel data
     document.getElementById('sectionMainData').style.display = 'none';

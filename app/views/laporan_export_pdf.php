@@ -13,14 +13,15 @@
     
     <style>
         @page {
-            margin: <?= $margin_top ?>mm <?= $margin_right ?>mm <?= $margin_bottom ?>mm <?= $margin_left ?>mm;
+            margin-top: <?= $margin_top ?>mm;
+            margin-bottom: <?= $margin_bottom ?>mm;
+            margin-left: <?= $margin_left ?>mm;
+            margin-right: <?= $margin_right ?>mm;
         }
         
-        body, html {
-            margin: 0;
-            padding: 0;
+        body {
             font-family: 'Helvetica', Arial, sans-serif;
-            font-size: 9.5pt;
+            font-size: 9pt;
             color: #111;
         }
         
