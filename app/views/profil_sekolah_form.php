@@ -107,427 +107,461 @@
         <?php endif; ?>
 
         <form action="<?= BASE_URL ?>profil_sekolah/save" method="POST" enctype="multipart/form-data">
-            <div class="row">
+            
+            <!-- NAV TABS UTAMA (TAB 1: PROFIL, TAB 2: KOP SURAT) -->
+            <div class="card card-primary card-outline card-outline-tabs shadow-sm mb-4" style="border-radius: 12px; overflow: hidden; border-top: 3px solid #3b82f6;">
+                <div class="card-header p-0 border-bottom-0 bg-white">
+                    <ul class="nav nav-tabs" id="profilSekolahTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active font-weight-bold py-3 px-4" id="tab-profil-link" data-toggle="pill" href="#tab-profil" role="tab" aria-controls="tab-profil" aria-selected="true" style="font-size: 0.95rem;">
+                                <i class="fas fa-school text-primary mr-2"></i> Tab 1: Identitas &amp; Lokasi Sekolah
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold py-3 px-4" id="tab-kop-link" data-toggle="pill" href="#tab-kop" role="tab" aria-controls="tab-kop" aria-selected="false" style="font-size: 0.95rem;">
+                                <i class="fas fa-file-invoice text-success mr-2"></i> Tab 2: Format Kop Surat &amp; Logo Cetak (Live Editor)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 
-                <!-- KOLOM KIRI: IDENTITAS, LEGALITAS & LOGO -->
-                <div class="col-lg-6 mb-4">
-                    
-                    <!-- CARD 1: IDENTITAS DASAR -->
-                    <div class="card card-profil-section mb-4">
-                        <div class="card-body">
-                            <div class="section-title">
-                                <i class="fas fa-info-circle"></i> Identitas Pokok Sekolah
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small">Nama Sekolah <span class="text-danger">*</span></label>
-                                <input type="text" name="nama_sekolah" class="form-control" value="<?= htmlspecialchars($profil['nama_sekolah'] ?? '') ?>" required placeholder="Contoh: SMA PLUS AL MANSHURIYAH">
-                            </div>
-
+                <div class="card-body p-4 bg-light">
+                    <div class="tab-content" id="profilSekolahTabsContent">
+                        
+                        <!-- ======================================================== -->
+                        <!-- TAB 1: IDENTITAS, LEGALITAS & LOKASI PETA SATELIT        -->
+                        <!-- ======================================================== -->
+                        <div class="tab-pane fade show active" id="tab-profil" role="tabpanel" aria-labelledby="tab-profil-link">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">NPSN <span class="text-danger">*</span></label>
-                                        <input type="text" name="npsn" class="form-control" value="<?= htmlspecialchars($profil['npsn'] ?? '') ?>" required placeholder="8 Digit NPSN">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">Status Sekolah</label>
-                                        <select name="status_sekolah" class="form-control">
-                                            <option value="Swasta" <?= ($profil['status_sekolah'] ?? '') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
-                                            <option value="Negeri" <?= ($profil['status_sekolah'] ?? '') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">Bentuk Pendidikan</label>
-                                        <select name="bentuk_pendidikan" class="form-control">
-                                            <option value="SMA/MA" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMA/MA' ? 'selected' : '' ?>>SMA/MA</option>
-                                            <option value="SMK" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMK' ? 'selected' : '' ?>>SMK</option>
-                                            <option value="SMP/MTs" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMP/MTs' ? 'selected' : '' ?>>SMP/MTs</option>
-                                            <option value="SD/MI" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SD/MI' ? 'selected' : '' ?>>SD/MI</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">Kurikulum Utama</label>
-                                        <select name="kurikulum" class="form-control">
-                                            <option value="Kurikulum Merdeka" <?= ($profil['kurikulum'] ?? '') == 'Kurikulum Merdeka' ? 'selected' : '' ?>>Kurikulum Merdeka</option>
-                                            <option value="Kurikulum 2013" <?= ($profil['kurikulum'] ?? '') == 'Kurikulum 2013' ? 'selected' : '' ?>>Kurikulum 2013</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small">Nama Kepala Sekolah</label>
-                                <input type="text" name="nama_kepala_sekolah" class="form-control" value="<?= htmlspecialchars($profil['nama_kepala_sekolah'] ?? '') ?>" placeholder="Nama Lengkap beserta Gelar">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small">Yayasan / Penyelenggara</label>
-                                <input type="text" name="nama_yayasan" class="form-control" value="<?= htmlspecialchars($profil['nama_yayasan'] ?? '') ?>" placeholder="Nama Yayasan / Dinas Pendidikan">
-                            </div>
-
-                            <div class="form-group mb-0">
-                                <label class="font-weight-bold text-dark small">Moto / Slogan Sekolah</label>
-                                <input type="text" name="moto" class="form-control" value="<?= htmlspecialchars($profil['moto'] ?? '') ?>" placeholder="Contoh: Religius, Unggul, dan Berakhlak Mulia">
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- CARD 2: KONTAK & LEGALITAS -->
-                    <div class="card card-profil-section mb-4">
-                        <div class="card-body">
-                            <div class="section-title">
-                                <i class="fas fa-address-book"></i> Kontak &amp; Legalitas
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small"><i class="fas fa-phone-alt mr-1 text-muted"></i> Nomor Telepon / WA</label>
-                                        <input type="text" name="telepon" class="form-control" value="<?= htmlspecialchars($profil['telepon'] ?? '') ?>" placeholder="08xxxxxxxxxx">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small"><i class="fas fa-envelope mr-1 text-muted"></i> Email Sekolah</label>
-                                        <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($profil['email'] ?? '') ?>" placeholder="email@sekolah.sch.id">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small"><i class="fas fa-globe mr-1 text-muted"></i> Alamat Website Resmi</label>
-                                <input type="text" name="website" class="form-control" value="<?= htmlspecialchars($profil['website'] ?? '') ?>" placeholder="https://smaplusalmanshuriyah.sch.id">
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">SK Izin Operasional</label>
-                                        <input type="text" name="sk_izin_operasional" class="form-control" value="<?= htmlspecialchars($profil['sk_izin_operasional'] ?? '') ?>" placeholder="Nomor SK Izin">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold text-dark small">SK Akreditasi</label>
-                                        <input type="text" name="sk_akreditasi" class="form-control" value="<?= htmlspecialchars($profil['sk_akreditasi'] ?? '') ?>" placeholder="Nomor SK / Status Akreditasi">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mb-0">
-                                <label class="font-weight-bold text-dark small"><i class="fas fa-image mr-1 text-muted"></i> Logo Sekolah</label>
-                                <div class="custom-file mb-2">
-                                    <input type="file" class="custom-file-input" id="logo_sekolah" name="logo_sekolah" accept="image/*">
-                                    <label class="custom-file-label" for="logo_sekolah">Pilih berkas gambar logo...</label>
-                                </div>
-                                <?php if (!empty($profil['logo'])): ?>
-                                    <div class="d-flex align-items-center p-2 bg-light rounded border mt-2">
-                                        <img src="assets/img/<?= htmlspecialchars($profil['logo']) ?>" alt="Logo Sekolah" id="preview_logo" class="img-thumbnail mr-3" style="max-height: 55px; max-width: 55px; object-fit: contain;">
-                                        <div>
-                                            <div class="font-weight-bold small text-dark"><?= htmlspecialchars($profil['logo']) ?></div>
-                                            <small class="text-muted">Logo saat ini aktif di sistem, rapor, &amp; portal</small>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- KOLOM KANAN: LOKASI & PETA SATELIT INTERAKTIF -->
-                <div class="col-lg-6 mb-4">
-                    <div class="card card-profil-section h-100">
-                        <div class="card-body d-flex flex-column">
-                            
-                            <div class="section-title">
-                                <i class="fas fa-map-marked-alt"></i> Lokasi &amp; Peta Satelit Interaktif
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small">Alamat Lengkap Sekolah <span class="text-danger">*</span></label>
-                                <textarea name="alamat" id="alamat_sekolah" class="form-control" rows="2" placeholder="Nama Jalan, RT/RW, Dusun/Desa, Kecamatan, Kabupaten/Kota, Provinsi"><?= htmlspecialchars($profil['alamat'] ?? '') ?></textarea>
-                            </div>
-
-                            <!-- INPUT KOORDINAT & LAT / LNG -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-2">
-                                        <label class="font-weight-bold text-dark small">Latitude (Garis Lintang)</label>
-                                        <input type="text" id="input_latitude" class="form-control form-control-sm font-weight-bold text-primary" placeholder="-6.917464" style="font-family: monospace;">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-2">
-                                        <label class="font-weight-bold text-dark small">Longitude (Garis Bujur)</label>
-                                        <input type="text" id="input_longitude" class="form-control form-control-sm font-weight-bold text-primary" placeholder="106.929384" style="font-family: monospace;">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- KOORDINAT GABUNGAN (SIMPAN KE DB) -->
-                            <div class="form-group mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <label class="font-weight-bold text-dark small m-0">Titik Koordinat (Lat, Lng)</label>
-                                    <small class="text-muted font-italic">Format: <code>latitude, longitude</code></small>
-                                </div>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-light"><i class="fas fa-crosshairs text-danger"></i></span>
-                                    </div>
-                                    <input type="text" name="koordinat" id="input_koordinat" class="form-control font-weight-bold" value="<?= htmlspecialchars($profil['koordinat'] ?? '') ?>" placeholder="-6.917464, 106.929384" style="font-family: monospace;">
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-primary" id="btn_my_location" title="Dapatkan Lokasi GPS Perangkat Ini">
-                                            <i class="fas fa-location-arrow mr-1"></i> Lokasi Saya (GPS)
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PETA INTERAKTIF SATELIT & JALAN -->
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="small font-weight-bold text-dark">
-                                    <i class="fas fa-satellite mr-1 text-info"></i> Pilih Titik Pin di Peta:
-                                </span>
-                                <small class="text-muted">Geser pin (drag) atau klik langsung pada peta</small>
-                            </div>
-
-                            <div class="map-container-wrapper flex-grow-1 mb-3">
-                                <!-- SEARCH BAR ATAS PETA -->
-                                <div class="map-search-bar">
-                                    <div class="input-group input-group-sm shadow-sm">
-                                        <input type="text" id="map_search_query" class="form-control border-0" placeholder="Ketik nama tempat/kecamatan/sekolah...">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-primary px-3" id="btn_map_search" title="Cari Lokasi">
-                                                <i class="fas fa-search"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- MAP ELEMENT -->
-                                <div id="mapSchool"></div>
-
-                                <!-- BADGE REALTIME KOORDINAT -->
-                                <div class="map-badge-coords shadow-sm">
-                                    <span id="badge_coord_display"><i class="fas fa-map-marker-alt text-danger mr-1"></i> Titik: Belum Dipilih</span>
-                                </div>
-                            </div>
-
-                            <div class="p-2.5 bg-light rounded border small text-muted">
-                                <i class="fas fa-lightbulb text-warning mr-1"></i>
-                                <strong>Tips:</strong> Anda bisa mengganti tampilan antara <strong>Peta Satelit Realistis (ESRI Imagery)</strong> dan <strong>Peta Jalan (OpenStreetMap)</strong> melalui ikon lapisan di pojok kanan atas peta.
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- CARD 3: KONFIGURASI FORMAT KOP SURAT RESMI & LIVE EDITOR -->
-            <div class="card card-profil-section mb-4" id="seksi_kop_surat">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                        <div class="section-title mb-0 border-0 p-0">
-                            <i class="fas fa-file-invoice text-primary"></i> Format Kop Surat Resmi &amp; Logo Cetak (Live Editor)
-                        </div>
-                        <span class="badge badge-primary px-3 py-1.5 font-weight-normal" style="font-size: 0.82rem; border-radius: 6px;">
-                            <i class="fas fa-check-double mr-1"></i> Standar Tata Naskah Dinas
-                        </span>
-                    </div>
-
-                    <div class="row">
-                        <!-- PENGATURAN KOP (KIRI) -->
-                        <div class="col-lg-6 mb-4 mb-lg-0">
-                            
-                            <!-- 1. PRESET TEMPLATE KOP CEPAT -->
-                            <div class="form-group mb-3">
-                                <label class="font-weight-bold text-dark small mb-1.5">
-                                    <i class="fas fa-magic text-warning mr-1"></i> Pilihan Standar Template Kop:
-                                </label>
-                                <div class="d-flex flex-wrap" style="gap: 6px;">
-                                    <button type="button" class="btn btn-sm btn-outline-primary btn-preset-kop" data-preset="yayasan">
-                                        <i class="fas fa-landmark mr-1"></i> Standar Yayasan / Swasta
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-info btn-preset-kop" data-preset="provinsi">
-                                        <i class="fas fa-building mr-1"></i> Standar Provinsi (SMA/SMK)
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-preset-kop" data-preset="kabupaten">
-                                        <i class="fas fa-city mr-1"></i> Standar Kab/Kota (SMP/SD)
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger btn-preset-kop" data-preset="nasional">
-                                        <i class="fas fa-flag mr-1"></i> Standar Nasional (Kementerian)
-                                    </button>
-                                </div>
-                                <input type="hidden" name="model_kop" id="input_model_kop" value="<?= htmlspecialchars($profil['model_kop'] ?? 'yayasan') ?>">
-                            </div>
-
-                            <!-- 2. DUAL LOGO SETTINGS -->
-                            <div class="p-3 bg-light rounded border mb-3">
-                                <label class="font-weight-bold text-dark small mb-2 d-block">
-                                    <i class="fas fa-images text-info mr-1"></i> Pengaturan Logo Ganda (Kiri &amp; Kanan)
-                                </label>
                                 
-                                <div class="row">
-                                    <!-- Logo Kiri -->
-                                    <div class="col-md-6 mb-2 mb-md-0">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="small font-weight-bold text-dark">Logo Kiri (Instansi / Yayasan)</span>
-                                            <div class="custom-control custom-switch custom-switch-sm">
-                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kiri" name="show_logo_kiri" value="1" <?= (!isset($profil['show_logo_kiri']) || $profil['show_logo_kiri']) ? 'checked' : '' ?>>
-                                                <label class="custom-control-label small text-muted" for="switch_logo_kiri">Tampil</label>
+                                <!-- KOLOM KIRI: IDENTITAS, LEGALITAS & LOGO -->
+                                <div class="col-lg-6 mb-4 mb-lg-0">
+                                    
+                                    <!-- CARD 1: IDENTITAS DASAR -->
+                                    <div class="card card-profil-section mb-4">
+                                        <div class="card-body">
+                                            <div class="section-title">
+                                                <i class="fas fa-info-circle"></i> Identitas Pokok Sekolah
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small">Nama Sekolah <span class="text-danger">*</span></label>
+                                                <input type="text" name="nama_sekolah" class="form-control" value="<?= htmlspecialchars($profil['nama_sekolah'] ?? '') ?>" required placeholder="Contoh: SMA PLUS AL MANSHURIYAH">
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">NPSN <span class="text-danger">*</span></label>
+                                                        <input type="text" name="npsn" class="form-control" value="<?= htmlspecialchars($profil['npsn'] ?? '') ?>" required placeholder="8 Digit NPSN">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">Status Sekolah</label>
+                                                        <select name="status_sekolah" class="form-control">
+                                                            <option value="Swasta" <?= ($profil['status_sekolah'] ?? '') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
+                                                            <option value="Negeri" <?= ($profil['status_sekolah'] ?? '') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">Bentuk Pendidikan</label>
+                                                        <select name="bentuk_pendidikan" class="form-control">
+                                                            <option value="SMA/MA" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMA/MA' ? 'selected' : '' ?>>SMA/MA</option>
+                                                            <option value="SMK" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMK' ? 'selected' : '' ?>>SMK</option>
+                                                            <option value="SMP/MTs" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SMP/MTs' ? 'selected' : '' ?>>SMP/MTs</option>
+                                                            <option value="SD/MI" <?= ($profil['bentuk_pendidikan'] ?? '') == 'SD/MI' ? 'selected' : '' ?>>SD/MI</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">Kurikulum Utama</label>
+                                                        <select name="kurikulum" class="form-control">
+                                                            <option value="Kurikulum Merdeka" <?= ($profil['kurikulum'] ?? '') == 'Kurikulum Merdeka' ? 'selected' : '' ?>>Kurikulum Merdeka</option>
+                                                            <option value="Kurikulum 2013" <?= ($profil['kurikulum'] ?? '') == 'Kurikulum 2013' ? 'selected' : '' ?>>Kurikulum 2013</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small">Nama Kepala Sekolah</label>
+                                                <input type="text" name="nama_kepala_sekolah" class="form-control" value="<?= htmlspecialchars($profil['nama_kepala_sekolah'] ?? '') ?>" placeholder="Nama Lengkap beserta Gelar">
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small">Yayasan / Penyelenggara</label>
+                                                <input type="text" name="nama_yayasan" class="form-control" value="<?= htmlspecialchars($profil['nama_yayasan'] ?? '') ?>" placeholder="Nama Yayasan / Dinas Pendidikan">
+                                            </div>
+
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold text-dark small">Moto / Slogan Sekolah</label>
+                                                <input type="text" name="moto" class="form-control" value="<?= htmlspecialchars($profil['moto'] ?? '') ?>" placeholder="Contoh: Religius, Unggul, dan Berakhlak Mulia">
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- CARD 2: KONTAK & LEGALITAS -->
+                                    <div class="card card-profil-section mb-0">
+                                        <div class="card-body">
+                                            <div class="section-title">
+                                                <i class="fas fa-address-book"></i> Kontak &amp; Legalitas
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small"><i class="fas fa-phone-alt mr-1 text-muted"></i> Nomor Telepon / WA</label>
+                                                        <input type="text" name="telepon" class="form-control" value="<?= htmlspecialchars($profil['telepon'] ?? '') ?>" placeholder="08xxxxxxxxxx">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small"><i class="fas fa-envelope mr-1 text-muted"></i> Email Sekolah</label>
+                                                        <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($profil['email'] ?? '') ?>" placeholder="email@sekolah.sch.id">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small"><i class="fas fa-globe mr-1 text-muted"></i> Alamat Website Resmi</label>
+                                                <input type="text" name="website" class="form-control" value="<?= htmlspecialchars($profil['website'] ?? '') ?>" placeholder="https://smaplusalmanshuriyah.sch.id">
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">SK Izin Operasional</label>
+                                                        <input type="text" name="sk_izin_operasional" class="form-control" value="<?= htmlspecialchars($profil['sk_izin_operasional'] ?? '') ?>" placeholder="Nomor SK Izin">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-dark small">SK Akreditasi</label>
+                                                        <input type="text" name="sk_akreditasi" class="form-control" value="<?= htmlspecialchars($profil['sk_akreditasi'] ?? '') ?>" placeholder="Nomor SK / Status Akreditasi">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold text-dark small"><i class="fas fa-image mr-1 text-muted"></i> Logo Utama Sekolah</label>
+                                                <div class="custom-file mb-2">
+                                                    <input type="file" class="custom-file-input" id="logo_sekolah" name="logo_sekolah" accept="image/*">
+                                                    <label class="custom-file-label" for="logo_sekolah">Pilih berkas gambar logo...</label>
+                                                </div>
+                                                <?php if (!empty($profil['logo'])): ?>
+                                                    <div class="d-flex align-items-center p-2 bg-light rounded border mt-2">
+                                                        <img src="assets/img/<?= htmlspecialchars($profil['logo']) ?>" alt="Logo Sekolah" id="preview_logo" class="img-thumbnail mr-3" style="max-height: 55px; max-width: 55px; object-fit: contain;">
+                                                        <div>
+                                                            <div class="font-weight-bold small text-dark"><?= htmlspecialchars($profil['logo']) ?></div>
+                                                            <small class="text-muted">Logo saat ini aktif di sistem, rapor, &amp; portal</small>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- KOLOM KANAN: LOKASI & PETA SATELIT INTERAKTIF -->
+                                <div class="col-lg-6">
+                                    <div class="card card-profil-section h-100">
+                                        <div class="card-body d-flex flex-column">
+                                            
+                                            <div class="section-title">
+                                                <i class="fas fa-map-marked-alt"></i> Lokasi &amp; Peta Satelit Interaktif
+                                            </div>
+
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small">Alamat Lengkap Sekolah <span class="text-danger">*</span></label>
+                                                <textarea name="alamat" id="alamat_sekolah" class="form-control" rows="2" placeholder="Nama Jalan, RT/RW, Dusun/Desa, Kecamatan, Kabupaten/Kota, Provinsi"><?= htmlspecialchars($profil['alamat'] ?? '') ?></textarea>
+                                            </div>
+
+                                            <!-- INPUT KOORDINAT & LAT / LNG -->
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label class="font-weight-bold text-dark small">Latitude (Garis Lintang)</label>
+                                                        <input type="text" id="input_latitude" class="form-control form-control-sm font-weight-bold text-primary" placeholder="-6.917464" style="font-family: monospace;">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label class="font-weight-bold text-dark small">Longitude (Garis Bujur)</label>
+                                                        <input type="text" id="input_longitude" class="form-control form-control-sm font-weight-bold text-primary" placeholder="106.929384" style="font-family: monospace;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- KOORDINAT GABUNGAN (SIMPAN KE DB) -->
+                                            <div class="form-group mb-3">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label class="font-weight-bold text-dark small m-0">Titik Koordinat (Lat, Lng)</label>
+                                                    <small class="text-muted font-italic">Format: <code>latitude, longitude</code></small>
+                                                </div>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-light"><i class="fas fa-crosshairs text-danger"></i></span>
+                                                    </div>
+                                                    <input type="text" name="koordinat" id="input_koordinat" class="form-control font-weight-bold" value="<?= htmlspecialchars($profil['koordinat'] ?? '') ?>" placeholder="-6.917464, 106.929384" style="font-family: monospace;">
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-outline-primary" id="btn_my_location" title="Dapatkan Lokasi GPS Perangkat Ini">
+                                                            <i class="fas fa-location-arrow mr-1"></i> Lokasi Saya (GPS)
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- PETA INTERAKTIF SATELIT & JALAN -->
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="small font-weight-bold text-dark">
+                                                    <i class="fas fa-satellite mr-1 text-info"></i> Pilih Titik Pin di Peta:
+                                                </span>
+                                                <small class="text-muted">Geser pin (drag) atau klik langsung pada peta</small>
+                                            </div>
+
+                                            <div class="map-container-wrapper flex-grow-1 mb-3" style="min-height: 320px;">
+                                                <!-- SEARCH BAR ATAS PETA -->
+                                                <div class="map-search-bar">
+                                                    <div class="input-group input-group-sm shadow-sm">
+                                                        <input type="text" id="map_search_query" class="form-control border-0" placeholder="Ketik nama tempat/kecamatan/sekolah...">
+                                                        <div class="input-group-append">
+                                                            <button type="button" class="btn btn-primary px-3" id="btn_map_search" title="Cari Lokasi">
+                                                                <i class="fas fa-search"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- MAP ELEMENT -->
+                                                <div id="mapSchool"></div>
+
+                                                <!-- BADGE REALTIME KOORDINAT -->
+                                                <div class="map-badge-coords shadow-sm">
+                                                    <span id="badge_coord_display"><i class="fas fa-map-marker-alt text-danger mr-1"></i> Titik: Belum Dipilih</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="p-2.5 bg-light rounded border small text-muted">
+                                                <i class="fas fa-lightbulb text-warning mr-1"></i>
+                                                <strong>Tips:</strong> Anda bisa mengganti tampilan antara <strong>Peta Satelit Realistis (ESRI Imagery)</strong> dan <strong>Peta Jalan (OpenStreetMap)</strong> melalui ikon lapisan di pojok kanan atas peta.
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ======================================================== -->
+                        <!-- TAB 2: FORMAT KOP SURAT RESMI & LIVE PREVIEW             -->
+                        <!-- ======================================================== -->
+                        <div class="tab-pane fade" id="tab-kop" role="tabpanel" aria-labelledby="tab-kop-link">
+                            <div class="card card-profil-section mb-0 border-0 shadow-none">
+                                <div class="card-body p-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                        <div class="section-title mb-0 border-0 p-0">
+                                            <i class="fas fa-file-invoice text-primary"></i> Pengaturan Format Kop Surat Resmi &amp; Dual Logo
+                                        </div>
+                                        <span class="badge badge-primary px-3 py-1.5 font-weight-normal" style="font-size: 0.82rem; border-radius: 6px;">
+                                            <i class="fas fa-check-double mr-1"></i> Standar Tata Naskah Dinas
+                                        </span>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- PENGATURAN KOP (KIRI) -->
+                                        <div class="col-lg-6 mb-4 mb-lg-0">
+                                            
+                                            <!-- 1. PRESET TEMPLATE KOP CEPAT -->
+                                            <div class="form-group mb-3">
+                                                <label class="font-weight-bold text-dark small mb-1.5">
+                                                    <i class="fas fa-magic text-warning mr-1"></i> Pilihan Standar Template Kop Cepat:
+                                                </label>
+                                                <div class="d-flex flex-wrap" style="gap: 6px;">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-preset-kop" data-preset="yayasan">
+                                                        <i class="fas fa-landmark mr-1"></i> Standar Yayasan / Swasta
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-info btn-preset-kop" data-preset="provinsi">
+                                                        <i class="fas fa-building mr-1"></i> Standar Provinsi (SMA/SMK)
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-preset-kop" data-preset="kabupaten">
+                                                        <i class="fas fa-city mr-1"></i> Standar Kab/Kota (SMP/SD)
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-preset-kop" data-preset="nasional">
+                                                        <i class="fas fa-flag mr-1"></i> Standar Nasional (Kementerian)
+                                                    </button>
+                                                </div>
+                                                <input type="hidden" name="model_kop" id="input_model_kop" value="<?= htmlspecialchars($profil['model_kop'] ?? 'yayasan') ?>">
+                                            </div>
+
+                                            <!-- 2. DUAL LOGO SETTINGS -->
+                                            <div class="p-3 bg-light rounded border mb-3">
+                                                <label class="font-weight-bold text-dark small mb-2 d-block">
+                                                    <i class="fas fa-images text-info mr-1"></i> Pengaturan Logo Ganda (Kiri &amp; Kanan)
+                                                </label>
+                                                
+                                                <div class="row">
+                                                    <!-- Logo Kiri -->
+                                                    <div class="col-md-6 mb-2 mb-md-0">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span class="small font-weight-bold text-dark">Logo Kiri (Instansi / Yayasan)</span>
+                                                            <div class="custom-control custom-switch custom-switch-sm">
+                                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kiri" name="show_logo_kiri" value="1" <?= (!isset($profil['show_logo_kiri']) || $profil['show_logo_kiri']) ? 'checked' : '' ?>>
+                                                                <label class="custom-control-label small text-muted" for="switch_logo_kiri">Tampil</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="custom-file custom-file-sm">
+                                                            <input type="file" class="custom-file-input" id="input_logo_kiri" name="logo_kiri_file" accept="image/*">
+                                                            <label class="custom-file-label small" for="input_logo_kiri">Ganti Logo Kiri...</label>
+                                                        </div>
+                                                        <?php if (!empty($profil['logo_kiri'])): ?>
+                                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kiri']) ?></small>
+                                                        <?php endif; ?>
+                                                    </div>
+
+                                                    <!-- Logo Kanan -->
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <span class="small font-weight-bold text-dark">Logo Kanan (Sekolah)</span>
+                                                            <div class="custom-control custom-switch custom-switch-sm">
+                                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kanan" name="show_logo_kanan" value="1" <?= (!isset($profil['show_logo_kanan']) || $profil['show_logo_kanan']) ? 'checked' : '' ?>>
+                                                                <label class="custom-control-label small text-muted" for="switch_logo_kanan">Tampil</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="custom-file custom-file-sm">
+                                                            <input type="file" class="custom-file-input" id="input_logo_kanan" name="logo_kanan_file" accept="image/*">
+                                                            <label class="custom-file-label small" for="input_logo_kanan">Ganti Logo Kanan...</label>
+                                                        </div>
+                                                        <?php if (!empty($profil['logo_kanan'])): ?>
+                                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kanan']) ?></small>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 3. INPUT BARIS TEKS KOP -->
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">Baris 1: Instansi Induk / Nama Yayasan / Pemda</label>
+                                                <input type="text" name="kop_baris_1" id="input_kop_b1" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>" placeholder="Contoh: YAYASAN TARBIYATUSSHIBYAN INDONESIA">
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">Baris 2: Cabang Dinas / Badan Pengelola (Opsional)</label>
+                                                <input type="text" name="kop_baris_2" id="input_kop_b2" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>" placeholder="Contoh: DINAS PENDIDIKAN - CABANG DINAS WILAYAH V (kosongkan jika tidak ada)">
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">Baris 3: Nama Satuan Pendidikan (Sekolah / Madrasah) <span class="text-danger">*</span></label>
+                                                <input type="text" name="kop_baris_3" id="input_kop_b3" class="form-control form-control-sm font-weight-bold text-primary" value="<?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>" placeholder="Contoh: SMA PLUS AL MANSHURIYAH">
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">Baris 4: NPSN, Akreditasi &amp; Legalitas</label>
+                                                <input type="text" name="kop_baris_4" id="input_kop_b4" class="form-control form-control-sm" value="<?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>" placeholder="Contoh: STATUS AKREDITASI: A | NPSN: 20247166">
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">Baris 5: Alamat, Telepon, Email, Website &amp; Medsos</label>
+                                                <textarea name="kop_baris_5" id="input_kop_b5" class="form-control form-control-sm" rows="2" placeholder="Contoh: Jl. Kalaparea KM. 5 RT 03 RW 09 Desa Kalaparea Kec. Nagrak Kab. Sukabumi 43356 | Telp: 0812-3456-7890 | Email: sekolah@gmail.com"><?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?></textarea>
+                                            </div>
+
+                                            <!-- 4. PILIHAN GAYA GARIS PEMBATAS -->
+                                            <div class="form-group mb-0">
+                                                <label class="font-weight-bold text-dark small mb-1">Gaya Garis Pembatas Kop:</label>
+                                                <select name="style_garis" id="select_style_garis" class="form-control form-control-sm">
+                                                    <option value="double" <?= ($profil['style_garis'] ?? 'double') === 'double' ? 'selected' : '' ?>>Garis Ganda Dinas Standar (Tebal-Tipis 3px)</option>
+                                                    <option value="thick" <?= ($profil['style_garis'] ?? '') === 'thick' ? 'selected' : '' ?>>Garis Tunggal Tebal (2.5px)</option>
+                                                    <option value="single" <?= ($profil['style_garis'] ?? '') === 'single' ? 'selected' : '' ?>>Garis Tunggal Sedang (1.5px)</option>
+                                                    <option value="none" <?= ($profil['style_garis'] ?? '') === 'none' ? 'selected' : '' ?>>Tanpa Garis</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- LIVE PREVIEW KOP SURAT (KANAN) -->
+                                        <div class="col-lg-6">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label class="font-weight-bold text-dark small m-0">
+                                                    <i class="fas fa-eye text-success mr-1"></i> Pratinjau Langsung Kop Surat (Live Preview):
+                                                </label>
+                                                <span class="badge badge-success px-2 py-1 font-weight-normal" style="font-size: 0.75rem;">
+                                                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Real-time Line Spacing 1.15
+                                                </span>
+                                            </div>
+
+                                            <!-- BOX PREVIEW KERTAS PUTIH -->
+                                            <div class="p-3 bg-white rounded border shadow-sm" style="min-height: 280px; background-color: #ffffff !important; border: 2px dashed #cbd5e1 !important;">
+                                                
+                                                <div id="live_kop_container" class="simaks-kop-container" style="font-family: 'Times New Roman', Times, serif; color: #000000;">
+                                                    <table class="simaks-kop-table" style="width: 100%; border-collapse: collapse;">
+                                                        <tr>
+                                                            <!-- Logo Kiri Preview -->
+                                                            <td id="live_logo_left_td" class="simaks-kop-logo-left" style="width: 85px; text-align: left; vertical-align: middle; padding-right: 8px;">
+                                                                <img id="live_logo_left_img" src="<?= !empty($profil['logo_kiri']) ? 'assets/img/' . htmlspecialchars($profil['logo_kiri']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kiri" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
+                                                            </td>
+
+                                                            <!-- Teks Tengah Preview -->
+                                                            <td class="simaks-kop-center" style="text-align: center; line-height: 1.15; vertical-align: middle;">
+                                                                <div id="live_kop_b1" class="simaks-kop-b1" style="font-size: 11pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15;">
+                                                                    <?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>
+                                                                </div>
+                                                                <div id="live_kop_b2" class="simaks-kop-b2" style="font-size: 10.5pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15; <?= empty($profil['kop_baris_2']) ? 'display: none;' : '' ?>">
+                                                                    <?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>
+                                                                </div>
+                                                                <div id="live_kop_b3" class="simaks-kop-b3" style="font-size: 14pt; font-weight: 900; text-transform: uppercase; margin: 1px 0 2px 0; line-height: 1.15;">
+                                                                    <?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>
+                                                                </div>
+                                                                <div id="live_kop_b4" class="simaks-kop-b4" style="font-size: 8.5pt; font-weight: bold; margin: 0 0 1px 0; line-height: 1.15;">
+                                                                    <?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>
+                                                                </div>
+                                                                <div id="live_kop_b5" class="simaks-kop-b5" style="font-size: 8pt; margin: 0; line-height: 1.15;">
+                                                                    <?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?>
+                                                                </div>
+                                                            </td>
+
+                                                            <!-- Logo Kanan Preview -->
+                                                            <td id="live_logo_right_td" class="simaks-kop-logo-right" style="width: 85px; text-align: right; vertical-align: middle; padding-left: 8px;">
+                                                                <img id="live_logo_right_img" src="<?= !empty($profil['logo_kanan']) ? 'assets/img/' . htmlspecialchars($profil['logo_kanan']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kanan" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <!-- Divider Line Preview -->
+                                                    <div id="live_kop_divider" class="simaks-kop-divider-double" style="border-top: 3px double #000000; margin-top: 5px; margin-bottom: 8px;"></div>
+                                                </div>
+
+                                                <!-- SIMULASI KONTEN SURAT CONTOH -->
+                                                <div class="text-center text-muted py-3 px-2 bg-light rounded border border-light" style="font-size: 0.8rem; font-family: sans-serif;">
+                                                    <div class="font-weight-bold text-dark mb-1">SURAT KETERANGAN / NASKAH UJIAN CBT / LAPORAN RESMI</div>
+                                                    <div>Nomor: 421.3 / 108 / SMA-AM / IX / <?= date('Y') ?></div>
+                                                    <div class="text-muted small mt-2 font-italic">
+                                                        (Contoh isi naskah dokumen cetak resmi SIMAKS dengan kop surat seragam di atas)
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            
+                                            <div class="mt-2.5 small text-muted">
+                                                <i class="fas fa-info-circle text-primary mr-1"></i> Format kop surat ini otomatis diterapkan pada seluruh modul: <strong>Naskah Soal CBT, Kartu Peserta Ujian, Berita Acara, Rapor Siswa, Transkrip Nilai, Surat Izin UKS, &amp; Seluruh Menu Laporan</strong>.
                                             </div>
                                         </div>
-                                        <div class="custom-file custom-file-sm">
-                                            <input type="file" class="custom-file-input" id="input_logo_kiri" name="logo_kiri_file" accept="image/*">
-                                            <label class="custom-file-label small" for="input_logo_kiri">Ganti Logo Kiri...</label>
-                                        </div>
-                                        <?php if (!empty($profil['logo_kiri'])): ?>
-                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kiri']) ?></small>
-                                        <?php endif; ?>
                                     </div>
 
-                                    <!-- Logo Kanan -->
-                                    <div class="col-md-6">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="small font-weight-bold text-dark">Logo Kanan (Sekolah)</span>
-                                            <div class="custom-control custom-switch custom-switch-sm">
-                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kanan" name="show_logo_kanan" value="1" <?= (!isset($profil['show_logo_kanan']) || $profil['show_logo_kanan']) ? 'checked' : '' ?>>
-                                                <label class="custom-control-label small text-muted" for="switch_logo_kanan">Tampil</label>
-                                            </div>
-                                        </div>
-                                        <div class="custom-file custom-file-sm">
-                                            <input type="file" class="custom-file-input" id="input_logo_kanan" name="logo_kanan_file" accept="image/*">
-                                            <label class="custom-file-label small" for="input_logo_kanan">Ganti Logo Kanan...</label>
-                                        </div>
-                                        <?php if (!empty($profil['logo_kanan'])): ?>
-                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kanan']) ?></small>
-                                        <?php endif; ?>
-                                    </div>
                                 </div>
                             </div>
-
-                            <!-- 3. INPUT BARIS TEKS KOP -->
-                            <div class="form-group mb-2">
-                                <label class="font-weight-bold text-dark small m-0">Baris 1: Instansi Induk / Nama Yayasan / Pemda</label>
-                                <input type="text" name="kop_baris_1" id="input_kop_b1" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>" placeholder="Contoh: YAYASAN TARBIYATUSSHIBYAN INDONESIA">
-                            </div>
-
-                            <div class="form-group mb-2">
-                                <label class="font-weight-bold text-dark small m-0">Baris 2: Cabang Dinas / Badan Pengelola (Opsional)</label>
-                                <input type="text" name="kop_baris_2" id="input_kop_b2" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>" placeholder="Contoh: DINAS PENDIDIKAN - CABANG DINAS WILAYAH V (kosongkan jika tidak ada)">
-                            </div>
-
-                            <div class="form-group mb-2">
-                                <label class="font-weight-bold text-dark small m-0">Baris 3: Nama Satuan Pendidikan (Sekolah / Madrasah) <span class="text-danger">*</span></label>
-                                <input type="text" name="kop_baris_3" id="input_kop_b3" class="form-control form-control-sm font-weight-bold text-primary" value="<?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>" placeholder="Contoh: SMA PLUS AL MANSHURIYAH">
-                            </div>
-
-                            <div class="form-group mb-2">
-                                <label class="font-weight-bold text-dark small m-0">Baris 4: NPSN, Akreditasi &amp; Legalitas</label>
-                                <input type="text" name="kop_baris_4" id="input_kop_b4" class="form-control form-control-sm" value="<?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>" placeholder="Contoh: STATUS AKREDITASI: A | NPSN: 20247166">
-                            </div>
-
-                            <div class="form-group mb-2">
-                                <label class="font-weight-bold text-dark small m-0">Baris 5: Alamat, Telepon, Email, Website &amp; Medsos</label>
-                                <textarea name="kop_baris_5" id="input_kop_b5" class="form-control form-control-sm" rows="2" placeholder="Contoh: Jl. Kalaparea KM. 5 RT 03 RW 09 Desa Kalaparea Kec. Nagrak Kab. Sukabumi 43356 | Telp: 0812-3456-7890 | Email: sekolah@gmail.com"><?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?></textarea>
-                            </div>
-
-                            <!-- 4. PILIHAN GAYA GARIS PEMBATAS -->
-                            <div class="form-group mb-0">
-                                <label class="font-weight-bold text-dark small mb-1">Gaya Garis Pembatas Kop:</label>
-                                <select name="style_garis" id="select_style_garis" class="form-control form-control-sm">
-                                    <option value="double" <?= ($profil['style_garis'] ?? 'double') === 'double' ? 'selected' : '' ?>>Garis Ganda Dinas Standar (Tebal-Tipis 3px)</option>
-                                    <option value="thick" <?= ($profil['style_garis'] ?? '') === 'thick' ? 'selected' : '' ?>>Garis Tunggal Tebal (2.5px)</option>
-                                    <option value="single" <?= ($profil['style_garis'] ?? '') === 'single' ? 'selected' : '' ?>>Garis Tunggal Sedang (1.5px)</option>
-                                    <option value="none" <?= ($profil['style_garis'] ?? '') === 'none' ? 'selected' : '' ?>>Tanpa Garis</option>
-                                </select>
-                            </div>
-
                         </div>
 
-                        <!-- LIVE PREVIEW KOP SURAT (KANAN) -->
-                        <div class="col-lg-6">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="font-weight-bold text-dark small m-0">
-                                    <i class="fas fa-eye text-success mr-1"></i> Pratinjau Langsung Kop Surat (Live Preview):
-                                </label>
-                                <span class="badge badge-success px-2 py-1 font-weight-normal" style="font-size: 0.75rem;">
-                                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Real-time Line Spacing 1.15
-                                </span>
-                            </div>
-
-                            <!-- BOX PREVIEW KERTAS PUTIH -->
-                            <div class="p-3 bg-white rounded border shadow-sm" style="min-height: 280px; background-color: #ffffff !important; border: 2px dashed #cbd5e1 !important;">
-                                
-                                <div id="live_kop_container" class="simaks-kop-container" style="font-family: 'Times New Roman', Times, serif; color: #000000;">
-                                    <table class="simaks-kop-table" style="width: 100%; border-collapse: collapse;">
-                                        <tr>
-                                            <!-- Logo Kiri Preview -->
-                                            <td id="live_logo_left_td" class="simaks-kop-logo-left" style="width: 85px; text-align: left; vertical-align: middle; padding-right: 8px;">
-                                                <img id="live_logo_left_img" src="<?= !empty($profil['logo_kiri']) ? 'assets/img/' . htmlspecialchars($profil['logo_kiri']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kiri" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
-                                            </td>
-
-                                            <!-- Teks Tengah Preview -->
-                                            <td class="simaks-kop-center" style="text-align: center; line-height: 1.15; vertical-align: middle;">
-                                                <div id="live_kop_b1" class="simaks-kop-b1" style="font-size: 11pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15;">
-                                                    <?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>
-                                                </div>
-                                                <div id="live_kop_b2" class="simaks-kop-b2" style="font-size: 10.5pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15; <?= empty($profil['kop_baris_2']) ? 'display: none;' : '' ?>">
-                                                    <?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>
-                                                </div>
-                                                <div id="live_kop_b3" class="simaks-kop-b3" style="font-size: 14pt; font-weight: 900; text-transform: uppercase; margin: 1px 0 2px 0; line-height: 1.15;">
-                                                    <?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>
-                                                </div>
-                                                <div id="live_kop_b4" class="simaks-kop-b4" style="font-size: 8.5pt; font-weight: bold; margin: 0 0 1px 0; line-height: 1.15;">
-                                                    <?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>
-                                                </div>
-                                                <div id="live_kop_b5" class="simaks-kop-b5" style="font-size: 8pt; margin: 0; line-height: 1.15;">
-                                                    <?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?>
-                                                </div>
-                                            </td>
-
-                                            <!-- Logo Kanan Preview -->
-                                            <td id="live_logo_right_td" class="simaks-kop-logo-right" style="width: 85px; text-align: right; vertical-align: middle; padding-left: 8px;">
-                                                <img id="live_logo_right_img" src="<?= !empty($profil['logo_kanan']) ? 'assets/img/' . htmlspecialchars($profil['logo_kanan']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kanan" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <!-- Divider Line Preview -->
-                                    <div id="live_kop_divider" class="simaks-kop-divider-double" style="border-top: 3px double #000000; margin-top: 5px; margin-bottom: 8px;"></div>
-                                </div>
-
-                                <!-- SIMULASI KONTEN SURAT CONTOH -->
-                                <div class="text-center text-muted py-3 px-2 bg-light rounded border border-light" style="font-size: 0.8rem; font-family: sans-serif;">
-                                    <div class="font-weight-bold text-dark mb-1">SURAT KETERANGAN / NASKAH UJIAN CBT / LAPORAN RESMI</div>
-                                    <div>Nomor: 421.3 / 108 / SMA-AM / IX / <?= date('Y') ?></div>
-                                    <div class="text-muted small mt-2 font-italic">
-                                        (Contoh isi naskah dokumen cetak resmi SIMAKS dengan kop surat seragam di atas)
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                            <div class="mt-2.5 small text-muted">
-                                <i class="fas fa-info-circle text-primary mr-1"></i> Format kop surat ini otomatis diterapkan pada seluruh modul: <strong>Naskah Soal CBT, Kartu Peserta Ujian, Berita Acara, Rapor Siswa, Transkrip Nilai, Surat Izin UKS, &amp; Seluruh Menu Laporan</strong>.
-                            </div>
-                        </div>
                     </div>
-
                 </div>
             </div>
 
@@ -535,7 +569,7 @@
             <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body py-3 d-flex justify-content-between align-items-center">
                     <div class="text-muted small">
-                        <i class="fas fa-shield-alt text-success mr-1"></i> Seluruh identitas sekolah, koordinat peta satelit, dan kop surat akan otomatis tersimpan.
+                        <i class="fas fa-shield-alt text-success mr-1"></i> Seluruh data pada Tab 1 (Profil &amp; Lokasi) serta Tab 2 (Format Kop Surat) akan otomatis tersimpan bersamaan.
                     </div>
                     <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold shadow-sm" style="border-radius: 8px;">
                         <i class="fas fa-save mr-1.5"></i> Simpan Profil &amp; Format Kop Surat
@@ -941,9 +975,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial sync
     syncLiveKop();
 
+    // Tab Switching & Map Size Invalidation Handler
+    $('a[data-toggle="pill"], a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        if (map) {
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 200);
+        }
+    });
+
+    // Support direct hash URL navigation (e.g. #tab-kop or #seksi_kop_surat)
+    if (window.location.hash) {
+        const hash = window.location.hash;
+        if (hash === '#tab-kop' || hash === '#seksi_kop_surat') {
+            $('#tab-kop-link').tab('show');
+        } else if (hash === '#tab-profil') {
+            $('#tab-profil-link').tab('show');
+        }
+    }
+
     // Invalidate map size to ensure tiles render properly after DOM render
     setTimeout(() => {
-        map.invalidateSize();
+        if (map) map.invalidateSize();
     }, 400);
 });
 </script>
