@@ -23,7 +23,7 @@ function jadwal_index($pdo)
         $view_type = 'kelas';
     }
 
-    $program = $_GET['program'] ?? '';
+    $program = !empty($_GET['program']) ? $_GET['program'] : 'reguler';
 
     // Filter kelas berdasarkan program jika ada
     $filtered_kelas_list = $kelas_list;
@@ -35,11 +35,23 @@ function jadwal_index($pdo)
         $filtered_kelas_list = array_values($filtered_kelas_list);
     }
 
-    $id_kelas_filter = $_GET['id_kelas'] ?? ($view_type === 'kelas' && !empty($filtered_kelas_list) ? $filtered_kelas_list[0]['id_kelas'] : (!empty($kelas_list) ? $kelas_list[0]['id_kelas'] : null));
-    $id_guru_filter = $_GET['id_guru'] ?? ($view_type === 'guru' && !empty($guru_list) ? $guru_list[0]['id_guru'] : null);
+    // Default id_kelas_filter ke kelas pertama jika tidak dipilih atau parameter kosong
+    $id_kelas_param = trim($_GET['id_kelas'] ?? '');
+    if ($id_kelas_param !== '' && $id_kelas_param !== '0') {
+        $id_kelas_filter = $id_kelas_param;
+    } else {
+        $id_kelas_filter = ($view_type === 'kelas' && !empty($filtered_kelas_list)) ? $filtered_kelas_list[0]['id_kelas'] : (!empty($kelas_list) ? $kelas_list[0]['id_kelas'] : null);
+    }
 
-    // Auto sync program dengan jenis kelas yang sedang dipilih jika program kosong
-    if (empty($program) && $view_type === 'kelas' && $id_kelas_filter) {
+    $id_guru_param = trim($_GET['id_guru'] ?? '');
+    if ($id_guru_param !== '' && $id_guru_param !== '0') {
+        $id_guru_filter = $id_guru_param;
+    } else {
+        $id_guru_filter = ($view_type === 'guru' && !empty($guru_list)) ? $guru_list[0]['id_guru'] : null;
+    }
+
+    // Auto sync program dengan jenis kelas yang sedang dipilih jika program belum sinkron
+    if ($view_type === 'kelas' && $id_kelas_filter) {
         foreach ($kelas_list as $k) {
             if ($k['id_kelas'] == $id_kelas_filter) {
                 $program = $k['jenis_kelas'] ?? 'reguler';
@@ -49,6 +61,15 @@ function jadwal_index($pdo)
     }
     if (empty($program)) {
         $program = 'reguler';
+    }
+
+    // Re-filter list kelas jika program berubah
+    if (!empty($program)) {
+        $filtered_kelas_list = array_filter($kelas_list, function($k) use ($program) {
+            $jk = $k['jenis_kelas'] ?? 'reguler';
+            return $jk === $program;
+        });
+        $filtered_kelas_list = array_values($filtered_kelas_list);
     }
 
     $result = JadwalModel::getJadwalLengkap($pdo, $id_ta_tampil, $view_type, $id_kelas_filter, $id_guru_filter);
