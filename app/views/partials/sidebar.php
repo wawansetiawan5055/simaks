@@ -617,8 +617,8 @@ if (!function_exists('is_menu_active_dynamic')) {
 
                             // 2. Tipe TREEVIEW (Menu dengan Submenu)
                             if ($has_sub) {
-                                echo '<li class="nav-item has-treeview ' . $menuOpenClass . '">';
-                                echo '  <a href="javascript:void(0);" class="nav-link ' . $activeClass . '">';
+                                echo '<li class="nav-item ' . $menuOpenClass . '">';
+                                echo '  <a href="#" class="nav-link ' . $activeClass . '">';
                                 echo '    <i class="nav-icon ' . htmlspecialchars($item['icon']) . '"></i>';
                                 echo '    <p>';
                                 echo htmlspecialchars($item['nama_menu']);
@@ -681,33 +681,36 @@ if (!function_exists('is_menu_active_dynamic')) {
 </aside>
 
 <script>
-// [PERBAIKAN] Handler Toggle Treeview Sidebar Responsif & Fleksibel
-document.addEventListener('DOMContentLoaded', function () {
-    if (typeof jQuery !== 'undefined') {
-        $(document).off('click.simaksTreeview', '.main-sidebar .has-treeview > .nav-link');
-        $(document).on('click.simaksTreeview', '.main-sidebar .has-treeview > .nav-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+// [PERBAIKAN TOTAL] Handler Buka-Tutup (Toggle Collapse/Expand) Menu Sidebar yang Bebas Macet
+$(document).ready(function () {
+    // 1. Hapus listener default AdminLTE agar tidak terjadi benturan ganda (double-toggle)
+    $('.nav-sidebar').removeAttr('data-widget');
 
-            var $link = $(this);
-            var $parent = $link.closest('.has-treeview');
-            var $treeview = $parent.children('.nav-treeview');
+    // 2. Pasang handler toggle yang mulus dan pasti merespons pada semua menu bertingkat
+    $(document).off('click', '.nav-sidebar li.nav-item > a.nav-link');
+    $(document).on('click', '.nav-sidebar li.nav-item > a.nav-link', function (e) {
+        var $link = $(this);
+        var $parent = $link.parent('li.nav-item');
+        var $treeview = $link.next('ul.nav-treeview');
+
+        // Hanya proses jika item ini adalah menu induk yang punya submenu
+        if ($treeview.length > 0) {
+            e.preventDefault();
 
             if ($parent.hasClass('menu-open') || $treeview.is(':visible')) {
-                // Tutup / Collapse Treeview
-                $treeview.stop(true, true).slideUp(200, function () {
-                    $parent.removeClass('menu-open menu-is-opening');
+                // TUTUP (Collapse)
+                $treeview.stop(true, true).slideUp(180, function () {
+                    $parent.removeClass('menu-open');
                     $treeview.css('display', 'none');
                 });
             } else {
-                // Buka / Expand Treeview
-                $parent.addClass('menu-is-opening');
-                $treeview.stop(true, true).slideDown(200, function () {
-                    $parent.addClass('menu-open').removeClass('menu-is-opening');
+                // BUKA (Expand)
+                $parent.addClass('menu-open');
+                $treeview.stop(true, true).slideDown(180, function () {
                     $treeview.css('display', 'block');
                 });
             }
-        });
-    }
+        }
+    });
 });
 </script>
