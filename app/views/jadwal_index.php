@@ -166,50 +166,52 @@
         </ul>
     </div>
 
-    <!-- FILTER PER KELAS / PER GURU + TOMBOL FILTER PER 2 HARI (1 BARIS RINGKAS & ELEGAN) -->
+    <!-- FILTER PER KELAS / PER GURU + TOMBOL FILTER PER 2 HARI (DIBAGI 50:50 SEIMBANG) -->
     <div class="col-md-12 mb-3">
         <div class="card shadow-sm border-0" style="border-radius: 14px; background: #ffffff;">
             <div class="card-body py-2.5 px-3">
-                <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 10px;">
+                <div class="row align-items-center">
                     
-                    <!-- BAGIAN KIRI: FORM DROPDOWN FILTER KELAS / GURU -->
-                    <form id="formJadwalFilter" method="GET" class="d-flex align-items-center flex-wrap m-0" style="gap: 8px;">
-                        <input type="hidden" name="mod" value="jadwal">
-                        <input type="hidden" name="program" id="input_program" value="<?= htmlspecialchars($program) ?>">
-                        
-                        <div class="d-flex align-items-center">
-                            <span class="badge badge-primary mr-2 px-2 py-1"><i class="fas fa-filter"></i></span>
-                            <span class="font-weight-bold text-dark d-none d-sm-inline" style="font-size: 0.82rem;">FILTER:</span>
-                        </div>
+                    <!-- 50% KIRI: FORM DROPDOWN FILTER KELAS / GURU -->
+                    <div class="col-lg-6 col-12 mb-2 mb-lg-0">
+                        <form id="formJadwalFilter" method="GET" class="d-flex align-items-center flex-nowrap m-0" style="gap: 8px;">
+                            <input type="hidden" name="mod" value="jadwal">
+                            <input type="hidden" name="program" id="input_program" value="<?= htmlspecialchars($program) ?>">
+                            
+                            <div class="d-flex align-items-center flex-shrink-0">
+                                <span class="badge badge-primary mr-2 px-2 py-1"><i class="fas fa-filter"></i></span>
+                                <span class="font-weight-bold text-dark d-none d-sm-inline" style="font-size: 0.82rem;">FILTER:</span>
+                            </div>
 
-                        <select name="view" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 155px;" onchange="this.form.submit()">
-                            <option value="kelas" <?= ($view_type == 'kelas') ? 'selected' : ''; ?>>Per Rombel / Kelas</option>
-                            <option value="guru" <?= ($view_type == 'guru') ? 'selected' : ''; ?>>Per Guru Pengampu</option>
-                        </select>
-
-                        <?php if ($view_type == 'guru'): ?>
-                            <select name="id_guru" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 180px;" onchange="this.form.submit()">
-                                <?php foreach ($guru_list as $g): ?>
-                                    <option value="<?= $g['id_guru'] ?>" <?= ($id_guru_filter == $g['id_guru']) ? 'selected' : ''; ?>>
-                                        <?= htmlspecialchars($g['nama_guru']) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                            <select name="view" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; flex: 1; min-width: 130px;" onchange="this.form.submit()">
+                                <option value="kelas" <?= ($view_type == 'kelas') ? 'selected' : ''; ?>>Per Rombel / Kelas</option>
+                                <option value="guru" <?= ($view_type == 'guru') ? 'selected' : ''; ?>>Per Guru Pengampu</option>
                             </select>
-                        <?php else: ?>
-                            <select name="id_kelas" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 160px;" onchange="this.form.submit()">
-                                <?php foreach ($filtered_kelas_list as $k): ?>
-                                    <?php $jk_suffix = ($k['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : (($k['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : ''); ?>
-                                    <option value="<?= $k['id_kelas'] ?>" <?= ($id_kelas_filter == $k['id_kelas']) ? 'selected' : ''; ?>>
-                                        <?= htmlspecialchars($k['nama_kelas']) ?><?= $jk_suffix ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        <?php endif; ?>
-                    </form>
 
-                    <!-- BAGIAN KANAN: TOMBOL FILTER HARI (1 BARIS RINGKAS) -->
-                    <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
-                        <span class="font-weight-bold text-muted mr-1 small d-none d-md-inline"><i class="fas fa-calendar-day mr-1"></i>Hari:</span>
+                            <?php if ($view_type == 'guru'): ?>
+                                <select name="id_guru" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; flex: 1.3; min-width: 150px;" onchange="this.form.submit()">
+                                    <?php foreach ($guru_list as $g): ?>
+                                        <option value="<?= $g['id_guru'] ?>" <?= ($id_guru_filter == $g['id_guru']) ? 'selected' : ''; ?>>
+                                            <?= htmlspecialchars($g['nama_guru']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php else: ?>
+                                <select name="id_kelas" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; flex: 1.3; min-width: 140px;" onchange="this.form.submit()">
+                                    <?php foreach ($filtered_kelas_list as $k): ?>
+                                        <?php $jk_suffix = ($k['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : (($k['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : ''); ?>
+                                        <option value="<?= $k['id_kelas'] ?>" <?= ($id_kelas_filter == $k['id_kelas']) ? 'selected' : ''; ?>>
+                                            <?= htmlspecialchars($k['nama_kelas']) ?><?= $jk_suffix ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+
+                    <!-- 50% KANAN: TOMBOL FILTER HARI (SENIN-SELASA, RABU-KAMIS, DLL) -->
+                    <div class="col-lg-6 col-12 d-flex align-items-center justify-content-lg-end justify-content-start flex-wrap" style="gap: 5px;">
+                        <span class="font-weight-bold text-muted mr-1 small d-none d-xl-inline"><i class="fas fa-calendar-day mr-1"></i>Hari:</span>
                         <div class="d-flex align-items-center flex-wrap" style="gap: 4px;">
                             <button type="button" class="btn btn-sm day-filter-btn active" data-target-days="all" onclick="filterJadwalHari('all', this)">
                                 Semua
