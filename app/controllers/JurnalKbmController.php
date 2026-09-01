@@ -120,6 +120,10 @@ function jurnal_kbm_save($pdo)
 
     JurnalKbmModel::save($pdo, $data);
 
+    if (function_exists('audit_log')) {
+        audit_log('CREATE', "Mengisi Jurnal KBM Kelas ID: {$data['id_kelas']} Tanggal: {$data['tanggal']}", 'jurnal_kbm');
+    }
+
     $_SESSION['pesan_sukses'] = "Jurnal KBM berhasil disimpan!";
     redirect('index.php?mod=jurnal_kbm');
 }

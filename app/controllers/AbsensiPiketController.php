@@ -99,6 +99,9 @@ function absensi_piket_save($pdo)
     $result = AbsensiPiketModel::save($pdo, $data_to_save);
 
     if ($result) {
+        if (function_exists('audit_log')) {
+            audit_log('CREATE', "Menyimpan/Memperbarui Absensi Harian Piket Kelas ID: {$_POST['id_kelas']} Tanggal: {$_POST['tanggal']}", 'absensi_piket');
+        }
         $_SESSION['pesan_sukses'] = "Absensi piket berhasil disimpan!";
     } else {
         $_SESSION['pesan_error'] = "Gagal menyimpan absensi piket. Silakan cek log server.";

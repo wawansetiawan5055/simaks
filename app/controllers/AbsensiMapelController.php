@@ -187,6 +187,11 @@ function absensi_mapel_save($pdo)
 
     AbsensiMapelModel::save($pdo, $data_to_save);
 
+    if (function_exists('audit_log')) {
+        audit_log('CREATE', "Menyimpan/Memperbarui Presensi Mapel Kelas ID: {$_POST['id_kelas']} Tanggal: {$_POST['tanggal']}", 'absensi_mapel');
+    }
+
     $_SESSION['pesan_sukses'] = "Absensi berhasil disimpan!";
     redirect('index.php?mod=absensi_mapel&id_kelas=' . $_POST['id_kelas'] . '&tanggal=' . $_POST['tanggal']);
 }
+

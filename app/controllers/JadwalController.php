@@ -114,6 +114,9 @@ function jadwal_save($pdo)
     try {
         // Panggil fungsi 'save' yang baru di Model
         JadwalModel::jadwal_save($pdo, $data);
+        if (function_exists('audit_log')) {
+            audit_log('CREATE', "Menambah Jadwal KBM Hari: {$data['hari_kbm']} Kelas ID: {$data['id_kelas']}", 'jadwal_mengajar');
+        }
         $_SESSION['pesan_sukses'] = "Jadwal berhasil disimpan.";
 
     } catch (Exception $e) {
@@ -152,6 +155,9 @@ function jadwal_update($pdo)
 
     try {
         JadwalModel::jadwal_update($pdo, $data);
+        if (function_exists('audit_log')) {
+            audit_log('UPDATE', "Memperbarui Jadwal KBM Hari: {$data['hari_kbm']} Kelas ID: {$data['id_kelas']}", 'jadwal_mengajar');
+        }
         $_SESSION['pesan_sukses'] = "Jadwal berhasil diperbarui.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "GAGAL UPDATE: " . $e->getMessage();
@@ -169,6 +175,9 @@ function jadwal_delete($pdo, $id)
     }
     try {
         JadwalModel::jadwal_delete($pdo, $id);
+        if (function_exists('audit_log')) {
+            audit_log('DELETE', "Menghapus Slot Jadwal KBM ID: $id", 'jadwal_mengajar', $id);
+        }
         $_SESSION['pesan_sukses'] = "Jadwal berhasil dihapus.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menghapus: " . $e->getMessage();

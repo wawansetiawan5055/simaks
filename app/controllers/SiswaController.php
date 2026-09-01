@@ -168,6 +168,11 @@ function siswa_save($pdo) {
 
     try {
         SiswaModel::save($pdo, $_POST);
+        if (function_exists('audit_log')) {
+            $action_name = $id ? 'UPDATE' : 'CREATE';
+            $nama = $_POST['nama'] ?? 'Siswa';
+            audit_log($action_name, ($id ? "Mengubah data siswa: $nama (ID: $id)" : "Menambah data siswa baru: $nama"), 'siswa', $id);
+        }
         $_SESSION['pesan_sukses'] = "Data siswa berhasil disimpan.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menyimpan: " . $e->getMessage();
@@ -192,6 +197,9 @@ function siswa_delete($pdo, $id) {
         
         // Cek result jika model mengembalikan false (tapi biasanya PDO throw exception)
         if ($result) {
+            if (function_exists('audit_log')) {
+                audit_log('DELETE', "Menghapus data siswa ID $id", 'siswa', $id);
+            }
             $_SESSION['pesan_sukses'] = "Data siswa berhasil dihapus.";
         } else {
              // Fallback jika model return false tanpa exception

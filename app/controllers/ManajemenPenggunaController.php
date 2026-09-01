@@ -29,6 +29,9 @@ function pengguna_generate($pdo) {
     
     try {
         $count = ManajemenPenggunaModel::generateAccounts($pdo, $target, $password);
+        if (function_exists('audit_log')) {
+            audit_log('CREATE', "Generate masal $count akun pengguna ($target)", 'pengguna');
+        }
         $_SESSION['pesan_sukses'] = "Berhasil membuat $count akun $target baru.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal generate: " . $e->getMessage();
@@ -40,6 +43,9 @@ function pengguna_cleanup($pdo) {
     if (!has_role('Admin')) redirect('index.php');
     try {
         ManajemenPenggunaModel::cleanupTrialAccounts($pdo);
+        if (function_exists('audit_log')) {
+            audit_log('DELETE', "Membersihkan seluruh akun pengguna uji coba", 'pengguna');
+        }
         $_SESSION['pesan_sukses'] = "Seluruh akun uji coba berhasil dihapus. Akun Admin tetap aman.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal membersihkan akun: " . $e->getMessage();
@@ -65,7 +71,13 @@ function pengguna_form($pdo, $id = null) {
 function pengguna_save($pdo) {
     if (!has_role('Admin')) redirect('index.php');
     try {
+        $id = $_POST['id_pengguna'] ?? null;
+        $username = $_POST['username'] ?? '';
         ManajemenPenggunaModel::saveUser($pdo, $_POST);
+        if (function_exists('audit_log')) {
+            $aksi_name = $id ? 'UPDATE' : 'CREATE';
+            audit_log($aksi_name, ($id ? "Mengubah data pengguna @$username (ID: $id)" : "Menambah pengguna baru @$username"), 'pengguna', $id);
+        }
         $_SESSION['pesan_sukses'] = "Data pengguna berhasil disimpan.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menyimpan: " . $e->getMessage();
@@ -77,6 +89,9 @@ function pengguna_delete($pdo, $id) {
     if (!has_role('Admin')) redirect('index.php');
     try {
         ManajemenPenggunaModel::deleteUser($pdo, $id);
+        if (function_exists('audit_log')) {
+            audit_log('DELETE', "Menghapus akun pengguna ID: $id", 'pengguna', $id);
+        }
         $_SESSION['pesan_sukses'] = "Pengguna berhasil dihapus.";
     } catch (PDOException $e) {
         if ($e->getCode() == '23000') {

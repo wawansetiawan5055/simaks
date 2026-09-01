@@ -135,6 +135,9 @@ function input_nilai_save($pdo)
 
     try {
         NilaiModel::save($pdo, $data_to_save);
+        if (function_exists('audit_log')) {
+            audit_log('UPDATE', "Menyimpan/Memperbarui Nilai Siswa TP ID: $id_tp Kelas ID: $id_kelas", 'nilai');
+        }
         $_SESSION['pesan_sukses'] = "Nilai berhasil disimpan.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menyimpan nilai: " . $e->getMessage();

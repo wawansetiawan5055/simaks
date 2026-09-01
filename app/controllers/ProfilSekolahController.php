@@ -52,6 +52,10 @@ function profil_sekolah_save($pdo) {
     
     ProfilSekolahModel::save($pdo, $data);
     
+    if (function_exists('audit_log')) {
+        audit_log('UPDATE', "Memperbarui Data Profil Sekolah ({$data['nama_sekolah']})", 'profil_sekolah');
+    }
+    
     $_SESSION['pesan_sukses'] = "Profil sekolah berhasil diperbarui!";
     redirect('index.php?mod=profil_sekolah');
 }
