@@ -167,10 +167,84 @@ $is_manager = in_array(1, $_SESSION['role_ids'] ?? []) ||
       font-size: 0.64rem !important;
       padding: 1px 3px !important;
       border-radius: 4px !important;
-      margin-bottom: 1px !important;
+    /* PREVIEW STUDIO STYLES */
+    .preview-unified-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #323639;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      border: 1px solid #45494d;
+      margin-bottom: 20px;
+    }
+    .preview-unified-header {
+      background: #2a2e33;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #3f4448;
+    }
+    .preview-unified-title {
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-icon-studio {
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-icon-studio:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-icon-studio-danger {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-icon-studio-danger:hover {
+      color: #ffffff;
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+    .preview-unified-body {
+      height: calc(100vh - 120px);
+      min-height: 680px;
+      width: 100%;
+      position: relative;
+      background-color: #525659;
+    }
+    .preview-unified-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
     }
   }
 </style>
+
+<div id="sectionMainKaldik">
 
 <div class="content-header pt-3 mb-2">
   <div class="container-fluid">
@@ -197,8 +271,8 @@ $is_manager = in_array(1, $_SESSION['role_ids'] ?? []) ||
               <i class="fas fa-file-import"></i> Impor Libur
             </button>
           <?php endif; ?>
-          <button type="button" class="btn btn-danger btn-kalender-action text-white" onclick="location.href='<?= BASE_URL ?>kalender_akademik/export_pdf?id_ta=<?= $filter_ta ?>'">
-            <i class="fas fa-file-pdf"></i> Cetak PDF
+          <button type="button" class="btn btn-danger btn-kalender-action text-white" onclick="openFullscreenKaldikPreview('<?= BASE_URL ?>kalender_akademik/export_pdf?id_ta=<?= $filter_ta ?>')">
+            <i class="fas fa-print mr-1"></i> Cetak / Pratinjau
           </button>
         </div>
       </div>
@@ -468,6 +542,83 @@ $is_manager = in_array(1, $_SESSION['role_ids'] ?? []) ||
     </div>
   </div>
 </div>
+
+</div> <!-- END #sectionMainKaldik -->
+
+<!-- ================================================================= -->
+<!-- SECTION PREVIEW STUDIO: KALENDER AKADEMIK -->
+<!-- ================================================================= -->
+<div id="sectionPreviewKaldik" style="display: none;" class="pt-2">
+  <div class="container-fluid">
+    <div class="preview-unified-card">
+      <div class="preview-unified-header">
+        <div class="d-flex align-items-center">
+          <button type="button" onclick="closeFullscreenKaldikPreview()" class="btn-icon-studio mr-2" title="Kembali ke Kalender">
+            <i class="fas fa-arrow-left"></i> <span>Kembali</span>
+          </button>
+          <button type="button" onclick="closeFullscreenKaldikPreview()" class="btn-icon-studio-danger mr-3" title="Tutup Pratinjau">
+            <i class="fas fa-times"></i> <span>Tutup</span>
+          </button>
+          <div class="preview-unified-title d-none d-md-flex">
+            <i class="fas fa-file-pdf text-info"></i>
+            <span>Pratinjau: Kalender Pendidikan &amp; Jadwal Akademik</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" onclick="printKaldikFrame()" class="btn-icon-studio mr-2" title="Cetak Dokumen">
+            <i class="fas fa-print text-success"></i> <span>Cetak</span>
+          </button>
+          <a id="btnDownloadKaldikPdf" href="#" class="btn-icon-studio" target="_blank" title="Unduh File PDF">
+            <i class="fas fa-download text-primary"></i> <span>Unduh PDF</span>
+          </a>
+        </div>
+      </div>
+      <div class="preview-unified-body">
+        <!-- Loader Spinner -->
+        <div id="kaldikStudioLoader" style="position: absolute; top:0; left:0; width:100%; height:100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #323639; color: #fff; z-index: 10;">
+          <div class="spinner-border text-info mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+          <div class="font-weight-bold" style="letter-spacing: 0.5px; font-size: 1.1rem;">Menyiapkan Lembar Kalender Pendidikan...</div>
+          <small class="text-muted mt-1">Sedang menyusun layout kalender, matriks HBE/ME &amp; agenda kegiatan</small>
+        </div>
+        <iframe id="kaldikStudioFrame" src="" class="preview-unified-frame" onload="var l = document.getElementById('kaldikStudioLoader'); if(l) l.style.display='none';" title="Pratinjau Cetak Kalender Pendidikan"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentKaldikPdfUrl = '';
+
+function openFullscreenKaldikPreview(url) {
+    currentKaldikPdfUrl = url || '<?= BASE_URL ?>kalender_akademik/export_pdf?id_ta=<?= $filter_ta ?>';
+    var frame = document.getElementById('kaldikStudioFrame');
+    var btnDownload = document.getElementById('btnDownloadKaldikPdf');
+    if (btnDownload) btnDownload.href = currentKaldikPdfUrl;
+    
+    var loader = document.getElementById('kaldikStudioLoader');
+    if (loader) loader.style.display = 'flex';
+    
+    frame.src = currentKaldikPdfUrl + (currentKaldikPdfUrl.indexOf('?') !== -1 ? '&' : '?') + '_t=' + new Date().getTime();
+    document.getElementById('sectionMainKaldik').style.display = 'none';
+    document.getElementById('sectionPreviewKaldik').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeFullscreenKaldikPreview() {
+    document.getElementById('sectionPreviewKaldik').style.display = 'none';
+    document.getElementById('sectionMainKaldik').style.display = 'block';
+}
+
+function printKaldikFrame() {
+    var iframe = document.getElementById('kaldikStudioFrame');
+    if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    } else {
+        window.open(currentKaldikPdfUrl, '_blank');
+    }
+}
+</script>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
 
