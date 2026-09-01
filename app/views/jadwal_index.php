@@ -257,7 +257,18 @@
         <div class="row" id="jadwalCardsContainer">
             <?php foreach ($all_days as $hari_ini): 
                 $theme = $day_colors[$hari_ini] ?? ['color' => '#0284c7', 'bg_header' => '#f8fafc', 'icon' => 'fas fa-calendar'];
-                $day_rows = $result[$hari_ini] ?? [];
+                $raw_day_rows = $result[$hari_ini] ?? [];
+                
+                // Jika Filter Per Guru: Hanya tampilkan slot KBM mengajar aktif (tanpa slot kegiatan non-KBM / istirahat)
+                if ($view_type === 'guru') {
+                    $day_rows = array_values(array_filter($raw_day_rows, function($r) {
+                        $is_kbm = ($r['jenis_jam_pelajaran'] == 'KBM' || $r['jenis_master_kegiatan'] == 'KBM');
+                        return $is_kbm && !empty($r['id_guru']);
+                    }));
+                } else {
+                    $day_rows = $raw_day_rows;
+                }
+
                 $total_slots = count($day_rows);
                 $total_jp = 0;
                 foreach ($day_rows as $r) {
@@ -298,7 +309,7 @@
                                     </span>
                                 <?php endif; ?>
                                 <span class="badge badge-pill badge-light border text-muted" style="font-size: 0.68rem;">
-                                    <?= $total_slots ?> Sesi
+                                    <?= $total_slots ?> <?= ($view_type === 'guru') ? 'Kelas' : 'Sesi' ?>
                                 </span>
                             </div>
                         </div>
@@ -310,11 +321,12 @@
                             <table class="table table-hover mb-0" style="border-collapse: collapse;">
                                 <thead class="bg-light">
                                     <tr class="text-muted" style="font-size: 0.70rem; letter-spacing: 0.5px;">
-                                        <th class="text-center align-middle py-2 border-top-0" style="width: 115px;">WAKTU</th>
-                                        <th class="text-left pl-3 align-middle border-top-0">MATA PELAJARAN</th>
+                                        <th class="text-center align-middle py-2 border-top-0" style="width: 115px;">JAM / WAKTU</th>
                                         <?php if ($view_type === 'guru'): ?>
-                                            <th class="text-left pl-3 align-middle border-top-0" style="width: 140px;">KELAS / ROMBEL</th>
+                                            <th class="text-left pl-3 align-middle border-top-0" style="width: 145px;">KELAS / ROMBEL</th>
+                                            <th class="text-left pl-3 align-middle border-top-0">MATA PELAJARAN</th>
                                         <?php else: ?>
+                                            <th class="text-left pl-3 align-middle border-top-0">MATA PELAJARAN</th>
                                             <th class="text-left pl-3 align-middle border-top-0">GURU PENGAMPU</th>
                                         <?php endif; ?>
                                         <?php if (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')): ?>
@@ -354,26 +366,13 @@
                                             </td>
 
                                             <?php if ($is_kbm): ?>
-                                                <!-- ROW KBM: MAPEL + GURU / KELAS + AKSI -->
-                                                <!-- KOLOM 2: MATA PELAJARAN -->
-                                                <td class="align-middle pl-3 py-2">
-                                                    <?php if ($is_orphan): ?>
-                                                        <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
-                                                            <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
-                                                        </div>
-                                                        <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
-                                                    <?php else: ?>
-                                                        <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
-                                                            <?= htmlspecialchars($display_name ?? '-') ?>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </td>
-
-                                                <!-- KOLOM 3: GURU PENGAMPU / KELAS -->
+                                                <!-- ROW KBM -->
                                                 <?php if ($view_type === 'guru'): ?>
-                                                    <td class="align-middle pl-3 py-2" style="width: 140px;">
+                                                    <!-- URUTAN FILTER PER GURU: KELAS DULU LALU MAPEL -->
+                                                    <!-- KOLOM 2: KELAS / ROMBEL -->
+                                                    <td class="align-middle pl-3 py-2" style="width: 145px;">
                                                         <?php if (!empty($row['nama_kelas'])): ?>
-                                                            <span class="badge badge-primary px-2 py-1 font-weight-bold" style="font-size: 0.72rem; border-radius: 6px;">
+                                                            <span class="badge badge-primary px-2 py-1 font-weight-bold shadow-xs" style="font-size: 0.74rem; border-radius: 6px;">
                                                                 <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
                                                             </span>
                                                             <?php if ($jk_row === 'pjj'): ?>
@@ -385,7 +384,37 @@
                                                             <span class="text-muted small">-</span>
                                                         <?php endif; ?>
                                                     </td>
+
+                                                    <!-- KOLOM 3: MATA PELAJARAN -->
+                                                    <td class="align-middle pl-3 py-2">
+                                                        <?php if ($is_orphan): ?>
+                                                            <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
+                                                                <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
+                                                            </div>
+                                                            <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
+                                                        <?php else: ?>
+                                                            <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
+                                                                <?= htmlspecialchars($display_name ?? '-') ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 <?php else: ?>
+                                                    <!-- URUTAN FILTER PER ROMBEL: MAPEL DULU LALU GURU -->
+                                                    <!-- KOLOM 2: MATA PELAJARAN -->
+                                                    <td class="align-middle pl-3 py-2">
+                                                        <?php if ($is_orphan): ?>
+                                                            <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
+                                                                <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
+                                                            </div>
+                                                            <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
+                                                        <?php else: ?>
+                                                            <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
+                                                                <?= htmlspecialchars($display_name ?? '-') ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </td>
+
+                                                    <!-- KOLOM 3: GURU PENGAMPU -->
                                                     <td class="align-middle pl-3 py-2">
                                                         <?php if (!empty($row['nama_guru'])): ?>
                                                             <div class="text-dark font-weight-500" style="font-size: 0.78rem;">
@@ -424,7 +453,7 @@
                                                 <?php endif; ?>
 
                                             <?php else: ?>
-                                                <!-- ROW NON-KBM (COLSPAN BANNER SESI KEGIATAN BERSAMA) -->
+                                                <!-- ROW NON-KBM: HANYA TAMPIL DI FILTER PER KELAS (COLSPAN BANNER SESI KEGIATAN BERSAMA) -->
                                                 <?php 
                                                 $name_lower = strtolower($display_name ?? '');
                                                 $banner_bg = '#f8fafc';
@@ -472,8 +501,8 @@
                                     <?php else: ?>
                                         <tr>
                                             <td colspan="4" class="text-center font-italic text-muted py-4 small bg-light">
-                                                <i class="fas fa-calendar-minus text-muted mb-1 d-block" style="font-size: 1.5rem; opacity: 0.35;"></i>
-                                                Tidak ada jadwal kegiatan untuk hari <?= $hari_ini ?>
+                                                <i class="fas fa-mug-hot text-muted mb-1 d-block" style="font-size: 1.5rem; opacity: 0.35;"></i>
+                                                <?= ($view_type === 'guru') ? 'Tidak ada jadwal mengajar pada hari ' . $hari_ini : 'Tidak ada jadwal kegiatan untuk hari ' . $hari_ini ?>
                                             </td>
                                         </tr>
                                     <?php endif; ?>
