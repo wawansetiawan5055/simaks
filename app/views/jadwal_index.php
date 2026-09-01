@@ -326,9 +326,9 @@
                                             $del_ids = !empty($row['ids_jadwal_mengajar']) ? implode(',', array_filter($row['ids_jadwal_mengajar'])) : ($row['id_jadwal_mengajar'] ?? '');
                                             $jam_ids_str = !empty($row['jam_ids']) ? implode(',', array_filter($row['jam_ids'])) : ($row['id_jam'] ?? '');
                                         ?>
-                                        <tr class="slot-kbm-row <?= $is_kbm ? '' : 'bg-light' ?>">
+                                        <tr class="slot-kbm-row">
                                             <!-- KOLOM 1: WAKTU -->
-                                            <td class="align-middle text-center p-2" style="font-size: 0.75rem; white-space: nowrap; color: #475569; border-right: 1px dashed #e2e8f0; width: 115px;">
+                                            <td class="align-middle text-center p-2" style="font-size: 0.75rem; white-space: nowrap; color: #475569; border-right: 1px dashed #e2e8f0; width: 115px; background: #fafafa;">
                                                 <div class="font-weight-bold text-dark" style="font-size: 0.78rem;">
                                                     <?= substr($row['jam_mulai'], 0, 5) ?> - <?= substr($row['jam_selesai'], 0, 5) ?>
                                                 </div>
@@ -346,75 +346,119 @@
                                                 </div>
                                             </td>
 
-                                            <!-- KOLOM 2: MATA PELAJARAN -->
-                                            <td class="align-middle pl-3 py-2">
-                                                <?php if ($is_orphan): ?>
-                                                    <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
-                                                        <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
-                                                    </div>
-                                                    <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
-                                                <?php else: ?>
-                                                    <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
-                                                        <?= htmlspecialchars($display_name ?? '-') ?>
-                                                    </div>
-                                                    <?php if (!$is_kbm): ?>
-                                                        <span class="badge badge-secondary px-1.5 py-0.5 font-italic" style="font-size: 0.62rem;">Kegiatan Sekolah</span>
-                                                    <?php endif; ?>
-                                                <?php endif; ?>
-                                            </td>
-
-                                            <!-- KOLOM 3: GURU PENGAMPU / KELAS -->
-                                            <?php if ($view_type === 'guru'): ?>
-                                                <td class="align-middle pl-3 py-2" style="width: 140px;">
-                                                    <?php if (!empty($row['nama_kelas'])): ?>
-                                                        <span class="badge badge-primary px-2 py-1 font-weight-bold" style="font-size: 0.72rem; border-radius: 6px;">
-                                                            <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
-                                                        </span>
-                                                        <?php if ($jk_row === 'pjj'): ?>
-                                                            <span class="badge badge-success px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">TERBUKA</span>
-                                                        <?php elseif ($jk_row === 'menginduk'): ?>
-                                                            <span class="badge badge-warning text-dark px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">MENGINDUK</span>
-                                                        <?php endif; ?>
-                                                    <?php else: ?>
-                                                        <span class="text-muted small">-</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                            <?php else: ?>
+                                            <?php if ($is_kbm): ?>
+                                                <!-- ROW KBM: MAPEL + GURU / KELAS + AKSI -->
+                                                <!-- KOLOM 2: MATA PELAJARAN -->
                                                 <td class="align-middle pl-3 py-2">
-                                                    <?php if (!empty($row['nama_guru'])): ?>
-                                                        <div class="text-dark font-weight-500" style="font-size: 0.78rem;">
-                                                            <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-75"></i><?= htmlspecialchars($row['nama_guru']) ?>
+                                                    <?php if ($is_orphan): ?>
+                                                        <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
+                                                            <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
                                                         </div>
+                                                        <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
                                                     <?php else: ?>
-                                                        <span class="text-muted small">-</span>
+                                                        <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
+                                                            <?= htmlspecialchars($display_name ?? '-') ?>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </td>
-                                            <?php endif; ?>
 
-                                            <!-- KOLOM 4: AKSI (EDIT & HAPUS) -->
-                                            <?php if (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')): ?>
-                                            <td class="text-center align-middle p-1" style="width: 70px; white-space: nowrap;">
-                                                <?php if (!empty($del_ids) && $is_kbm): ?>
-                                                    <?php if (can_do($pdo, 'jadwal', 'update')): ?>
-                                                        <button type="button" class="btn btn-xs btn-outline-warning border-0 rounded-circle btn-edit-jadwal mr-1" 
-                                                            style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" 
-                                                            data-id="<?= $del_ids ?>"
-                                                            data-id-kelas="<?= $row['id_kelas'] ?? '' ?>"
-                                                            data-id-guru-mapel="<?= $row['id_guru_mapel'] ?? '' ?>"
-                                                            data-hari="<?= $hari_ini ?>"
-                                                            data-mode="<?= $mode_row ?>"
-                                                            data-jam-ids="<?= $jam_ids_str ?>"
-                                                            title="Edit Jadwal">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </button>
-                                                    <?php endif; ?>
-                                                    <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
-                                                        <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal">
-                                                            <i class="fas fa-times"></i>
-                                                        </a>
-                                                    <?php endif; ?>
+                                                <!-- KOLOM 3: GURU PENGAMPU / KELAS -->
+                                                <?php if ($view_type === 'guru'): ?>
+                                                    <td class="align-middle pl-3 py-2" style="width: 140px;">
+                                                        <?php if (!empty($row['nama_kelas'])): ?>
+                                                            <span class="badge badge-primary px-2 py-1 font-weight-bold" style="font-size: 0.72rem; border-radius: 6px;">
+                                                                <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
+                                                            </span>
+                                                            <?php if ($jk_row === 'pjj'): ?>
+                                                                <span class="badge badge-success px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">TERBUKA</span>
+                                                            <?php elseif ($jk_row === 'menginduk'): ?>
+                                                                <span class="badge badge-warning text-dark px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">MENGINDUK</span>
+                                                            <?php endif; ?>
+                                                        <?php else: ?>
+                                                            <span class="text-muted small">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                <?php else: ?>
+                                                    <td class="align-middle pl-3 py-2">
+                                                        <?php if (!empty($row['nama_guru'])): ?>
+                                                            <div class="text-dark font-weight-500" style="font-size: 0.78rem;">
+                                                                <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-75"></i><?= htmlspecialchars($row['nama_guru']) ?>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <span class="text-muted small">-</span>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 <?php endif; ?>
-                                            </td>
+
+                                                <!-- KOLOM 4: AKSI (EDIT & HAPUS) -->
+                                                <?php if (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')): ?>
+                                                <td class="text-center align-middle p-1" style="width: 70px; white-space: nowrap;">
+                                                    <?php if (!empty($del_ids)): ?>
+                                                        <?php if (can_do($pdo, 'jadwal', 'update')): ?>
+                                                            <button type="button" class="btn btn-xs btn-outline-warning border-0 rounded-circle btn-edit-jadwal mr-1" 
+                                                                style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" 
+                                                                data-id="<?= $del_ids ?>"
+                                                                data-id-kelas="<?= $row['id_kelas'] ?? '' ?>"
+                                                                data-id-guru-mapel="<?= $row['id_guru_mapel'] ?? '' ?>"
+                                                                data-hari="<?= $hari_ini ?>"
+                                                                data-mode="<?= $mode_row ?>"
+                                                                data-jam-ids="<?= $jam_ids_str ?>"
+                                                                title="Edit Jadwal">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
+                                                            <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal">
+                                                                <i class="fas fa-times"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <?php endif; ?>
+
+                                            <?php else: ?>
+                                                <!-- ROW NON-KBM (COLSPAN BANNER SESI KEGIATAN BERSAMA) -->
+                                                <?php 
+                                                $name_lower = strtolower($display_name ?? '');
+                                                $banner_bg = '#f8fafc';
+                                                $banner_badge_class = 'badge-secondary';
+                                                $banner_icon = 'fas fa-school';
+                                                $banner_subtitle = 'Kegiatan Sekolah / Pembiasaan';
+
+                                                if (strpos($name_lower, 'istirahat') !== false) {
+                                                    $banner_bg = '#fffbeb';
+                                                    $banner_badge_class = 'badge-warning text-dark';
+                                                    $banner_icon = 'fas fa-mug-hot';
+                                                    $banner_subtitle = 'Jeda Pembelajaran & Istirahat Siswa';
+                                                } elseif (strpos($name_lower, 'upacara') !== false || strpos($name_lower, 'apel') !== false) {
+                                                    $banner_bg = '#fff1f2';
+                                                    $banner_badge_class = 'badge-danger text-white';
+                                                    $banner_icon = 'fas fa-flag';
+                                                    $banner_subtitle = 'Diikuti Seluruh Guru, Tenaga Kependidikan & Siswa';
+                                                } elseif (strpos($name_lower, 'tadarus') !== false || strpos($name_lower, 'dhuha') !== false || strpos($name_lower, 'sholat') !== false || strpos($name_lower, 'dzuhur') !== false || strpos($name_lower, 'kajian') !== false || strpos($name_lower, 'jumat') !== false) {
+                                                    $banner_bg = '#f0fdf4';
+                                                    $banner_badge_class = 'badge-success text-white';
+                                                    $banner_icon = 'fas fa-praying-hands';
+                                                    $banner_subtitle = 'Pembiasaan Ibadah Bersama (Didampingi Guru Piket & Wali Kelas)';
+                                                } elseif (strpos($name_lower, 'literasi') !== false || strpos($name_lower, 'senam') !== false) {
+                                                    $banner_bg = '#ecfeff';
+                                                    $banner_badge_class = 'badge-info text-white';
+                                                    $banner_icon = 'fas fa-book-reader';
+                                                    $banner_subtitle = 'Kegiatan Pembiasaan Sekolah';
+                                                }
+
+                                                $colspan_count = (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')) ? 3 : 2;
+                                                ?>
+                                                <td colspan="<?= $colspan_count ?>" class="align-middle pl-3 py-2" style="background-color: <?= $banner_bg ?>;">
+                                                    <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                                                        <span class="badge badge-pill <?= $banner_badge_class ?> px-2.5 py-1 font-weight-bold shadow-xs" style="font-size: 0.70rem; letter-spacing: 0.3px;">
+                                                            <i class="<?= $banner_icon ?> mr-1"></i> <?= strtoupper(htmlspecialchars($display_name ?? 'NON-KBM')) ?>
+                                                        </span>
+                                                        <span class="text-muted small font-italic" style="font-size: 0.73rem;">
+                                                            <?= $banner_subtitle ?>
+                                                        </span>
+                                                    </div>
+                                                </td>
                                             <?php endif; ?>
                                         </tr>
                                         <?php endforeach; ?>
