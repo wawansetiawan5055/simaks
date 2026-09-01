@@ -1,5 +1,5 @@
 <?php
-// app/views/laporan_siswa.php - Clean, Fast & Standard Laporan Siswa
+// app/views/laporan_siswa.php - Seamless In-Body Direct PDF Print Preview Trial
 include __DIR__ . '/partials/header.php'; 
 
 $nama_ta = $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'Tahun Ajaran Aktif';
@@ -8,6 +8,16 @@ unset($query_params['mod'], $query_params['act']);
 $new_query_string = http_build_query($query_params);
 $pdf_url = BASE_URL . 'laporan/siswa_export_pdf?' . $new_query_string;
 $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
+
+$selected_kelas_name = 'Semua Kelas';
+if (!empty($_GET['kelas'])) {
+    foreach ($kelas_list as $k) {
+        if ($k['id_kelas'] == $_GET['kelas']) {
+            $selected_kelas_name = 'Kelas ' . $k['nama_kelas'];
+            break;
+        }
+    }
+}
 ?>
 
 <div class="content-header pt-3 mb-2">
@@ -21,7 +31,7 @@ $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
           <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
             Laporan Data Peserta Didik
           </h4>
-          <p class="text-muted small m-0">Tahun Ajaran <?= htmlspecialchars($nama_ta) ?></p>
+          <p class="text-muted small m-0">Tahun Ajaran <?= htmlspecialchars($nama_ta) ?> &bull; <?= htmlspecialchars($selected_kelas_name) ?></p>
         </div>
       </div>
       <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
@@ -37,9 +47,10 @@ $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
 <section class="content">
   <div class="container-fluid">
     
+    <!-- TOP TOOLBAR & FILTER -->
     <div class="card shadow-sm border-0 mb-3">
       <div class="card-body p-3">
-        <form method="get" class="m-0">
+        <form method="get" class="m-0" id="filterForm">
           <input type="hidden" name="mod" value="laporan">
           <input type="hidden" name="act" value="siswa">
 
@@ -59,15 +70,23 @@ $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
             </div>
 
             <div class="col-md-8 text-md-right">
-              <div class="btn-group shadow-sm">
+              <!-- Tombol Saat di Mode Tabel -->
+              <div id="btnGroupTable" class="btn-group shadow-sm">
                 <a href="<?= $excel_url ?>" class="btn btn-success font-weight-bold px-3">
                   <i class="fas fa-file-excel mr-1"></i> Excel
                 </a>
-                <a href="<?= $pdf_url ?>" class="btn btn-danger font-weight-bold px-3" target="_blank">
-                  <i class="fas fa-file-pdf mr-1"></i> PDF
-                </a>
-                <a href="<?= $pdf_url ?>" class="btn btn-info font-weight-bold px-3" target="_blank">
+                <button type="button" onclick="showPrintPreview()" class="btn btn-info font-weight-bold px-4">
                   <i class="fas fa-print mr-1"></i> Cetak
+                </button>
+              </div>
+
+              <!-- Tombol Saat di Mode Pratinjau Cetak -->
+              <div id="btnGroupPreview" class="btn-group shadow-sm" style="display: none;">
+                <button type="button" onclick="hidePrintPreview()" class="btn btn-secondary font-weight-bold px-3">
+                  <i class="fas fa-arrow-left mr-1"></i> Kembali ke Tabel
+                </button>
+                <a href="<?= $excel_url ?>" class="btn btn-success font-weight-bold px-3">
+                  <i class="fas fa-file-excel mr-1"></i> Excel
                 </a>
               </div>
             </div>
@@ -76,7 +95,10 @@ $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
       </div>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <!-- ================================================================= -->
+    <!-- VIEW 1: DATA TABLE (DEFAULT) -->
+    <!-- ================================================================= -->
+    <div id="viewTable" class="card shadow-sm border-0">
       <div class="card-header bg-white border-bottom-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
         <h3 class="card-title font-weight-bold text-dark">
           <i class="fas fa-list text-primary mr-1"></i> Data Siswa
@@ -132,7 +154,36 @@ $excel_url = BASE_URL . 'laporan/siswa_export_excel?' . $new_query_string;
       </div>
     </div>
 
+    <!-- ================================================================= -->
+    <!-- VIEW 2: FULL IN-BODY NATIVE PDF VIEWER (UNDER NAVBAR) -->
+    <!-- ================================================================= -->
+    <div id="viewPrint" class="card shadow-sm border-0 mb-4 overflow-hidden" style="display: none; height: calc(100vh - 200px); min-height: 680px; border-radius: 12px; background: #525659;">
+      <iframe id="pdfFrame" src="" style="width: 100%; height: 100%; border: none; display: block;" title="Pratinjau Cetak Dokumen"></iframe>
+    </div>
+
   </div>
 </section>
+
+<script>
+var pdfUrl = <?= json_encode($pdf_url) ?>;
+
+function showPrintPreview() {
+    var frame = document.getElementById('pdfFrame');
+    if (!frame.src || frame.src === 'about:blank' || frame.src === window.location.href) {
+        frame.src = pdfUrl;
+    }
+    document.getElementById('viewTable').style.display = 'none';
+    document.getElementById('btnGroupTable').style.display = 'none';
+    document.getElementById('viewPrint').style.display = 'block';
+    document.getElementById('btnGroupPreview').style.display = 'inline-flex';
+}
+
+function hidePrintPreview() {
+    document.getElementById('viewPrint').style.display = 'none';
+    document.getElementById('btnGroupPreview').style.display = 'none';
+    document.getElementById('viewTable').style.display = 'block';
+    document.getElementById('btnGroupTable').style.display = 'inline-flex';
+}
+</script>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
