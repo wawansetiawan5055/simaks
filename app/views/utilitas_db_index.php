@@ -65,25 +65,28 @@ include __DIR__.'/partials/header.php';
             <?php unset($_SESSION['sql_result']); ?>
         <?php endif; ?>
 
-        <!-- ROW 0: 3 BLOCKS (Backup, Insert, Restore) -->
+        <!-- ROW 0: 3 BLOCKS (Backup & Optimasi, Insert, Restore) -->
         <div class="row mb-3">
-             <!-- BLOCK 1: Backup -->
+             <!-- BLOCK 1: Backup & Optimasi -->
              <div class="col-md-4">
-                <div class="card card-primary card-outline h-100">
+                <div class="card card-primary card-outline h-100 shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-download"></i> Backup Data</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-download mr-1"></i> Backup &amp; Optimasi Database</h3>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small">Download database sql file.</p>
+                        <p class="text-muted small mb-2">Unduh berkas cadangan SQL atau jalankan pembersihan indeks.</p>
                         <div class="btn-group-vertical d-block">
-                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=full" class="btn btn-primary mb-2 btn-block text-left shadow-sm">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=full" class="btn btn-primary mb-2 btn-block text-left shadow-sm font-weight-bold">
                                 <i class="fas fa-database mr-2"></i> Backup Full (Struktur + Data)
                             </a>
-                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=structure" class="btn btn-info mb-2 btn-block text-left shadow-sm text-white">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=structure" class="btn btn-info mb-2 btn-block text-left shadow-sm text-white font-weight-bold">
                                 <i class="fas fa-project-diagram mr-2"></i> Backup Struktur Saja
                             </a>
-                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=data" class="btn btn-secondary btn-block text-left shadow-sm">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=data" class="btn btn-secondary mb-2 btn-block text-left shadow-sm font-weight-bold">
                                 <i class="fas fa-file-alt mr-2"></i> Backup Data Saja
+                            </a>
+                            <a href="<?= BASE_URL ?>utilitas_db/optimize" class="btn btn-success btn-block text-left shadow-sm font-weight-bold" onclick="return confirm('Jalankan optimasi dan defragmentasi pada seluruh 180 tabel database?')">
+                                <i class="fas fa-tachometer-alt mr-2"></i> Optimasi &amp; Defrag Database
                             </a>
                         </div>
                     </div>
@@ -92,18 +95,18 @@ include __DIR__.'/partials/header.php';
 
              <!-- BLOCK 2: Insert Data (SQL Runner) -->
              <div class="col-md-4">
-                <div class="card card-navy card-outline h-100">
+                <div class="card card-navy card-outline h-100 shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-terminal"></i> Insert Data (SQL Dump)</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-terminal mr-1"></i> Raw SQL Query Runner</h3>
                     </div>
                     <div class="card-body">
                         <form action="<?= BASE_URL ?>utilitas_db/run_sql" method="POST">
                             <div class="form-group pb-0 mb-2">
-                                <textarea class="form-control form-control-sm" name="sql_query" rows="5" placeholder="Paste SQL Insert/Dump here..." style="font-family: monospace; font-size: 12px;"><?= $_SESSION['last_query'] ?? '' ?></textarea>
+                                <textarea class="form-control form-control-sm" name="sql_query" rows="5" placeholder="Ketik query SQL (SELECT, INSERT, UPDATE, ALTER)..." style="font-family: monospace; font-size: 12px;"><?= $_SESSION['last_query'] ?? '' ?></textarea>
                                 <?php unset($_SESSION['last_query']); ?>
                             </div>
                             <button type="submit" class="btn btn-success btn-block shadow-sm font-weight-bold">
-                                <i class="fas fa-play mr-2"></i> Jalankan / Insert
+                                <i class="fas fa-play mr-2"></i> Jalankan Query SQL
                             </button>
                         </form>
                     </div>
@@ -112,20 +115,20 @@ include __DIR__.'/partials/header.php';
 
              <!-- BLOCK 3: Restore Data -->
              <div class="col-md-4">
-                <div class="card card-warning card-outline h-100">
+                <div class="card card-warning card-outline h-100 shadow-sm">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-upload"></i> Restore Data</h3>
+                        <h3 class="card-title font-weight-bold"><i class="fas fa-upload mr-1"></i> Restore Database</h3>
                     </div>
                     <div class="card-body">
-                        <form action="<?= BASE_URL ?>utilitas_db/restore" method="POST" enctype="multipart/form-data" onsubmit="return confirm('APAKAH ANDA YAKIN? Ini akan menimpa seluruh database Anda saat ini.')">
-                            <p class="text-muted small">Upload file .sql untuk restore.</p>
-                            <div class="form-group">
-                                <div class="custom-file mb-3">
+                        <form action="<?= BASE_URL ?>utilitas_db/restore" method="POST" enctype="multipart/form-data" onsubmit="return confirm('APAKAH ANDA YAKIN? Ini akan menimpa data pada tabel yang ada di dalam berkas backup .sql.')">
+                            <p class="text-muted small mb-2">Pilih berkas <code>.sql</code> untuk memulihkan database.</p>
+                            <div class="form-group mb-3">
+                                <div class="custom-file">
                                     <input type="file" class="custom-file-input" id="backup_file" name="backup_file" accept=".sql" required>
-                                    <label class="custom-file-label" for="backup_file">Pilih file...</label>
+                                    <label class="custom-file-label" for="backup_file">Pilih file .sql...</label>
                                 </div>
                             </div>
-                            <button class="btn btn-warning btn-block shadow-sm font-weight-bold text-white" type="submit">
+                            <button class="btn btn-warning btn-block shadow-sm font-weight-bold text-dark" type="submit">
                                 <i class="fas fa-upload mr-2"></i> Restore Database
                             </button>
                         </form>
@@ -149,19 +152,13 @@ include __DIR__.'/partials/header.php';
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="p-3 bg-light border-bottom">
-                            <small class="text-muted d-block">
-                                <i class="fas fa-info-circle text-info mr-1"></i>
-                                Menu ini digunakan untuk mengeksekusi berkas migrasi/patch database SQL baru yang disimpan di folder <code>sql/</code> atau <code>patch/</code> secara terisolasi tanpa membebani alur runtime aplikasi.
-                            </small>
-                        </div>
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 text-nowrap table-sm">
-                                <thead class="bg-indigo text-white">
+                            <table class="table table-hover table-striped table-sm mb-0">
+                                <thead class="thead-light">
                                     <tr>
-                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th style="width: 50px;" class="text-center">#</th>
                                         <th>Nama Berkas Patch</th>
-                                        <th>Folder</th>
+                                        <th>Lokasi Folder</th>
                                         <th>Ukuran</th>
                                         <th>Status Eksekusi</th>
                                         <th>Terakhir Dijalankan</th>
@@ -170,33 +167,36 @@ include __DIR__.'/partials/header.php';
                                 </thead>
                                 <tbody>
                                     <?php if (!empty($available_patches)): ?>
-                                        <?php $no = 1; foreach ($available_patches as $patch): 
-                                            $is_applied = isset($applied_patches[$patch['filename']]);
-                                            $applied_info = $applied_patches[$patch['filename']] ?? null;
+                                        <?php 
+                                        $applied_map = [];
+                                        foreach ($applied_patches as $ap) {
+                                            $applied_map[$ap['patch_name']] = $ap;
+                                        }
+                                        $no = 1;
+                                        foreach ($available_patches as $patch): 
+                                            $is_applied = isset($applied_map[$patch['filename']]);
+                                            $applied_info = $applied_map[$patch['filename']] ?? null;
                                         ?>
                                         <tr>
-                                            <td class="text-center align-middle"><?= $no++ ?></td>
-                                            <td class="align-middle font-weight-bold">
-                                                <i class="fas fa-file-code text-indigo mr-1"></i>
-                                                <?= htmlspecialchars($patch['filename']) ?>
+                                            <td class="text-center align-middle font-weight-bold text-muted"><?= $no++ ?></td>
+                                            <td class="align-middle">
+                                                <code class="text-indigo font-weight-bold"><?= htmlspecialchars($patch['filename']) ?></code>
                                             </td>
                                             <td class="align-middle">
-                                                <span class="badge badge-secondary"><?= htmlspecialchars($patch['folder']) ?>/</span>
+                                                <span class="badge badge-secondary"><?= htmlspecialchars($patch['dir_name']) ?>/</span>
                                             </td>
-                                            <td class="align-middle text-muted"><?= number_format($patch['size'] / 1024, 2) ?> KB</td>
+                                            <td class="align-middle text-muted small">
+                                                <?= number_format($patch['size'] / 1024, 1) ?> KB
+                                            </td>
                                             <td class="align-middle">
                                                 <?php if ($is_applied): ?>
-                                                    <span class="badge badge-success px-2 py-1 shadow-sm">
-                                                        <i class="fas fa-check-circle mr-1"></i> Sudah Diterapkan
-                                                    </span>
+                                                    <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Sudah Diterapkan</span>
                                                 <?php else: ?>
-                                                    <span class="badge badge-warning px-2 py-1 shadow-sm">
-                                                        <i class="fas fa-clock mr-1"></i> Belum Diterapkan
-                                                    </span>
+                                                    <span class="badge badge-warning px-2 py-1"><i class="fas fa-clock mr-1"></i> Belum Dijalankan</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="align-middle text-muted small">
-                                                <?= $is_applied ? ($applied_info['executed_at'] . ' (' . ($applied_info['executed_by'] ?? 'Admin') . ')') : '-' ?>
+                                                <?= $is_applied ? date('d M Y H:i', strtotime($applied_info['executed_at'])) . ' (' . htmlspecialchars($applied_info['executed_by']) . ')' : '-' ?>
                                             </td>
                                             <td class="text-center align-middle">
                                                 <form action="<?= BASE_URL ?>utilitas_db/run_patch" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menjalankan file patch \'<?= htmlspecialchars($patch['filename']) ?>\'?');">
@@ -225,13 +225,25 @@ include __DIR__.'/partials/header.php';
             </div>
         </div>
 
-        <!-- ROW 1: Master & Setup (Balanced) -->
+        <!-- ROW TABEL PER KATEGORI (Mendukung 180+ Tabel Dinamis) -->
         <div class="row">
             <?php
-            // Group tables
+            // Group tables by category
             $tables_by_category = [];
             foreach ($tables as $tbl) {
                 $tables_by_category[$tbl['category']][] = $tbl;
+            }
+
+            $all_categories = array_keys($tables_by_category);
+            $left_categories = [];
+            $right_categories = [];
+            
+            foreach ($all_categories as $idx => $cat_name) {
+                if ($idx % 2 == 0) {
+                    $left_categories[] = $cat_name;
+                } else {
+                    $right_categories[] = $cat_name;
+                }
             }
 
             function renderTableCard($categories, $tables_by_category) {
@@ -239,23 +251,29 @@ include __DIR__.'/partials/header.php';
                     if (empty($tables_by_category[$cat])) continue;
                     $cat_tables = $tables_by_category[$cat];
                     
-                    // Colors
+                    // Dynamic Colors per Category
                     $card_color = 'primary';
-                    if ($cat == 'Data Konfigurasi/Setup') $card_color = 'info';
-                    if ($cat == 'Data Histori/Log') $card_color = 'warning';
-                    if ($cat == 'Data Master') $card_color = 'success';
+                    if (strpos($cat, 'Master') !== false) $card_color = 'success';
+                    elseif (strpos($cat, 'CBT') !== false) $card_color = 'indigo';
+                    elseif (strpos($cat, 'LMS') !== false) $card_color = 'teal';
+                    elseif (strpos($cat, 'Keuangan') !== false) $card_color = 'navy';
+                    elseif (strpos($cat, 'Kesiswaan') !== false) $card_color = 'purple';
+                    elseif (strpos($cat, 'Histori') !== false) $card_color = 'warning';
+                    elseif (strpos($cat, 'Persuratan') !== false) $card_color = 'maroon';
+                    elseif (strpos($cat, 'UKS') !== false || strpos($cat, 'Perpus') !== false || strpos($cat, 'Sarana') !== false) $card_color = 'info';
             ?>
-            <div class="card card-<?= $card_color ?> card-outline h-100">
-                <div class="card-header">
-                    <h3 class="card-title"><?= $cat ?></h3>
+            <div class="card card-<?= $card_color ?> card-outline mb-3 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title font-weight-bold"><?= htmlspecialchars($cat) ?></h3>
+                    <span class="badge badge-light border ml-auto font-weight-bold"><?= count($cat_tables) ?> Tabel</span>
                 </div>
-                <div class="card-body table-responsive p-0" style="max-height: 400px;">
+                <div class="card-body table-responsive p-0" style="max-height: 380px;">
                     <form action="<?= BASE_URL ?>utilitas_db" method="POST">
                         <table class="table table-hover table-sm table-head-fixed text-nowrap">
-                            <thead class="">
+                            <thead>
                                 <tr>
-                                    <th class="pl-3 bg-primary text-white border-0" style="z-index: 10;">Nama Data</th>
-                                    <th style="width: 80px; z-index: 10;" class="text-right bg-primary text-white border-0">Jml Data</th>
+                                    <th class="pl-3 bg-light border-bottom" style="z-index: 10;">Nama Tabel Data</th>
+                                    <th style="width: 90px; z-index: 10;" class="text-right pr-3 bg-light border-bottom">Jml Baris</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -264,25 +282,26 @@ include __DIR__.'/partials/header.php';
                                     <td class="align-middle pl-3">
                                         <div class="custom-control custom-checkbox custom-checkbox-aligned">
                                             <input class="custom-control-input checkbox-table" type="checkbox" id="tbl_<?= $tbl['name'] ?>" name="selected_tables[]" value="<?= $tbl['name'] ?>">
-                                            <label for="tbl_<?= $tbl['name'] ?>" class="custom-control-label" style="font-weight: normal; cursor: pointer; padding-top: 4px;">
-                                                <?= $tbl['label'] ?>
+                                            <label for="tbl_<?= $tbl['name'] ?>" class="custom-control-label" style="font-weight: 500; cursor: pointer; padding-top: 2px;">
+                                                <?= htmlspecialchars($tbl['label']) ?>
+                                                <small class="text-muted d-block font-weight-normal font-italic" style="font-size: 0.72rem;">`<?= $tbl['name'] ?>`</small>
                                             </label>
                                         </div>
                                     </td>
-                                    <td class="text-right align-middle font-weight-bold text-muted"><?= number_format($tbl['rows']) ?></td>
+                                    <td class="text-right align-middle pr-3 font-weight-bold text-muted"><?= number_format($tbl['rows']) ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        <div class="card-footer p-2 bg-white border-top-0">
+                        <div class="card-footer p-2 bg-white border-top">
                              <div class="row no-gutters">
                                 <div class="col-6 pr-1">
-                                    <button type="submit" name="backup_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/backup'" class="btn btn-primary btn-sm btn-block shadow-sm">
+                                    <button type="submit" name="backup_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/backup'" class="btn btn-primary btn-xs btn-block shadow-sm py-1 font-weight-bold">
                                         <i class="fas fa-download mr-1"></i> Backup
                                     </button>
                                 </div>
                                 <div class="col-6 pl-1">
-                                    <button type="submit" name="truncate_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/truncate_selected'; return confirm('Yakin ingin kosongkan/hapus data terpilih?');" class="btn btn-danger btn-sm btn-block shadow-sm">
+                                    <button type="submit" name="truncate_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/truncate_selected'; return confirm('Yakin ingin mengosongkan tabel terpilih?');" class="btn btn-danger btn-xs btn-block shadow-sm py-1 font-weight-bold">
                                         <i class="fas fa-trash mr-1"></i> Kosongkan
                                     </button>
                                 </div>
@@ -296,51 +315,32 @@ include __DIR__.'/partials/header.php';
             }
             ?>
 
-            <!-- LEFT: Master -->
-            <div class="col-lg-6 mb-3">
-                <?php renderTableCard(['Data Master'], $tables_by_category); ?>
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-6">
+                <?php renderTableCard($left_categories, $tables_by_category); ?>
             </div>
 
-            <!-- RIGHT: Setup -->
-            <div class="col-lg-6 mb-3">
-                <?php renderTableCard(['Data Konfigurasi/Setup'], $tables_by_category); ?>
-            </div>
-        </div>
-
-        <style>
-            /* Correction for vertical alignment of checkbox with padded text */
-            .custom-control.custom-checkbox-aligned .custom-control-label::before,
-            .custom-control.custom-checkbox-aligned .custom-control-label::after {
-                top: 0.5rem; /* Shift down 4px from default 0.25rem to match text padding */
-            }
-        </style>
-
-        <!-- ROW 2: History & Reset -->
-        <div class="row">
-            <!-- LEFT: History -->
-            <div class="col-lg-6 mb-3">
-                 <?php renderTableCard(['Data Histori/Log'], $tables_by_category); ?>
-                 <?php renderTableCard(['Lainnya'], $tables_by_category); ?>
-            </div>
-
-            <!-- RIGHT: Reset Aplikasi -->
-            <div class="col-lg-6 mb-3">
-                <div class="card card-danger card-outline h-100">
+            <!-- RIGHT COLUMN -->
+            <div class="col-lg-6">
+                <?php renderTableCard($right_categories, $tables_by_category); ?>
+                
+                <!-- Reset Total Aplikasi Card -->
+                <div class="card card-danger card-outline shadow-sm mb-3">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Reset Aplikasi TOTAL (TRUNCATE)</h3>
+                        <h3 class="card-title font-weight-bold text-danger"><i class="fas fa-exclamation-triangle mr-1"></i> Reset Aplikasi TOTAL (Setelan Pabrik)</h3>
                     </div>
                     <form action="<?= BASE_URL ?>utilitas_db/reset_aplikasi" method="POST" onsubmit="return confirm('ANDA SANGAT YAKIN INGIN MELAKUKAN RESET APLIKASI TOTAL? SEMUA DATA AKAN HILANG PERMANEN!')">
                         <div class="card-body">
-                            <p class="text-danger"><strong>PERINGATAN PALING SERIUS:</strong> Aksi ini akan menghapus **SEMUA DATA** di database. Digunakan untuk mengembalikan aplikasi ke "Setelan Pabrik".</p>
+                            <p class="text-danger small mb-2"><strong>PERINGATAN PALING SERIUS:</strong> Aksi ini akan mengosongkan seluruh data transaksi dan mengembalikan aplikasi ke kondisi awal pabrik.</p>
                             
                             <div class="form-group mb-0">
-                                <label for="confirm_text">Ketik: <strong class="text-danger">RESET APLIKASI</strong></label>
-                                <input type="text" id="confirm_text" class="form-control" name="confirm_text" placeholder="Ketik teks konfirmasi..." autocomplete="off">
+                                <label for="confirm_text" class="small">Ketik persis: <strong class="text-danger">RESET APLIKASI</strong></label>
+                                <input type="text" id="confirm_text" class="form-control form-control-sm" name="confirm_text" placeholder="Ketik teks konfirmasi..." autocomplete="off">
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <button type="submit" id="btn-reset" class="btn btn-danger btn-block" disabled>
-                                <i class="fas fa-skull-crossbones"></i> Hapus Total & Reset Aplikasi
+                        <div class="card-footer p-2 bg-white">
+                            <button type="submit" id="btn-reset" class="btn btn-danger btn-sm btn-block font-weight-bold" disabled>
+                                <i class="fas fa-skull-crossbones mr-1"></i> Hapus Total &amp; Reset Aplikasi
                             </button>
                         </div>
                     </form>

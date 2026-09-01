@@ -207,6 +207,30 @@ function dispatch_route($pdo, $mod, $act) {
                 }
                 exit; // Stop execution setelah API response
     
+            // --- UTILITAS & DATABASE MANAGEMENT ---
+            case 'utilitas_db':
+                if ($act == 'run_sql')
+                    utilitas_db_run_sql($pdo);
+                elseif ($act == 'backup')
+                    utilitas_db_backup($pdo);
+                elseif ($act == 'restore')
+                    utilitas_db_restore($pdo);
+                elseif ($act == 'optimize')
+                    utilitas_db_optimize($pdo);
+                elseif ($act == 'hapus_histori')
+                    utilitas_db_hapus_histori($pdo);
+                elseif ($act == 'hapus_setup')
+                    utilitas_db_hapus_setup($pdo);
+                elseif ($act == 'truncate_selected')
+                    utilitas_db_truncate_selected($pdo);
+                elseif ($act == 'reset_aplikasi')
+                    utilitas_db_reset_aplikasi($pdo);
+                elseif ($act == 'run_patch')
+                    utilitas_db_run_patch($pdo);
+                else
+                    utilitas_db_index($pdo);
+                break;
+
             // --- KEUANGAN ---
             case 'keuangan_dashboard':
                 if ($act == 'sync_saldo')
