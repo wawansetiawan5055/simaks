@@ -12,7 +12,7 @@
                 <h3 class="card-title">Form Data Tracer Study Alumni</h3>
             </div>
 
-            <form action="index.php?mod=tracer_study&act=save" method="POST">
+            <form action="<?= BASE_URL ?>tracer_study/save" method="POST">
                 <?php if ($tracer_data): ?>
                     <input type="hidden" name="id_tracer" value="<?= $tracer_data['id_tracer'] ?>">
                     <input type="hidden" name="id_siswa" value="<?= $tracer_data['id_siswa'] ?>">
@@ -135,7 +135,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Simpan
                     </button>
-                    <a href="index.php?mod=tracer_study" class="btn btn-secondary">
+                    <a href="<?= BASE_URL ?>tracer_study" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Batal
                     </a>
                 </div>

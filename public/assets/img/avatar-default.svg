@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#312e81" />
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa" />
+      <stop offset="100%" stop-color="#fba471" />
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <rect width="160" height="160" rx="80" fill="url(#bgGrad)" />
+
+  <!-- Person Illustration -->
+  <g transform="translate(0, 4)">
+    <!-- Body / Shoulders -->
+    <path d="M30 148 C30 114, 52 102, 80 102 C108 102, 130 114, 130 148 Z" fill="url(#shirtGrad)" />
+    <!-- Collar / Inner Shirt -->
+    <polygon points="80,102 70,118 90,118" fill="#ffffff" opacity="0.9" />
+    <!-- Neck -->
+    <rect x="71" y="80" width="18" height="24" rx="4" fill="url(#skinGrad)" />
+    <!-- Head -->
+    <ellipse cx="80" cy="58" rx="26" ry="30" fill="url(#skinGrad)" />
+    <!-- Hair -->
+    <path d="M54 52 C54 30, 68 20, 80 20 C96 20, 106 32, 106 50 C106 54, 104 42, 98 38 C90 32, 70 34, 62 44 C57 50, 55 54, 54 52 Z" fill="#1e293b" />
+  </g>
+</svg>

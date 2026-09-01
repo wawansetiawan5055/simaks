@@ -313,7 +313,7 @@ $(document).ready(function() {
     $('select[name="id_kelas"]').on('change', function() {
         var id_kelas = $(this).val();
         if (id_kelas) {
-            fetch('index.php?mod=keuangan_get_siswa&id_kelas=' + id_kelas)
+            fetch('<?= BASE_URL ?>keuangan_get_siswa?id_kelas=' + id_kelas)
             .then(res => res.json())
             .then(res => {
                 var html = '<option value="">-- Semua Siswa --</option>';

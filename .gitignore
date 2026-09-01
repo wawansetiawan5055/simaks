@@ -1,6 +1,35 @@
+# Environment
 .env
-node_modules/
+.env.local
+.env.*.local
+
+# Dependencies
 vendor/
+node_modules/
+
+# Logs & Temp
+*.log
+logs/
+*.tmp
+lms_debug.log
+
+# Uploads & Media (Disimpan terpisah / Cloud)
+uploads/
+public/uploads/
+!public/uploads/.gitkeep
+
+# Large Database Dumps & Archives
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz
+*.rar
+backup/
+backups/
+
+# OS Generated
 .DS_Store
 Thumbs.db
-*.log
+desktop.ini
+*.lock
+.~lock.*#

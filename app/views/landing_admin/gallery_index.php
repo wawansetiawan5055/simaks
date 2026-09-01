@@ -12,7 +12,7 @@ include __DIR__ . '/../partials/header.php';
                 <h1 class="m-0"><i class="fas fa-images mr-2"></i> Daftar Foto Galeri</h1>
                 <p class="text-muted small mb-0">Kelola foto dan gambar untuk landing page.</p>
             </div>
-            <a href="index.php?mod=landing_admin&act=gallery_form" class="btn btn-primary btn-lg shadow-sm px-4">
+            <a href="<?= BASE_URL ?>landing_admin/gallery_form" class="btn btn-primary btn-lg shadow-sm px-4">
                 <i class="fas fa-plus mr-2"></i> Tambah Foto
             </a>
         </div>
@@ -82,12 +82,12 @@ include __DIR__ . '/../partials/header.php';
                                     <!-- Footer Actions -->
                                     <div class="card-footer bg-light border-0 p-2">
                                         <div class="d-flex justify-content-center">
-                                            <a href="index.php?mod=landing_admin&act=gallery_form&id=<?= $item['id'] ?>"
+                                            <a href="<?= BASE_URL ?>landing_admin/gallery_form?id=<?= $item['id'] ?>"
                                                 class="btn btn-sm btn-outline-warning border-0 px-3 mr-2"
                                                 style="background: #fffbeb; color: #d97706; border-radius: 8px;" title="Edit">
                                                 <i class="fas fa-pencil-alt mr-1" style="font-size: 0.8rem;"></i> Edit
                                             </a>
-                                            <a href="index.php?mod=landing_admin&act=gallery_delete&id=<?= $item['id'] ?>"
+                                            <a href="<?= BASE_URL ?>landing_admin/gallery_delete?id=<?= $item['id'] ?>"
                                                 class="btn btn-sm btn-outline-danger border-0 px-3"
                                                 style="background: #fee; color: #dc3545; border-radius: 8px;"
                                                 onclick="return confirmDelete(event)" title="Hapus">

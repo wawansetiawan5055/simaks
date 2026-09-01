@@ -7,7 +7,7 @@
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="index.php?mod=ppdb">PPDB</a></li>
+          <li class="breadcrumb-item"><a href="<?= BASE_URL ?>ppdb">PPDB</a></li>
           <li class="breadcrumb-item active">Detail</li>
         </ol>
       </div>
@@ -290,7 +290,7 @@
                     <h3 class="card-title"><i class="fas fa-sticky-note"></i> Catatan Verifikasi</h3>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="index.php?mod=ppdb&act=update_catatan">
+                    <form method="POST" action="<?= BASE_URL ?>ppdb/update_catatan">
                         <input type="hidden" name="id" value="<?= $data_pendaftar['id'] ?>">
                         <textarea name="catatan" class="form-control" rows="3" placeholder="Tulis catatan verifikasi..."><?= htmlspecialchars($data_pendaftar['catatan_verifikasi'] ?? '') ?></textarea>
                         <button type="submit" class="btn btn-success mt-3"><i class="fas fa-save"></i> Simpan Catatan</button>
@@ -311,23 +311,23 @@
     <!-- TOMBOL AKSI -->
     <div class="row">
         <div class="col-12">
-            <a href="index.php?mod=ppdb&act=index" class="btn btn-secondary">
+            <a href="<?= BASE_URL ?>ppdb" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             
             <?php if ($data_pendaftar['status'] == 'pending'): ?>
-                <a href="index.php?mod=ppdb&act=update_status&id=<?= $data_pendaftar['id'] ?>&status=diterima" 
+                <a href="<?= BASE_URL ?>ppdb/update_status?id=<?= $data_pendaftar['id'] ?>&status=diterima" 
                    class="btn btn-success">
                     <i class="fas fa-check"></i> Terima
                 </a>
-                <a href="index.php?mod=ppdb&act=update_status&id=<?= $data_pendaftar['id'] ?>&status=ditolak" 
+                <a href="<?= BASE_URL ?>ppdb/update_status?id=<?= $data_pendaftar['id'] ?>&status=ditolak" 
                    class="btn btn-danger">
                     <i class="fas fa-times"></i> Tolak
                 </a>
             <?php endif; ?>
             
             <?php if (empty($data_pendaftar['id_siswa'])): ?>
-                <a href="index.php?mod=ppdb&act=delete&id=<?= $data_pendaftar['id'] ?>" 
+                <a href="<?= BASE_URL ?>ppdb/delete?id=<?= $data_pendaftar['id'] ?>" 
                    class="btn btn-danger float-right" 
                    onclick="return confirmDelete(event, 'Data pendaftar ini akan dihapus permanen!')">
                     <i class="fas fa-trash"></i> Hapus Data

@@ -300,7 +300,7 @@
 
                 var formData = new FormData(form);
 
-                fetch('index.php?mod=keuangan_memorial&act=save', {
+                fetch('<?= BASE_URL ?>keuangan_memorial/save', {
                     method: 'POST',
                     body: formData
                 })

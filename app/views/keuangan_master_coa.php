@@ -201,7 +201,7 @@
                 <h4 class="modal-title">Form Kategori (Level 1)</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="index.php?mod=keuangan_master&act=save_kategori" method="post" id="form-kategori">
+            <form action="<?= BASE_URL ?>keuangan_master/save_kategori" method="post" id="form-kategori">
                 <input type="hidden" name="id_kategori" id="kat_id_kategori">
                 <div class="modal-body">
                     <div class="form-group">
@@ -241,7 +241,7 @@
                 <h4 class="modal-title">Form Akun (Level 2)</h4>
                 <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
             </div>
-            <form action="index.php?mod=keuangan_master&act=save_jenis" method="post" id="form-jenis">
+            <form action="<?= BASE_URL ?>keuangan_master/save_jenis" method="post" id="form-jenis">
                 <input type="hidden" name="id" id="jen_id">
                 <div class="modal-body">
                     <div class="form-group">
@@ -320,6 +320,65 @@
         $('#jen_is_recurring').prop('checked', data.is_recurring == 1);
         $('#modal-jenis').modal('show');
     }
+
+    // Ajax Submit Function
+    function bindAjaxSubmit(formSelector) {
+        const form = document.querySelector(formSelector);
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const btnSubmit = this.querySelector('button[type="submit"]');
+                const originalText = btnSubmit.innerHTML;
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    // Try to parse JSON but also handle non-JSON responses just in case
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        return response.json();
+                    } else {
+                        return response.text().then(text => { throw new Error('Not JSON: ' + text) });
+                    }
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Berhasil', data.message || 'Data berhasil disimpan.', 'success').then(() => location.reload());
+                        } else {
+                            alert(data.message || 'Data berhasil disimpan.');
+                            location.reload();
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Error', data.message || 'Gagal menyimpan', 'error');
+                        } else {
+                            alert('Error: ' + (data.message || 'Gagal menyimpan'));
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Submit Error:', err);
+                    if (typeof Swal !== 'undefined') Swal.fire('Error', 'Terjadi kesalahan sistem saat menghubungi server', 'error');
+                    else alert('Terjadi kesalahan sistem. Cek form untuk error.');
+                })
+                .finally(() => {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalText;
+                });
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindAjaxSubmit('#form-kategori');
+        bindAjaxSubmit('#form-jenis');
+    });
 </script>
 
 <?php include '../app/views/partials/footer.php'; ?>

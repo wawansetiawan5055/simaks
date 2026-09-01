@@ -14,7 +14,7 @@
                 <h3 class="card-title">Data Study Tracer Alumni</h3>
                 <div class="card-tools">
                     <?php if(can_do($pdo, 'tracer_study', 'create')): ?>
-                    <a href="index.php?mod=tracer_study&act=form" class="btn btn-primary btn-sm">
+                    <a href="<?= BASE_URL ?>tracer_study/form" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus"></i> Tambah Data Tracer
                     </a>
                     <?php endif; ?>
@@ -62,7 +62,7 @@
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>&nbsp;</label>
-                                <a href="index.php?mod=tracer_study" class="btn btn-secondary btn-block">
+                                <a href="<?= BASE_URL ?>tracer_study" class="btn btn-secondary btn-block">
                                     <i class="fas fa-redo"></i> Reset
                                 </a>
                             </div>
@@ -122,14 +122,14 @@
                                     <?php if(can_do($pdo, 'tracer_study', 'update') || can_do($pdo, 'tracer_study', 'delete')): ?>
                                     <td>
                                         <?php if(can_do($pdo, 'tracer_study', 'update')): ?>
-                                        <a href="index.php?mod=tracer_study&act=form&id=<?= $tracer['id_tracer'] ?>" 
+                                        <a href="<?= BASE_URL ?>tracer_study/form?id=<?= $tracer['id_tracer'] ?>" 
                                            class="btn btn-sm btn-warning" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <?php endif; ?>
                                         
                                         <?php if(can_do($pdo, 'tracer_study', 'delete')): ?>
-                                        <a href="index.php?mod=tracer_study&act=delete&id=<?= $tracer['id_tracer'] ?>" 
+                                        <a href="<?= BASE_URL ?>tracer_study/delete?id=<?= $tracer['id_tracer'] ?>" 
                                            class="btn btn-sm btn-danger" 
                                            onclick="return confirmDelete(event)"
                                            title="Hapus">

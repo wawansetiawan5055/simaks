@@ -59,9 +59,10 @@ function kokulikuler_index($pdo)
 
     } else {
         // Main List View
-        // Main List View
         $kokul_list = KokulikulerModel::getAll($pdo);
-        // Added for Modal Dropdown
+        // Guru list for coordinator dropdown
+        $guru_list = GuruModel::all($pdo);
+        // For backward compatibility (penugasan dropdown) - kept but may be empty
         $assigned_activities_list = KokulikulerModel::getAssignedActivities($pdo, $_SESSION['id_ta_aktif']);
 
         // Add dimension mapping to kokul_list

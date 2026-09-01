@@ -11,7 +11,7 @@
       <div class="card-header">
         <h3 class="card-title">Formulir Data Guru</h3>
       </div>
-      <form action="index.php?mod=guru&act=save" method="POST">
+      <form action="<?= BASE_URL ?>guru/save" method="POST">
         <?php if ($guru): ?>
           <input type="hidden" name="id_guru" value="<?= $guru['id_guru'] ?>">
         <?php endif; ?>
@@ -20,8 +20,23 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" name="nama" value="<?= $guru['nama'] ?? '' ?>" class="form-control" required>
+                <label>Nama Lengkap / Nama Jabatan Perwakilan <span class="text-danger">*</span></label>
+                <input type="text" name="nama" value="<?= $guru['nama'] ?? '' ?>" class="form-control" placeholder="Contoh: Budi Santoso, S.Pd / Koordinator PJJ Sentra 1" required>
+              </div>
+
+              <div class="form-group">
+                <label>Peran / Jenis GTK <span class="text-danger">*</span></label>
+                <select name="jenis_guru" id="selectJenisGuru" class="form-control" required onchange="toggleLokasiField(this.value)">
+                  <option value="reguler" <?= ($guru['jenis_guru'] ?? 'reguler') == 'reguler' ? 'selected' : '' ?>>👨‍🏫 Guru Reguler (Sekolah Induk Pusat)</option>
+                  <option value="koordinator_pjj" <?= ($guru['jenis_guru'] ?? '') == 'koordinator_pjj' ? 'selected' : '' ?>>🌐 Koordinator / Tutor PJJ (Sekolah Terbuka)</option>
+                  <option value="koordinator_menginduk" <?= ($guru['jenis_guru'] ?? '') == 'koordinator_menginduk' ? 'selected' : '' ?>>🤝 Koordinator / Petugas Sekolah Menginduk</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="groupLokasiTugas" style="<?= ($guru['jenis_guru'] ?? 'reguler') == 'reguler' ? 'display:none;' : '' ?>">
+                <label>Nama Lokasi / Kampus / Sekolah Mitra</label>
+                <input type="text" name="lokasi_tugas" value="<?= $guru['lokasi_tugas'] ?? '' ?>" class="form-control" placeholder="Contoh: Sentra PJJ Wilayah A / SMK Mitra Bintang">
+                <small class="form-text text-muted">Keterangan lokasi penempatan tugas sentra atau sekolah menginduk.</small>
               </div>
 
               <div class="form-group">
@@ -77,10 +92,21 @@
 
         <div class="card-footer">
           <button type="submit" class="btn btn-success">Simpan</button>
-          <a href="index.php?mod=guru" class="btn btn-secondary">Batal</a>
+          <a href="<?= BASE_URL ?>guru" class="btn btn-secondary">Batal</a>
         </div>
       </form>
     </div>
   </div>
 </section>
+
+<script>
+function toggleLokasiField(val) {
+  if (val === 'koordinator_pjj' || val === 'koordinator_menginduk') {
+    $('#groupLokasiTugas').slideDown(200);
+  } else {
+    $('#groupLokasiTugas').slideUp(200);
+  }
+}
+</script>
+
 <?php include __DIR__ . '/partials/footer.php'; ?>

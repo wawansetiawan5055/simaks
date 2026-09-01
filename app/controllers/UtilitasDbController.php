@@ -8,6 +8,10 @@ function utilitas_db_index($pdo) {
     // List of tables for the "All Tables" view
     $tables = UtilitasDbModel::getAllTables($pdo);
 
+    // List of SQL patches & applied status
+    $available_patches = UtilitasDbModel::getAvailablePatches();
+    $applied_patches = UtilitasDbModel::getAppliedPatches($pdo);
+
     include __DIR__ . '/../views/utilitas_db_index.php';
 }
 
@@ -304,5 +308,29 @@ function utilitas_db_reset_aplikasi($pdo) {
     }
     
     redirect('index.php?mod=utilitas_db');
+}
+
+/**
+ * Aksi: Menjalankan file patch SQL yang dipilih
+ */
+function utilitas_db_run_patch($pdo) {
+    if (!has_role(['Admin'])) redirect('index.php');
+
+    $filename = $_POST['patch_filename'] ?? '';
+    if (empty($filename)) {
+        $_SESSION['pesan_error'] = "File patch belum dipilih.";
+        redirect('index.php?mod=utilitas_db&tab=patches');
+    }
+
+    $username = $_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? 'Admin';
+    $result = UtilitasDbModel::executePatch($pdo, $filename, $username);
+
+    if ($result['success']) {
+        $_SESSION['pesan_sukses'] = $result['message'];
+    } else {
+        $_SESSION['pesan_error'] = $result['message'];
+    }
+
+    redirect('index.php?mod=utilitas_db&tab=patches');
 }
 ?>

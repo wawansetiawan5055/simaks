@@ -8,6 +8,57 @@
 class PpdbModel {
     
     /**
+     * Normalisasi format tanggal lahir menjadi format standar SQL (YYYY-MM-DD)
+     * Menangani berbagai format: Excel serial, DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, teks bulan Indonesia
+     */
+    public static function normalizeDateForSql($raw) {
+        if (empty($raw)) return null;
+        $raw = trim((string)$raw);
+        if ($raw === '' || $raw === '0000-00-00' || $raw === '-' || $raw === 'NULL') return null;
+
+        // 1. Jika sudah YYYY-MM-DD
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
+            [$y, $m, $d] = explode('-', $raw);
+            if (checkdate((int)$m, (int)$d, (int)$y)) {
+                return $raw;
+            }
+        }
+
+        // 2. Jika format DD/MM/YYYY atau DD-MM-YYYY (format umum Indonesia)
+        if (preg_match('/^(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})$/', $raw, $matches)) {
+            $day = (int)$matches[1];
+            $month = (int)$matches[2];
+            $year = (int)$matches[3];
+            if (checkdate($month, $day, $year)) {
+                return sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+
+        // 3. Konversi nama bulan Indonesia ke Inggris
+        $bulan_indo = [
+            'januari' => 'january', 'februari' => 'february', 'maret' => 'march',
+            'april' => 'april', 'mei' => 'may', 'juni' => 'june',
+            'juli' => 'july', 'agustus' => 'august', 'september' => 'september',
+            'oktober' => 'october', 'november' => 'november', 'desember' => 'december',
+            'jan' => 'jan', 'feb' => 'feb', 'mar' => 'mar', 'apr' => 'apr',
+            'agt' => 'aug', 'ags' => 'aug', 'sep' => 'sep', 'okt' => 'oct', 'nov' => 'nov', 'des' => 'dec'
+        ];
+        $clean_str = str_ireplace(array_keys($bulan_indo), array_values($bulan_indo), strtolower($raw));
+
+        try {
+            $dt = new DateTime($clean_str);
+            return $dt->format('Y-m-d');
+        } catch (Exception $e) {
+            $time = strtotime($clean_str);
+            if ($time !== false && $time > 0) {
+                return date('Y-m-d', $time);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Simpan data pendaftaran PPDB (Manual Entry dari Admin)
      * @param PDO $pdo
      * @param array $data
@@ -45,7 +96,7 @@ class PpdbModel {
             ':nik' => $data['nik'],
             ':jk' => $data['jk'],
             ':tempat_lahir' => $data['tempat_lahir'],
-            ':tanggal_lahir' => $data['tanggal_lahir'],
+            ':tanggal_lahir' => self::normalizeDateForSql($data['tanggal_lahir']),
             ':asal_sekolah' => $data['sekolah_asal'] ?? null,
             ':jalur_pendaftaran' => $data['jalur_pendaftaran'] ?? 'Zonasi',
             ':nama_wali' => $data['nama_wali'] ?? null,
@@ -296,15 +347,20 @@ class PpdbModel {
                 // Format: 252610 + 001
                 $nipd_baru = $prefix_nipd . str_pad($next_urut, 3, '0', STR_PAD_LEFT);
                 
+                // Map jenis_kelamin dari PPDB (L/P) ke Siswa (Laki-laki/Perempuan)
+                $jk_mapped = ($data_ppdb['jenis_kelamin'] == 'L') ? 'Laki-laki' : (($data_ppdb['jenis_kelamin'] == 'P') ? 'Perempuan' : $data_ppdb['jenis_kelamin']);
+                
+                $tgl_lahir_clean = self::normalizeDateForSql($data_ppdb['tanggal_lahir']);
+
                 // Insert ke 'siswa'
                 $stmt_siswa->execute([
                     $data_ppdb['nama_lengkap'], 
                     $data_ppdb['nisn'], 
                     $nipd_baru,
                     $data_ppdb['nik'], 
-                    $data_ppdb['jenis_kelamin'], 
+                    $jk_mapped, 
                     $data_ppdb['tempat_lahir'],
-                    $data_ppdb['tanggal_lahir'], 
+                    $tgl_lahir_clean, 
                     $data_ppdb['asal_sekolah'],
                     $id_ta_aktif // id_ta_masuk
                 ]);
@@ -390,5 +446,204 @@ class PpdbModel {
         $stmt->execute([$id_ta_aktif]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Re-Generate NIPD Massal untuk siswa berdasarkan TA Masuk tertentu.
+     * 
+     * Aturan:
+     * - Hanya siswa dengan id_ta_masuk = $id_ta yang di-update NIPD-nya
+     * - Tingkat ditentukan dari penempatan kelas pertama di TA masuk tersebut
+     *   (X → 10, XI → 11, XII → 12)
+     * - Siswa diurutkan alfabet dalam setiap tingkat
+     * - Nomor urut NIPD bersifat KONTINU antar tingkat (XI mulai dari nomor setelah X)
+     * - Format NIPD: [2-digit-tahun-mulai][2-digit-tahun-akhir][tingkat][3-digit-urut]
+     *   Contoh: TA 2026/2027, tingkat 10, urut 1 → 262710001
+     * - Username siswa (NISN) TIDAK diubah
+     * 
+     * @param PDO $pdo
+     * @param int $id_ta ID Tahun Ajaran yang akan di-regenerate NIPD-nya
+     * @return array ['jumlah' => int, 'preview' => array]
+     */
+    public static function regenerateNipdMassal($pdo, $id_ta) {
+        // 1. Ambil nama TA untuk membuat prefix NIPD
+        $stmt_ta = $pdo->prepare("SELECT nama_ta FROM tahun_ajaran WHERE id_ta = ?");
+        $stmt_ta->execute([$id_ta]);
+        $nama_ta = $stmt_ta->fetchColumn();
+
+        if (!$nama_ta) {
+            throw new Exception("Tahun ajaran dengan ID $id_ta tidak ditemukan.");
+        }
+
+        // Parse tahun dari nama_ta (format: "2026/2027 Ganjil" atau "2026/2027")
+        if (!preg_match('/(\d{4})\/(\d{4})/', $nama_ta, $matches)) {
+            throw new Exception("Format nama TA tidak dikenali: $nama_ta");
+        }
+        $prefix_base = substr($matches[1], -2) . substr($matches[2], -2); // "2627"
+
+        // 2. Ambil semua siswa dengan id_ta_masuk = $id_ta,
+        //    sekaligus tentukan tingkat dari penempatan pertama mereka
+        $sql = "SELECT 
+                    s.id_siswa, s.nama, s.nipd AS nipd_lama,
+                    COALESCE(
+                        CASE 
+                            WHEN k.nama_kelas LIKE 'XII%' THEN 12
+                            WHEN k.nama_kelas LIKE 'XI%' THEN 11
+                            ELSE 10 
+                        END,
+                        10
+                    ) AS tingkat,
+                    k.nama_kelas
+                FROM siswa s
+                LEFT JOIN (
+                    SELECT ps.id_siswa, ps.id_kelas
+                    FROM penempatan_siswa ps
+                    WHERE ps.id_ta = ?
+                    GROUP BY ps.id_siswa
+                ) AS first_ps ON first_ps.id_siswa = s.id_siswa
+                LEFT JOIN kelas k ON k.id_kelas = first_ps.id_kelas
+                WHERE s.id_ta_masuk = ?
+                ORDER BY 
+                    COALESCE(
+                        CASE 
+                            WHEN k.nama_kelas LIKE 'XII%' THEN 12
+                            WHEN k.nama_kelas LIKE 'XI%' THEN 11
+                            ELSE 10 
+                        END,
+                        10
+                    ) ASC,
+                    s.nama ASC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_ta, $id_ta]);
+        $siswa_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($siswa_list)) {
+            throw new Exception("Tidak ada siswa dengan id_ta_masuk = $id_ta.");
+        }
+
+        // 3. Generate NIPD baru secara kontinu antar tingkat
+        $urut_global = 0;
+        $current_tingkat = null;
+        $current_prefix = '';
+        $preview = [];
+
+        $pdo->beginTransaction();
+        try {
+            $stmt_update = $pdo->prepare("UPDATE siswa SET nipd = ? WHERE id_siswa = ?");
+
+            foreach ($siswa_list as $s) {
+                $urut_global++;
+                $tingkat = $s['tingkat'];
+                $prefix_nipd = $prefix_base . $tingkat; // "262710" / "262711" / "262712"
+                $nipd_baru = $prefix_nipd . str_pad($urut_global, 3, '0', STR_PAD_LEFT);
+
+                $stmt_update->execute([$nipd_baru, $s['id_siswa']]);
+
+                $preview[] = [
+                    'id_siswa'   => $s['id_siswa'],
+                    'nama'       => $s['nama'],
+                    'tingkat'    => $tingkat,
+                    'nama_kelas' => $s['nama_kelas'] ?? '-',
+                    'nipd_lama'  => $s['nipd_lama'],
+                    'nipd_baru'  => $nipd_baru,
+                ];
+            }
+
+            $pdo->commit();
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        return [
+            'jumlah'   => count($siswa_list),
+            'nama_ta'  => $nama_ta,
+            'preview'  => $preview,
+        ];
+    }
+
+    /**
+     * Ambil semua Tahun Ajaran untuk dropdown pilih TA pada regenerasi NIPD.
+     */
+    public static function getAllTa($pdo) {
+        return $pdo->query("SELECT id_ta, nama_ta FROM tahun_ajaran ORDER BY id_ta DESC")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Preview regenerasi NIPD tanpa benar-benar menyimpan (dry-run).
+     */
+    public static function previewRegenerateNipd($pdo, $id_ta) {
+        $stmt_ta = $pdo->prepare("SELECT nama_ta FROM tahun_ajaran WHERE id_ta = ?");
+        $stmt_ta->execute([$id_ta]);
+        $nama_ta = $stmt_ta->fetchColumn();
+
+        if (!$nama_ta) {
+            throw new Exception("Tahun ajaran tidak ditemukan.");
+        }
+
+        if (!preg_match('/(\d{4})\/(\d{4})/', $nama_ta, $matches)) {
+            throw new Exception("Format nama TA tidak dikenali: $nama_ta");
+        }
+        $prefix_base = substr($matches[1], -2) . substr($matches[2], -2);
+
+        $sql = "SELECT 
+                    s.id_siswa, s.nama, s.nipd AS nipd_lama,
+                    COALESCE(
+                        CASE 
+                            WHEN k.nama_kelas LIKE 'XII%' THEN 12
+                            WHEN k.nama_kelas LIKE 'XI%' THEN 11
+                            ELSE 10 
+                        END,
+                        10
+                    ) AS tingkat,
+                    k.nama_kelas
+                FROM siswa s
+                LEFT JOIN (
+                    SELECT ps.id_siswa, ps.id_kelas
+                    FROM penempatan_siswa ps
+                    WHERE ps.id_ta = ?
+                    GROUP BY ps.id_siswa
+                ) AS first_ps ON first_ps.id_siswa = s.id_siswa
+                LEFT JOIN kelas k ON k.id_kelas = first_ps.id_kelas
+                WHERE s.id_ta_masuk = ?
+                ORDER BY 
+                    COALESCE(
+                        CASE 
+                            WHEN k.nama_kelas LIKE 'XII%' THEN 12
+                            WHEN k.nama_kelas LIKE 'XI%' THEN 11
+                            ELSE 10 
+                        END,
+                        10
+                    ) ASC,
+                    s.nama ASC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_ta, $id_ta]);
+        $siswa_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $urut_global = 0;
+        $preview = [];
+        foreach ($siswa_list as $s) {
+            $urut_global++;
+            $prefix_nipd = $prefix_base . $s['tingkat'];
+            $nipd_baru = $prefix_nipd . str_pad($urut_global, 3, '0', STR_PAD_LEFT);
+            $preview[] = [
+                'id_siswa'   => $s['id_siswa'],
+                'nama'       => $s['nama'],
+                'tingkat'    => $s['tingkat'],
+                'nama_kelas' => $s['nama_kelas'] ?? '-',
+                'nipd_lama'  => $s['nipd_lama'],
+                'nipd_baru'  => $nipd_baru,
+                'berubah'    => ($s['nipd_lama'] !== $nipd_baru),
+            ];
+        }
+
+        return [
+            'jumlah'  => count($siswa_list),
+            'nama_ta' => $nama_ta,
+            'preview' => $preview,
+        ];
+    }
 }
+
 ?>

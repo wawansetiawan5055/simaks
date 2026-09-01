@@ -1,13 +1,87 @@
 <?php include __DIR__ . '/../partials/header.php'; ?>
-<div class="content-header">
+<style>
+    .profil-icon-box {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);
+        flex-shrink: 0;
+    }
+
+    /* ============================================================ */
+    /* 📱 MOBILE RESPONSIVENESS (DETAIL PROFIL SISWA)              */
+    /* ============================================================ */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+        .content-header {
+            padding: 8px 4px 2px !important;
+        }
+        .content-header h4 {
+            font-size: 0.90rem !important;
+        }
+        .card {
+            border-radius: 10px !important;
+            margin-bottom: 10px !important;
+        }
+        .card-body {
+            padding: 10px 8px !important;
+        }
+        .profile-user-img {
+            width: 80px !important;
+            height: 80px !important;
+        }
+        .profile-username {
+            font-size: 1.05rem !important;
+        }
+        .nav-tabs .nav-link {
+            font-size: 0.78rem !important;
+            padding: 6px 12px !important;
+        }
+        .form-group.row {
+            margin-bottom: 8px !important;
+        }
+        .col-form-label {
+            font-size: 0.76rem !important;
+            padding-bottom: 2px !important;
+        }
+        .form-control {
+            font-size: 0.80rem !important;
+            height: 34px !important;
+        }
+        .btn-block {
+            font-size: 0.78rem !important;
+            padding: 6px 12px !important;
+        }
+    }
+</style>
+
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-user-circle mr-2"></i> Detail Siswa: <?= htmlspecialchars($siswa['nama']) ?></h1>
+        <div class="row align-items-center">
+            <div class="col-sm-7 col-12 d-flex align-items-center">
+                <div class="profil-icon-box mr-3">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Profil Saya: <?= htmlspecialchars($siswa['nama']) ?>
+                    </h4>
+                </div>
             </div>
-            <div class="col-sm-6 text-right">
-                <a href="index.php?mod=profil_siswa" class="btn btn-default"><i class="fas fa-arrow-left"></i>
-                    Kembali</a>
+            <div class="col-sm-5 col-12 text-sm-right mt-2 mt-sm-0">
+                <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>siswa_portal/dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Portal Siswa</a></li>
+                    <li class="breadcrumb-item active text-primary font-weight-bold">Profil Saya</li>
+                </ol>
             </div>
         </div>
     </div>
@@ -33,13 +107,13 @@
                     <div class="card-body box-profile">
                         <div class="text-center">
                             <img class="profile-user-img img-fluid img-circle"
-                                src="../public/assets/img/avatar-student.png" alt="User profile picture">
+                                src="<?= $avatar_src ?>" alt="User profile picture">
                         </div>
                         <h3 class="profile-username text-center"><?= htmlspecialchars($siswa['nama']) ?></h3>
                         <p class="text-muted text-center"><?= htmlspecialchars($siswa['nisn']) ?></p>
 
                         <button
-                            onclick="previewPrint('index.php?mod=profil_siswa&act=print&id=<?= $siswa['id_siswa'] ?>')"
+                            onclick="previewPrint('<?= BASE_URL ?>profil_siswa/print?id=<?= $siswa['id_siswa'] ?>')"
                             class="btn btn-primary btn-block"><b><i class="fas fa-print"></i> Cetak Biodata</b></button>
                     </div>
                 </div>
@@ -68,7 +142,7 @@
                             <!-- TAB DATA ORTU -->
                             <div class="tab-pane fade <?= (!isset($_GET['tab']) || $_GET['tab'] == 'data') ? 'show active' : '' ?>"
                                 id="parent" role="tabpanel" aria-labelledby="parent-tab">
-                                <form action="index.php?mod=profil_siswa&act=save" method="post"
+                                <form action="<?= BASE_URL ?>profil_siswa/save" method="post"
                                     class="form-horizontal">
                                     <input type="hidden" name="id_siswa" value="<?= $siswa['id_siswa'] ?>">
                                     <h5 class="text-primary mb-3">Data Ayah</h5>
@@ -160,8 +234,8 @@
                                                             Tersedia</p>
                                                         <div class="btn-group btn-group-sm">
                                                             <button class="btn btn-info"
-                                                                onclick="previewFile('../public/uploads/siswa/<?= $fVal ?>')">Lihat</button>
-                                                            <a href="../public/uploads/siswa/<?= $fVal ?>" download
+                                                                onclick="previewFile('<?= BASE_URL ?>uploads/siswa/<?= $fVal ?>')">Lihat</button>
+                                                            <a href="<?= BASE_URL ?>uploads/siswa/<?= $fVal ?>" download
                                                                 class="btn btn-default">Unduh</a>
                                                         </div>
                                                     <?php else: ?>
@@ -169,7 +243,7 @@
                                                             ada file</p>
                                                     <?php endif; ?>
                                                     <hr>
-                                                    <form action="index.php?mod=profil_siswa&act=upload" method="post"
+                                                    <form action="<?= BASE_URL ?>profil_siswa/upload" method="post"
                                                         enctype="multipart/form-data">
                                                         <input type="hidden" name="id_siswa"
                                                             value="<?= $siswa['id_siswa'] ?>">

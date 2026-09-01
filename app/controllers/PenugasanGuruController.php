@@ -26,6 +26,7 @@ function penugasan_guru_index($pdo)
         'master_kegiatan_nona' => PenugasanModel::getMasterKegiatanNonAkademik($pdo),
         'all_guru' => PenugasanModel::all_guru($pdo),
         'all_mapel' => PenugasanModel::all_mapel($pdo),
+        'all_kelas' => PenugasanModel::all_kelas($pdo, $id_ta_tampil), 
         'guru_mapel_list' => PenugasanModel::guru_mapel_list($pdo, $id_ta_tampil),
         'nama_ta' => $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? '',
         // [BARU] Active Tab Logic
@@ -71,10 +72,57 @@ function penugasan_guru_mapel_save($pdo)
         die("Tidak ada TA Aktif untuk menyimpan data.");
 
     try {
-        PenugasanModel::guru_mapel_save($pdo, $_POST['id_guru'], $_POST['id_mapel'], $id_ta_aktif);
-        $_SESSION['pesan_sukses'] = "Guru mapel berhasil disimpan.";
+        $id_mapel_list = $_POST['id_mapel'] ?? [];
+        $id_kelas_list = $_POST['id_kelas'] ?? [];
+        
+        if (empty($id_mapel_list) || empty($id_kelas_list)) {
+            $_SESSION['pesan_error'] = "Pilih minimal satu mata pelajaran dan satu kelas.";
+            redirect('index.php?mod=penugasan_guru&tab=mapel');
+            return;
+        }
+
+        $total_saved = 0;
+        foreach ($id_mapel_list as $id_mapel) {
+            foreach ($id_kelas_list as $id_kelas) {
+                PenugasanModel::guru_mapel_save($pdo, $_POST['id_guru'], $id_mapel, $id_kelas, $id_ta_aktif);
+                $total_saved++;
+            }
+        }
+        
+        $_SESSION['pesan_sukses'] = "Berhasil menyimpan $total_saved penugasan guru mapel.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menyimpan guru mapel: " . $e->getMessage();
+    }
+    redirect('index.php?mod=penugasan_guru&tab=mapel');
+}
+
+function penugasan_guru_mapel_update($pdo)
+{
+    if (!can_do($pdo, 'penugasan_guru', 'update') && !can_do($pdo, 'penugasan_guru', 'create')) {
+        $_SESSION['pesan_error'] = "Akses ditolak. Anda tidak memiliki izin untuk mengubah data.";
+        redirect('index.php?mod=penugasan_guru&tab=mapel');
+        return;
+    }
+
+    $id_ta_aktif = $_SESSION['id_ta_aktif'] ?? 0;
+    if (!$id_ta_aktif)
+        die("Tidak ada TA Aktif untuk menyimpan data.");
+
+    try {
+        $id_guru = (int)($_POST['id_guru'] ?? 0);
+        $id_mapel_list = $_POST['id_mapel'] ?? [];
+        $id_kelas_list = $_POST['id_kelas'] ?? [];
+
+        if (!$id_guru || empty($id_mapel_list) || empty($id_kelas_list)) {
+            $_SESSION['pesan_error'] = "Pilih minimal satu mata pelajaran dan satu kelas.";
+            redirect('index.php?mod=penugasan_guru&tab=mapel');
+            return;
+        }
+
+        PenugasanModel::guru_mapel_update($pdo, $id_guru, $id_mapel_list, $id_kelas_list, $id_ta_aktif);
+        $_SESSION['pesan_sukses'] = "Penugasan guru mapel berhasil diperbarui.";
+    } catch (Exception $e) {
+        $_SESSION['pesan_error'] = "Gagal memperbarui guru mapel: " . $e->getMessage();
     }
     redirect('index.php?mod=penugasan_guru&tab=mapel');
 }
@@ -105,8 +153,12 @@ function penugasan_guru_mapel_delete($pdo, $id)
     }
 
     try {
-        PenugasanModel::guru_mapel_delete($pdo, $id);
-        $_SESSION['pesan_sukses'] = "Guru mapel berhasil dihapus.";
+        // ID bisa berupa satu angka atau list ID dipisahkan koma (dari grouped list)
+        $ids = explode(',', $id);
+        foreach ($ids as $id_item) {
+            PenugasanModel::guru_mapel_delete($pdo, $id_item);
+        }
+        $_SESSION['pesan_sukses'] = "Penugasan guru mapel berhasil dihapus.";
     } catch (PDOException $e) {
         if ($e->getCode() == '23000') {
             $_SESSION['pesan_error'] = "Gagal menghapus: Guru mapel ini mungkin sudah memiliki jadwal. Hapus jadwal terkait terlebih dahulu.";
@@ -135,7 +187,18 @@ function penugasan_jabatan_save($pdo)
     }
 
     try {
-        PenugasanModel::jabatan_save($pdo, $_POST['id_guru'], $_POST['jenis_jabatan'], $id_ta_aktif);
+        $jabatan_list = $_POST['jenis_jabatan'] ?? [];
+        if (empty($jabatan_list)) {
+            $_SESSION['pesan_error'] = "Pilih minimal satu jabatan.";
+            $tab = $_POST['tab'] ?? 'jabatan_guru';
+            redirect('index.php?mod=penugasan_guru&tab=' . $tab);
+            return;
+        }
+
+        foreach ($jabatan_list as $jabatan) {
+            PenugasanModel::jabatan_save($pdo, $_POST['id_guru'], $jabatan, $id_ta_aktif);
+        }
+        
         $_SESSION['pesan_sukses'] = "Jabatan berhasil disimpan.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menyimpan jabatan: " . $e->getMessage();
@@ -153,7 +216,10 @@ function penugasan_jabatan_delete($pdo, $id)
     }
 
     try {
-        PenugasanModel::jabatan_delete($pdo, $id);
+        $ids = explode(',', $id);
+        foreach ($ids as $id_item) {
+            PenugasanModel::jabatan_delete($pdo, $id_item);
+        }
         $_SESSION['pesan_sukses'] = "Jabatan berhasil dihapus.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menghapus: " . $e->getMessage();

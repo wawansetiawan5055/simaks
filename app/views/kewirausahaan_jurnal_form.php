@@ -13,8 +13,8 @@ include __DIR__ . '/partials/sidebar.php';
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php?mod=dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="index.php?mod=kewirausahaan&id=<?= $id_kew ?>">Detail</a></li>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>kewirausahaan?id=<?= $id_kew ?>">Detail</a></li>
                     <li class="breadcrumb-item active">Jurnal</li>
                 </ol>
             </div>
@@ -24,7 +24,7 @@ include __DIR__ . '/partials/sidebar.php';
 
 <section class="content">
     <div class="container-fluid">
-        <form action="index.php?mod=kewirausahaan&act=jurnal_save" method="post">
+        <form action="<?= BASE_URL ?>kewirausahaan/jurnal_save" method="post">
             <input type="hidden" name="id_kewirausahaan" value="<?= $id_kew ?>">
             <?php if ($jurnal): ?>
                 <input type="hidden" name="id_jurnal" value="<?= $jurnal['id_jurnal'] ?>">
@@ -137,7 +137,7 @@ include __DIR__ . '/partials/sidebar.php';
                             </table>
                         </div>
                         <div class="card-footer text-right">
-                            <a href="index.php?mod=kewirausahaan&act=index&id=<?= $id_kew ?>&tab=jurnal"
+                            <a href="<?= BASE_URL ?>kewirausahaan/index?id=<?= $id_kew ?>&tab=jurnal"
                                 class="btn btn-secondary">Batal</a>
                             <button type="submit" class="btn btn-primary">Simpan Jurnal & Absensi</button>
                         </div>

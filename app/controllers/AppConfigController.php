@@ -39,7 +39,11 @@ function app_config_save($pdo) {
             'theme_color_table_content',
             'theme_color_body',
             'theme_color_small',
-            'theme_color_sidebar_text'
+            'theme_color_sidebar_text',
+            'gemini_api_key',
+            'login_quote_1',
+            'login_quote_2',
+            'login_quote_3'
         ];
 
         $data_to_update = [];
@@ -49,8 +53,38 @@ function app_config_save($pdo) {
             }
         }
 
+        // Handle Image Uploads for login background sliders (1, 2, 3)
+        $upload_dir = __DIR__ . '/../../public/assets/img/';
+        $allowed_types = ['jpg', 'png', 'jpeg', 'webp'];
+        
+        for ($i = 1; $i <= 3; $i++) {
+            $input_name = "login_bg_image_$i";
+            if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] === UPLOAD_ERR_OK) {
+                $file_name = 'login_bg_' . $i . '_' . time() . '_' . basename(str_replace(' ', '_', $_FILES[$input_name]['name']));
+                $target_file = $upload_dir . $file_name;
+                
+                $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                
+                if (in_array($imageFileType, $allowed_types)) {
+                    if (move_uploaded_file($_FILES[$input_name]['tmp_name'], $target_file)) {
+                        $data_to_update[$input_name] = $file_name;
+                        // For backward compatibility, also set login_bg_image if slide 1 is uploaded
+                        if ($i === 1) {
+                            $data_to_update['login_bg_image'] = $file_name;
+                        }
+                    } else {
+                        $_SESSION['pesan_error'] = "Gagal mengunggah gambar latar login $i.";
+                    }
+                } else {
+                    $_SESSION['pesan_error'] = "Format file gambar $i tidak didukung.";
+                }
+            }
+        }
+
         if (AppConfigModel::updateBulk($pdo, $data_to_update)) {
-            $_SESSION['pesan_sukses'] = "Pengaturan tampilan berhasil diperbarui.";
+            if (!isset($_SESSION['pesan_error'])) {
+                $_SESSION['pesan_sukses'] = "Pengaturan tampilan berhasil diperbarui.";
+            }
         } else {
             $_SESSION['pesan_error'] = "Gagal memperbarui pengaturan tampilan.";
         }

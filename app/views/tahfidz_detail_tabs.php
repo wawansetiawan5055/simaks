@@ -47,7 +47,7 @@ include __DIR__ . '/partials/header.php';
                 <h1>Tahfidz Qur'an: <strong><?= htmlspecialchars($tahfidz['nama_kelompok']) ?></strong></h1>
             </div>
             <div class="col-sm-6 text-end">
-                <a href="index.php?mod=tahfidz" class="btn btn-secondary btn-sm float-right">
+                <a href="<?= BASE_URL ?>tahfidz" class="btn btn-secondary btn-sm float-right">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </div>
@@ -61,22 +61,22 @@ include __DIR__ . '/partials/header.php';
             <div class="card-header p-0 pt-1 border-bottom-0">
                 <ul class="nav nav-tabs" id="tahfidzTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'program' || $tab == '') ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=program">
+                        <a class="nav-link <?= ($tab == 'program' || $tab == '') ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index/<?= $id ?>/program">
                             <i class="fas fa-file-signature"></i> Program Kerja
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'anggota') ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=anggota">
+                        <a class="nav-link <?= ($tab == 'anggota') ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index/<?= $id ?>/anggota">
                             <i class="fas fa-users"></i> Anggota
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=jurnal">
+                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index/<?= $id ?>/jurnal">
                             <i class="fas fa-book"></i> Jurnal Umum
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'setoran') ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=setoran">
+                        <a class="nav-link <?= ($tab == 'setoran') ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index/<?= $id ?>/setoran">
                             <i class="fas fa-microphone-alt"></i> Setoran Hafalan
                         </a>
                     </li>
@@ -142,7 +142,7 @@ include __DIR__ . '/partials/header.php';
                                                                             </button>
                                                                         <?php endif; ?>
                                                                         <button class="btn btn-xs btn-warning p-1" onclick='editAgenda(<?= json_encode($ag) ?>)' title="Edit" style="line-height: 1;"><i class="fas fa-edit fa-xs"></i></button>
-                                                                        <a href="index.php?mod=tahfidz&act=agenda_delete&id_tahfidz=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
+                                                                        <a href="<?= BASE_URL ?>tahfidz/agenda_delete?id_tahfidz=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -187,7 +187,7 @@ include __DIR__ . '/partials/header.php';
                                                                         <button class="btn btn-xs btn-info p-1" onclick="previewFile('<?= $pr['file_path'] ?>', 'pdf', '<?= htmlspecialchars($pr['nama_agenda']) ?>')" title="Lihat File" style="line-height: 1;">
                                                                             <i class="fas fa-eye fa-xs"></i>
                                                                         </button>
-                                                                        <a href="index.php?mod=tahfidz&act=agenda_delete&id_tahfidz=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
+                                                                        <a href="<?= BASE_URL ?>tahfidz/agenda_delete?id_tahfidz=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
                                                                             <i class="fas fa-trash fa-xs"></i>
                                                                         </a>
                                                                     </div>
@@ -277,7 +277,7 @@ include __DIR__ . '/partials/header.php';
                     <div class="tab-pane fade show active" id="jurnal" role="tabpanel">
                         <div class="mb-3 d-flex justify-content-between">
                              <h5>Jurnal Kegiatan / Murajaah Bersama</h5>
-                             <a href="index.php?mod=tahfidz&act=jurnal_form&id_tahfidz=<?= $id ?>" class="btn btn-primary btn-sm">
+                             <a href="<?= BASE_URL ?>tahfidz/jurnal_form?id_tahfidz=<?= $id ?>" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus"></i> Isi Jurnal & Absensi
                             </a>
                         </div>
@@ -309,8 +309,8 @@ include __DIR__ . '/partials/header.php';
                                                 <td><?= htmlspecialchars($ji['keterangan']) ?></td>
                                                 <td><?= $hadir_count ?> Siswa</td>
                                                 <td>
-                                                    <a href="index.php?mod=tahfidz&act=jurnal_form&id_tahfidz=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i></a>
-                                                    <a href="index.php?mod=tahfidz&act=jurnal_delete&id_tahfidz=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
+                                                    <a href="<?= BASE_URL ?>tahfidz/jurnal_form?id_tahfidz=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i></a>
+                                                    <a href="<?= BASE_URL ?>tahfidz/jurnal_delete?id_tahfidz=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -338,7 +338,7 @@ include __DIR__ . '/partials/header.php';
                                     <?php foreach($anggota_list as $s): 
                                         $isActive = (isset($_GET['id_siswa']) && $_GET['id_siswa'] == $s['id_siswa']);
                                     ?>
-                                        <a href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=setoran&id_siswa=<?= $s['id_siswa'] ?>" 
+                                        <a href="<?= BASE_URL ?>tahfidz/index?id=<?= $id ?>&tab=setoran&id_siswa=<?= $s['id_siswa'] ?>" 
                                             class="list-group-item list-group-item-action <?= $isActive?'active':'' ?>">
                                             <?= $s['nama_siswa'] ?>
                                             <br><small><?= $s['nama_kelas'] ?></small>
@@ -371,10 +371,10 @@ include __DIR__ . '/partials/header.php';
                                     <!-- TAB NAV FOR JENIS SETORAN -->
                                     <ul class="nav nav-tabs mb-3">
                                         <li class="nav-item">
-                                            <a class="nav-link <?= $curr_jenis == 'Harian' ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=setoran&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=Harian">Hafalan Harian</a>
+                                            <a class="nav-link <?= $curr_jenis == 'Harian' ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index?id=<?= $id ?>&tab=setoran&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=Harian">Hafalan Harian</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link <?= $curr_jenis == 'Ujian' ? 'active' : '' ?>" href="index.php?mod=tahfidz&act=index&id=<?= $id ?>&tab=setoran&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=Ujian">Ujian / Evaluasi</a>
+                                            <a class="nav-link <?= $curr_jenis == 'Ujian' ? 'active' : '' ?>" href="<?= BASE_URL ?>tahfidz/index?id=<?= $id ?>&tab=setoran&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=Ujian">Ujian / Evaluasi</a>
                                         </li>
                                     </ul>
         
@@ -424,7 +424,7 @@ include __DIR__ . '/partials/header.php';
                                                                     $jsonData = htmlspecialchars(json_encode($st), ENT_QUOTES, 'UTF-8');
                                                                 ?>
                                                                 <button class="btn btn-xs btn-info" onclick="editSetoran(<?= $jsonData ?>)"><i class="fas fa-edit"></i></button>
-                                                                <a href="index.php?mod=tahfidz&act=delete_setoran&id_tahfidz=<?= $id ?>&id_setoran=<?= $st['id_setoran'] ?>&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=<?= $curr_jenis ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash-alt"></i></a>
+                                                                <a href="<?= BASE_URL ?>tahfidz/delete_setoran?id_tahfidz=<?= $id ?>&id_setoran=<?= $st['id_setoran'] ?>&id_siswa=<?= $_GET['id_siswa'] ?>&jenis=<?= $curr_jenis ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash-alt"></i></a>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -466,7 +466,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalUploadProker" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=tahfidz&act=program_upload" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>tahfidz/program_upload" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_tahfidz" value="<?= $id ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Program Kerja</h5>
@@ -498,7 +498,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalAgenda" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=tahfidz&act=agenda_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>tahfidz/agenda_save" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_tahfidz" value="<?= $id ?>">
                 <input type="hidden" name="id_agenda" id="id_agenda">
                 <div class="modal-header">
@@ -559,7 +559,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalSetoran" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content border-top-primary">
-            <form action="index.php?mod=tahfidz&act=save_setoran" method="post">
+            <form action="<?= BASE_URL ?>tahfidz/save_setoran" method="post">
                 <input type="hidden" name="id_tahfidz" value="<?= $id ?>">
                 <input type="hidden" name="id_siswa" value="<?= $_GET['id_siswa'] ?? '' ?>">
                 <input type="hidden" name="id_setoran" id="setoran_id">
@@ -689,7 +689,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalJurnal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=tahfidz&act=jurnal_save" method="post">
+            <form action="<?= BASE_URL ?>tahfidz/jurnal_save" method="post">
                 <input type="hidden" name="id_tahfidz" value="<?= $id ?>">
                 <input type="hidden" name="id_jurnal" id="id_jurnal">
                 <div class="modal-header">
@@ -875,7 +875,7 @@ $(document).ready(function() {
             var studentId = ui.item.data('id');
             var action = $(this).attr('id') == 'targetList' ? 'add' : 'remove';
             
-            $.post('index.php?mod=tahfidz&act=update_anggota', {
+            $.post('<?= BASE_URL ?>tahfidz/update_anggota', {
                 action: action,
                 id_tahfidz: id_tah,
                 student_ids: [studentId]
@@ -896,7 +896,7 @@ $(document).ready(function() {
     function searchStudents() {
         var q = $("#search-left").val();
         var id_kelas = $("#filter-kelas").val();
-        $.get('index.php?mod=tahfidz&act=search_students', { id_tahfidz: id_tah, q: q, id_kelas: id_kelas }, function(response) {
+        $.get('<?= BASE_URL ?>tahfidz/search_students', { id_tahfidz: id_tah, q: q, id_kelas: id_kelas }, function(response) {
             if(response.status === 'success') {
                 $("#sourceList").empty();
                 $.each(response.data, function(i, s) {

@@ -37,7 +37,7 @@
 <div class="kop-surat-standard">
     <?php if (!empty($kop['logo'])): ?>
         <div style="position: absolute; left: 0;">
-            <img src="assets/img/<?= $kop['logo'] ?>" class="kop-logo-img">
+            <img src="<?= defined('BASE_URL') ? BASE_URL : '' ?>assets/img/<?= $kop['logo'] ?>" class="kop-logo-img">
         </div>
     <?php endif; ?>
     <div style="flex-grow: 1;">

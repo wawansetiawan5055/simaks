@@ -6,7 +6,7 @@
                 <h1>Rekap Absensi Manual: <strong><?= htmlspecialchars($pembiasaan['nama_kegiatan']) ?></strong></h1>
             </div>
             <div class="col-sm-4 text-end">
-                <a href="index.php?mod=pembiasaan&id=<?= $pembiasaan['id_pembiasaan'] ?>&tab=jurnal" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Kembali</a>
+                <a href="<?= BASE_URL ?>pembiasaan?id=<?= $pembiasaan['id_pembiasaan'] ?>&tab=jurnal" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Kembali</a>
             </div>
         </div>
     </div>
@@ -39,13 +39,36 @@
                 </form>
             </div>
             
-            <form action="index.php?mod=pembiasaan&act=rekap_save" method="POST">
+            <form action="<?= BASE_URL ?>pembiasaan/rekap_save" method="POST">
                 <input type="hidden" name="id_pembiasaan" value="<?= $id_pem ?>">
                 <input type="hidden" name="bulan" value="<?= $bulan ?>">
                 <input type="hidden" name="tahun" value="<?= $tahun ?>">
                 
                 <div class="card-body p-0 table-responsive">
-                    <table class="table table-bordered table-striped table-hover text-center">
+                    <?php
+                    // Ekstrak list kelas unik untuk filter
+                    $kelas_list = [];
+                    if (!empty($anggota)) {
+                        foreach ($anggota as $a) {
+                            if (!empty($a['nama_kelas']) && !in_array($a['nama_kelas'], $kelas_list)) {
+                                $kelas_list[] = $a['nama_kelas'];
+                            }
+                        }
+                        sort($kelas_list);
+                    }
+                    ?>
+                    <?php if (!empty($kelas_list)): ?>
+                    <div class="p-3 bg-light border-bottom">
+                        <label class="mb-0 mr-2">Filter Kelas:</label>
+                        <select id="filter_kelas" class="form-control form-control-sm d-inline-block w-auto" onchange="filterKelasRekap()">
+                            <option value="all">Semua Kelas</option>
+                            <?php foreach ($kelas_list as $k): ?>
+                                <option value="<?= htmlspecialchars($k) ?>"><?= htmlspecialchars($k) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                    <table class="table table-bordered table-striped table-hover text-center mb-0">
                         <thead>
                             <tr>
                                 <th width="5%" rowspan="2" class="align-middle">No</th>
@@ -69,8 +92,8 @@
                                     $total = $r['jml_H'] + $r['jml_S'] + $r['jml_I'] + $r['jml_A'];
                                     $persen = $total > 0 ? round(($r['jml_H'] / $total) * 100, 1) : 0;
                                 ?>
-                                <tr class="siswa-row" data-id="<?= $a['id_siswa'] ?>">
-                                    <td><?= $i + 1 ?></td>
+                                <tr class="siswa-row" data-id="<?= $a['id_siswa'] ?>" data-kelas="<?= htmlspecialchars($a['nama_kelas'] ?? '') ?>">
+                                    <td class="nomor-urut"><?= $i + 1 ?></td>
                                     <td class="text-left font-weight-bold">
                                         <?= $a['nama_siswa'] ?><br>
                                         <small class="text-muted"><?= $a['nama_kelas'] ?></small>
@@ -153,6 +176,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function filterKelasRekap() {
+    var selected = document.getElementById('filter_kelas').value;
+    var rows = document.querySelectorAll('.siswa-row');
+    var visibleCount = 0;
+    
+    rows.forEach(function(row) {
+        if (selected === 'all' || row.getAttribute('data-kelas') === selected) {
+            row.style.display = '';
+            visibleCount++;
+            // Update nomor urut agar tetap rapi saat di-filter
+            row.querySelector('.nomor-urut').textContent = visibleCount;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
 </script>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>

@@ -12,7 +12,7 @@ include __DIR__ . '/../partials/header.php';
                 <h1 class="m-0"><i class="fas fa-newspaper mr-2"></i> Daftar Berita</h1>
                 <p class="text-muted small mb-0">Kelola berita dan pengumuman untuk landing page.</p>
             </div>
-            <a href="index.php?mod=landing_admin&act=news_form" class="btn btn-primary btn-lg shadow-sm px-4">
+            <a href="<?= BASE_URL ?>landing_admin/news_form" class="btn btn-primary btn-lg shadow-sm px-4">
                 <i class="fas fa-plus mr-2"></i> Tambah Baru
             </a>
         </div>
@@ -46,8 +46,6 @@ include __DIR__ . '/../partials/header.php';
                                 style="width: 50px; font-size: 0.7rem; letter-spacing: 1px;">NO</th>
                             <th class="py-3 border-bottom" style="font-size: 0.7rem; letter-spacing: 1px;">JUDUL</th>
                             <th class="text-center py-3 border-bottom"
-                                style="font-size: 0.7rem; letter-spacing: 1px; width: 120px;">TIPE</th>
-                            <th class="text-center py-3 border-bottom"
                                 style="font-size: 0.7rem; letter-spacing: 1px; width: 120px;">TANGGAL</th>
                             <th class="text-center py-3 border-bottom"
                                 style="font-size: 0.7rem; letter-spacing: 1px; width: 100px;">STATUS</th>
@@ -74,29 +72,17 @@ include __DIR__ . '/../partials/header.php';
                                             </div>
                                             <div>
                                                 <span class="font-weight-bold text-dark d-block" style="font-size: 0.9rem;">
-                                                    <?= htmlspecialchars($item['title']) ?>
+                                                    <?= htmlspecialchars($item['judul']) ?>
                                                 </span>
-                                                <?php if ($item['is_featured']): ?>
-                                                    <span class="badge badge-warning px-2 py-1 mt-1"
-                                                        style="font-size: 0.65rem; border-radius: 100px;">
-                                                        <i class="fas fa-star mr-1"></i> Featured
-                                                    </span>
-                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <span class="badge badge-info px-3 py-2 shadow-none"
-                                            style="font-size: 0.7rem; border-radius: 8px; font-weight: 600;">
-                                            <?= ucfirst($item['type']) ?>
-                                        </span>
-                                    </td>
-                                    <td class="text-center align-middle">
                                         <code
-                                            class="text-muted small"><?= date('d/m/Y', strtotime($item['publish_date'])) ?></code>
+                                            class="text-muted small"><?= date('d/m/Y', strtotime($item['tanggal_publikasi'])) ?></code>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <?php if ($item['is_published']): ?>
+                                        <?php if ($item['is_active']): ?>
                                             <span class="badge badge-success px-2 py-1 shadow-none"
                                                 style="font-size: 0.65rem; border-radius: 100px; font-weight: 600;">
                                                 <i class="fas fa-check-circle mr-1"></i> Terbit
@@ -110,13 +96,13 @@ include __DIR__ . '/../partials/header.php';
                                     </td>
                                     <td class="text-center align-middle">
                                         <div class="btn-group">
-                                            <a href="index.php?mod=landing_admin&act=news_form&id=<?= $item['id'] ?>"
+                                            <a href="<?= BASE_URL ?>landing_admin/news_form?id=<?= $item['id'] ?>"
                                                 class="btn btn-xs btn-outline-warning border-0 p-1 mr-1"
                                                 style="background: #fffbeb; width: 32px; height: 32px; border-radius: 8px; color: #d97706;"
                                                 title="Edit">
                                                 <i class="fas fa-pencil-alt" style="font-size: 0.85rem;"></i>
                                             </a>
-                                            <a href="index.php?mod=landing_admin&act=news_delete&id=<?= $item['id'] ?>"
+                                            <a href="<?= BASE_URL ?>landing_admin/news_delete?id=<?= $item['id'] ?>"
                                                 class="btn btn-xs btn-outline-danger border-0 p-1"
                                                 style="background: #fee; width: 32px; height: 32px; border-radius: 8px; color: #dc3545;"
                                                 onclick="return confirmDelete(event)" title="Hapus">

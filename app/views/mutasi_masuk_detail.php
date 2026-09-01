@@ -7,7 +7,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php?mod=mutasi_masuk&act=index">Daftar Siswa Mutasi</a>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>mutasi_masuk/index">Daftar Siswa Mutasi</a>
                     </li>
                     <li class="breadcrumb-item active">Detail</li>
                 </ol>
@@ -90,7 +90,7 @@
                 </table>
             </div>
             <div class="card-footer">
-                <a href="index.php?mod=mutasi_masuk&act=index" class="btn btn-secondary">Kembali ke Daftar</a>
+                <a href="<?= BASE_URL ?>mutasi_masuk/index" class="btn btn-secondary">Kembali ke Daftar</a>
             </div>
         </div>
     </div>

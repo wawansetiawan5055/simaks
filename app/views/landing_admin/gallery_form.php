@@ -15,7 +15,7 @@ include __DIR__ . '/../partials/header.php';
     <div class="card-header">
         <h3 class="card-title"><?= $is_edit ? 'Edit Foto' : 'Upload Foto Baru' ?></h3>
     </div>
-    <form action="index.php?mod=landing_admin&act=gallery_save" method="post" enctype="multipart/form-data">
+    <form action="<?= BASE_URL ?>landing_admin/gallery_save" method="post" enctype="multipart/form-data">
         <?php if ($is_edit): ?>
             <input type="hidden" name="id" value="<?= $gallery['id'] ?>">
         <?php endif; ?>
@@ -72,7 +72,7 @@ include __DIR__ . '/../partials/header.php';
 
         <div class="card-footer">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
-            <a href="index.php?mod=landing_admin&act=gallery" class="btn btn-default">Batal</a>
+            <a href="<?= BASE_URL ?>landing_admin/gallery" class="btn btn-default">Batal</a>
         </div>
     </form>
 </div>

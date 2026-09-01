@@ -7,7 +7,7 @@
 
 <section class="content">
     <div class="container-fluid">
-        <form action="index.php?mod=ekskul&act=jurnal_save" method="POST">
+        <form action="<?= BASE_URL ?>ekskul/jurnal_save" method="POST">
             <input type="hidden" name="id_ekskul" value="<?= $ekskul['id_ekskul'] ?>">
             <?php if ($jurnal): ?>
                 <input type="hidden" name="id_jurnal" value="<?= $jurnal['id_jurnal'] ?>">
@@ -92,7 +92,7 @@
                             </table>
                         </div>
                         <div class="card-footer text-right">
-                             <a href="index.php?mod=ekskul&id=<?= $ekskul['id_ekskul'] ?>&tab=jurnal" class="btn btn-secondary">Batal</a>
+                             <a href="<?= BASE_URL ?>ekskul?id=<?= $ekskul['id_ekskul'] ?>&tab=jurnal" class="btn btn-secondary">Batal</a>
                              <button type="submit" class="btn btn-primary">Simpan Jurnal & Absensi</button>
                         </div>
                     </div>

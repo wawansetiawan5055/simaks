@@ -145,4 +145,52 @@ class DateHelper
         $flip = array_flip(self::$hari);
         return $flip[$dayId] ?? $dayId;
     }
+
+    /**
+     * Split a date range into multiple segments, excluding Sundays
+     * @param string $startDate YYYY-MM-DD
+     * @param string $endDate YYYY-MM-DD
+     * @return array Array of segments [['start' => '...', 'end' => '...'], ...]
+     */
+    public static function splitDateRangeBySunday($startDate, $endDate)
+    {
+        $results = [];
+        $start = new DateTime($startDate);
+        $end = new DateTime($endDate);
+        
+        $iter = clone $start;
+        $currentSegmentStart = null;
+
+        while ($iter <= $end) {
+            $isSunday = ($iter->format('w') == 0);
+            
+            if (!$isSunday) {
+                if ($currentSegmentStart === null) {
+                    $currentSegmentStart = clone $iter;
+                }
+            } else {
+                if ($currentSegmentStart !== null) {
+                    // End current segment at the day before Sunday (iterator - 1 day)
+                    $segmentEnd = clone $iter;
+                    $segmentEnd->modify('-1 day');
+                    $results[] = [
+                        'start' => $currentSegmentStart->format('Y-m-d'),
+                        'end' => $segmentEnd->format('Y-m-d')
+                    ];
+                    $currentSegmentStart = null;
+                }
+            }
+            $iter->modify('+1 day');
+        }
+        
+        // Last segment
+        if ($currentSegmentStart !== null) {
+            $results[] = [
+                'start' => $currentSegmentStart->format('Y-m-d'),
+                'end' => $end->format('Y-m-d')
+            ];
+        }
+        
+        return $results;
+    }
 }

@@ -2,7 +2,7 @@
 <div class="content-header">
   <div class="container-fluid">
     <h1><i class="fas fa-user-graduate mr-2"></i> <?= $siswa ? 'Edit' : 'Tambah' ?> Data Siswa</h1>
-    <form action="index.php?mod=siswa&act=save" method="POST" class="mt-3">
+    <form action="<?= BASE_URL ?>siswa/save" method="POST" class="mt-3">
       <?php if ($siswa): ?>
         <input type="hidden" name="id_siswa" value="<?= $siswa['id_siswa'] ?>">
       <?php endif; ?>
@@ -66,7 +66,7 @@
         </small>
       </div>
       <button type="submit" class="btn btn-success">Simpan</button>
-      <a href="index.php?mod=siswa" class="btn btn-secondary">Batal</a>
+      <a href="<?= BASE_URL ?>siswa" class="btn btn-secondary">Batal</a>
     </form>
   </div>
 </div>

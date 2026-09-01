@@ -745,6 +745,7 @@ function keuangan_master_coa($pdo)
 
 function keuangan_kategori_save($pdo)
 {
+    header('Content-Type: application/json');
     try {
         $model = new KeuanganKategoriModel($pdo);
         $data = [
@@ -763,12 +764,10 @@ function keuangan_kategori_save($pdo)
             $msg = 'Kategori berhasil ditambahkan';
         }
 
-        // Redirect back
-        header('Location: index.php?mod=keuangan_master&act=coa');
-        exit;
+        echo json_encode(['success' => true, 'message' => $msg]);
 
     } catch (Exception $e) {
-        die("Error: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
 
@@ -793,12 +792,19 @@ function keuangan_master_jenis($pdo)
 
 function keuangan_jenis_save($pdo)
 {
+    header('Content-Type: application/json');
     try {
         $jenisModel = new KeuanganJenisModel($pdo);
 
+        $kode_jenis = $_POST['kode_jenis'] ?? '';
+        if (empty($kode_jenis) || $kode_jenis === 'AUTO') {
+            // Generate unique code based on timestamp to avoid duplicate entry
+            $kode_jenis = 'JNS-' . time() . rand(10, 99);
+        }
+
         $data = [
             'id_kategori' => $_POST['id_kategori'] ?? $_POST['kategori_id'],
-            'kode_jenis' => $_POST['kode_jenis'],
+            'kode_jenis' => $kode_jenis,
             'kode_akun' => $_POST['kode_akun'],
             'nama_jenis' => $_POST['nama_jenis'],
             'harga_default' => str_replace('.', '', $_POST['harga_default']),
@@ -831,6 +837,37 @@ function keuangan_master_rekening($pdo)
     $rekeningModel = new KeuanganRekeningModel($pdo);
     $rekening = $rekeningModel->getAll();
     include '../app/views/keuangan_master_rekening.php';
+}
+
+function keuangan_rekening_save($pdo)
+{
+    try {
+        $rekeningModel = new KeuanganRekeningModel($pdo);
+
+        $data = [
+            'tipe' => $_POST['tipe'],
+            'kode_rekening' => $_POST['kode_rekening'],
+            'nama_rekening' => $_POST['nama_rekening'],
+            'nama_bank' => $_POST['nama_bank'] ?? null,
+            'nomor_rekening' => $_POST['nomor_rekening'] ?? null,
+            'atas_nama' => $_POST['atas_nama'] ?? null,
+            'saldo_awal' => isset($_POST['saldo_awal']) ? str_replace('.', '', $_POST['saldo_awal']) : 0,
+        ];
+
+        if (!empty($_POST['id_rekening'])) {
+            $success = $rekeningModel->update($_POST['id_rekening'], $data);
+            $message = 'Rekening berhasil diperbarui';
+        } else {
+            $success = $rekeningModel->create($data);
+            if ($success) $rekeningModel->recalculateBalances();
+            $message = 'Rekening berhasil ditambahkan';
+        }
+
+        echo json_encode(['success' => $success, 'message' => $message]);
+
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
 }
 
 // =========================================================================================

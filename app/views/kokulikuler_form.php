@@ -8,7 +8,7 @@
 <section class="content">
     <div class="container-fluid">
         <div class="card card-info">
-            <form action="index.php?mod=kokulikuler&act=save" method="POST">
+            <form action="<?= BASE_URL ?>kokulikuler/save" method="POST">
                 <?php if ($kokul): ?>
                     <input type="hidden" name="id_kokulikuler" value="<?= $kokul['id_kokulikuler'] ?>">
                 <?php endif; ?>
@@ -80,7 +80,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <a href="index.php?mod=kokulikuler" class="btn btn-secondary">Batal</a>
+                    <a href="<?= BASE_URL ?>kokulikuler" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>

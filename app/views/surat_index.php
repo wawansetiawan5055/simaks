@@ -1,20 +1,25 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header p-0 pt-4">
-    <div class="container-fluid px-4">
-        <div class="header-banner p-4 mb-4 shadow-sm position-relative overflow-hidden" style="border-radius: 20px; background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);">
-            <div class="row align-items-center position-relative" style="z-index: 2;">
-                <div class="col-md-8">
-                    <h2 class="fw-bold m-0 text-dark"><i class="fas fa-envelope-open-text text-primary mr-2"></i> Manajemen Surat</h2>
-                    <p class="text-muted mb-0">Sistem Administrasi Persuratan Terpadu & Arsip Digital Sekolah.</p>
+<div class="content-header pt-3 mb-2">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-envelope-open-text"></i>
                 </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2873/2873550.png" style="height: 80px; opacity: 0.8;" alt="icon">
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Manajemen Persuratan &amp; Arsip Digital
+                    </h4>
                 </div>
             </div>
-            <!-- Decorative circle -->
-            <div class="position-absolute" style="width: 200px; height: 200px; background: rgba(0,123,255,0.05); border-radius: 50%; top: -50px; right: -50px; z-index: 1;"></div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+                    <li class="breadcrumb-item active text-primary font-weight-bold">Persuratan</li>
+                </ol>
+            </div>
         </div>
     </div>
 </div>
@@ -82,21 +87,21 @@
                         <h6 class="fw-bold text-dark mb-4"><i class="fas fa-th-large text-primary mr-2"></i> Akses Cepat Navigasi</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <a href="index.php?mod=surat&act=keluar" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
+                                <a href="<?= BASE_URL ?>surat/keluar" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
                                     <div class="tile-icon bg-soft-primary mx-auto mb-3"><i class="fas fa-plus text-primary"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Buat Surat</h6>
                                     <p class="small text-muted mb-0">Generate surat keluar baru</p>
                                 </a>
                             </div>
                             <div class="col-md-4">
-                                <a href="index.php?mod=surat&act=masuk" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
+                                <a href="<?= BASE_URL ?>surat/masuk" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
                                     <div class="tile-icon bg-soft-success mx-auto mb-3"><i class="fas fa-file-import text-success"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Arsip Masuk</h6>
                                     <p class="small text-muted mb-0">Catat dan scan surat masuk</p>
                                 </a>
                             </div>
                             <div class="col-md-4">
-                                <a href="index.php?mod=surat&act=template" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
+                                <a href="<?= BASE_URL ?>surat/template" class="action-tile p-4 border rounded d-block text-center text-decoration-none">
                                     <div class="tile-icon bg-soft-info mx-auto mb-3"><i class="fas fa-sliders-h text-info"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Pengaturan</h6>
                                     <p class="small text-muted mb-0">Kelola master template</p>

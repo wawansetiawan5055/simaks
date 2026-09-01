@@ -15,7 +15,7 @@ include __DIR__ . '/../partials/header.php';
     <div class="card-header">
         <h3 class="card-title"><?= $is_edit ? 'Edit Berita' : 'Tambah Berita Baru' ?></h3>
     </div>
-    <form action="index.php?mod=landing_admin&act=news_save" method="post" enctype="multipart/form-data">
+    <form action="<?= BASE_URL ?>landing_admin/news_save" method="post" enctype="multipart/form-data">
         <?php if ($is_edit): ?>
             <input type="hidden" name="id" value="<?= $news['id'] ?>">
         <?php endif; ?>
@@ -24,27 +24,15 @@ include __DIR__ . '/../partials/header.php';
             <div class="form-group">
                 <label>Judul <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="title"
-                    value="<?= $is_edit ? htmlspecialchars($news['title']) : '' ?>" required>
+                    value="<?= $is_edit ? htmlspecialchars($news['judul']) : '' ?>" required>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Tipe</label>
-                        <select class="form-control" name="type">
-                            <option value="berita" <?= ($is_edit && $news['type'] == 'berita') ? 'selected' : '' ?>>Berita
-                            </option>
-                            <option value="pengumuman" <?= ($is_edit && $news['type'] == 'pengumuman') ? 'selected' : '' ?>>Pengumuman</option>
-                            <option value="event" <?= ($is_edit && $news['type'] == 'event') ? 'selected' : '' ?>>Event
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Tanggal Terbit</label>
+                        <label>Tanggal Publikasi</label>
                         <input type="date" class="form-control" name="publish_date"
-                            value="<?= $is_edit ? $news['publish_date'] : date('Y-m-d') ?>">
+                            value="<?= $is_edit ? $news['tanggal_publikasi'] : date('Y-m-d') ?>">
                     </div>
                 </div>
             </div>
@@ -52,15 +40,15 @@ include __DIR__ . '/../partials/header.php';
             <div class="form-group">
                 <label>Konten</label>
                 <textarea class="form-control" name="content" rows="10"
-                    required><?= $is_edit ? htmlspecialchars($news['content']) : '' ?></textarea>
+                    required><?= $is_edit ? htmlspecialchars($news['konten']) : '' ?></textarea>
                 <small class="text-muted">Bisa menggunakan HTML sederhana.</small>
             </div>
 
             <div class="form-group">
-                <label>Gambar Unggulan</label>
-                <?php if ($is_edit && !empty($news['featured_image'])): ?>
+                <label>Gambar</label>
+                <?php if ($is_edit && !empty($news['gambar'])): ?>
                     <div class="mb-2">
-                        <img src="<?= BASE_URL . $news['featured_image'] ?>" alt="Current Image" style="max-height: 100px;">
+                        <img src="<?= BASE_URL . $news['gambar'] ?>" alt="Current Image" style="max-height: 100px;">
                     </div>
                 <?php endif; ?>
                 <div class="custom-file">
@@ -72,23 +60,15 @@ include __DIR__ . '/../partials/header.php';
             <div class="form-group">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="is_published" name="is_published" value="1"
-                        <?= (!$is_edit || $news['is_published']) ? 'checked' : '' ?>>
-                    <label class="custom-control-label" for="is_published">Terbitkan Langsung</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="is_featured" name="is_featured" value="1"
-                        <?= ($is_edit && $news['is_featured']) ? 'checked' : '' ?>>
-                    <label class="custom-control-label" for="is_featured">Tampilkan di Beranda (Featured)</label>
+                        <?= (!$is_edit || $news['is_active']) ? 'checked' : '' ?>>
+                    <label class="custom-control-label" for="is_published">Langsung Aktifkan/Terbitkan</label>
                 </div>
             </div>
         </div>
 
         <div class="card-footer">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
-            <a href="index.php?mod=landing_admin&act=news" class="btn btn-default">Batal</a>
+            <a href="<?= BASE_URL ?>landing_admin/news" class="btn btn-default">Batal</a>
         </div>
     </form>
 </div>

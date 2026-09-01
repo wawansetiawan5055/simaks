@@ -8,7 +8,7 @@
 <section class="content">
     <div class="container-fluid">
         <div class="card card-primary">
-            <form action="index.php?mod=ekskul&act=save" method="POST">
+            <form action="<?= BASE_URL ?>ekskul/save" method="POST">
                 <?php if ($ekskul): ?>
                     <input type="hidden" name="id_ekskul" value="<?= $ekskul['id_ekskul'] ?>">
                 <?php endif; ?>
@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <a href="index.php?mod=ekskul" class="btn btn-secondary">Batal</a>
+                    <a href="<?= BASE_URL ?>ekskul" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>

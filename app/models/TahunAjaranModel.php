@@ -40,6 +40,28 @@ public static function existsByName($pdo, $nama_ta, $exclude_id = null) {
         $stmt = $pdo->prepare("DELETE FROM tahun_ajaran WHERE id_ta = ?");
         $stmt->execute([$id]);
     }
+
+    public static function findPrevious($pdo, $current_id_ta) {
+        $current = self::find($pdo, $current_id_ta);
+        if (!$current) {
+            return null;
+        }
+
+        $previous = null;
+        if (!empty($current['tanggal_mulai'])) {
+            $stmt = $pdo->prepare("SELECT * FROM tahun_ajaran WHERE tanggal_selesai < ? ORDER BY tanggal_selesai DESC LIMIT 1");
+            $stmt->execute([$current['tanggal_mulai']]);
+            $previous = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        if (!$previous) {
+            $stmt = $pdo->prepare("SELECT * FROM tahun_ajaran WHERE id_ta < ? ORDER BY id_ta DESC LIMIT 1");
+            $stmt->execute([$current_id_ta]);
+            $previous = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        return $previous ?: null;
+    }
     
     public static function aktif($pdo) {
         return $pdo->query("SELECT * FROM tahun_ajaran WHERE status='Aktif' LIMIT 1")->fetch(PDO::FETCH_ASSOC);

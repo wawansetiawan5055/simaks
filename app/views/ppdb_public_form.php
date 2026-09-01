@@ -19,9 +19,9 @@
         }
         
         :root {
-            --primary: #C41E3A;
-            --secondary: #2D8A4E;
-            --accent: #FFD700;
+            --primary: #000033;
+            --secondary: #10b981;
+            --accent: #f59e0b;
             --dark: #1a1a2e;
             --light: #f8f9fa;
         }
@@ -219,40 +219,119 @@
         
         .button-group {
             display: flex;
-            gap: 1rem;
+            align-items: center;
             justify-content: space-between;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 2px solid #f0f0f0;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            padding-top: 1.75rem;
+            border-top: 2px solid #f1f5f9;
         }
         
         .btn {
-            padding: 1rem 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.85rem 2.2rem;
             border: none;
-            border-radius: 50px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
         }
         
         .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            margin-right: auto;
         }
         
         .btn-secondary:hover {
-            background: #d0d0d0;
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000033;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+            margin-left: auto;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+            margin-left: auto;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+        }
+
+        .btn-back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            position: absolute;
+            top: 1.25rem;
+            left: 1.25rem;
+            transition: all 0.2s ease;
+        }
+        .btn-back-home:hover {
+            background: rgba(245,158,11,0.3);
+            color: #fbbf24;
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 0.75rem 0.5rem 80px 0.5rem !important;
+            }
+            .container {
+                border-radius: 18px;
+            }
+            .header {
+                padding: 2.75rem 1.25rem 1.5rem 1.25rem !important;
+            }
+            .header h1 {
+                font-size: 1.35rem;
+            }
+            .form-container {
+                padding: 1.5rem 1rem;
+            }
+            .button-group {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 10px;
+                margin-top: 1.5rem;
+                padding-top: 1.25rem;
+            }
+            .button-group .btn {
+                flex: 1;
+                padding: 0.75rem 0.8rem;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
         }
         
         .alert {
@@ -302,7 +381,7 @@
                 </div>
             </div>
             
-            <form action="index.php?mod=landing&act=ppdb_save" method="POST" enctype="multipart/form-data" id="ppdbForm">
+            <form action="<?= BASE_URL ?>landing/ppdb_save" method="POST" enctype="multipart/form-data" id="ppdbForm">
                 <!-- STEP 1: Data Pribadi -->
                 <div class="step-content active" data-step="1">
                     <div class="alert alert-info">
@@ -601,7 +680,7 @@
                     <button type="button" class="btn btn-primary" id="nextBtn">
                         Selanjutnya <i class="fas fa-arrow-right"></i>
                     </button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                    <button type="submit" class="btn btn-success-submit" id="submitBtn" style="display: none;">
                         <i class="fas fa-check"></i> Kirim Pendaftaran
                     </button>
                 </div>

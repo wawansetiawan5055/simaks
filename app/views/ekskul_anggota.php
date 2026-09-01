@@ -65,7 +65,7 @@
                 <h1>Anggota Ekskul: <strong><?= htmlspecialchars($ekskul['nama_ekskul']) ?></strong></h1>
             </div>
             <div class="col-sm-6 text-end">
-                <a href="index.php?mod=ekskul" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i>
+                <a href="<?= BASE_URL ?>ekskul" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i>
                     Kembali</a>
             </div>
         </div>
@@ -192,7 +192,7 @@
                 ui.item.css('opacity', '0.5');
 
                 $.ajax({
-                    url: 'index.php?mod=ekskul&act=update_anggota',
+                    url: '<?= BASE_URL ?>ekskul/update_anggota',
                     type: 'POST',
                     data: {
                         action: action,
@@ -235,7 +235,7 @@
             var keyword = $('#search-left').val();
             var id_kelas = $('#filter-kelas').val();
 
-            $.getJSON('index.php?mod=ekskul&act=search_students', { 
+            $.getJSON('<?= BASE_URL ?>ekskul/search_students', { 
                 id_ekskul: id_ekskul, 
                 q: keyword,
                 id_kelas: id_kelas // Send class filter

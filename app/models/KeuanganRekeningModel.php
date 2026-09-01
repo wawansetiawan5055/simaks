@@ -62,6 +62,35 @@ class KeuanganRekeningModel {
     }
 
     /**
+     * Update existing rekening
+     */
+    public function update($id, $data) {
+        $sql = "UPDATE keuangan_rekening SET 
+                kode_rekening = ?, 
+                nama_rekening = ?, 
+                tipe = ?, 
+                nama_bank = ?, 
+                nomor_rekening = ?, 
+                atas_nama = ? 
+                WHERE id_rekening = ?";
+                
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute([
+            $data['kode_rekening'],
+            $data['nama_rekening'],
+            $data['tipe'],
+            $data['nama_bank'] ?? null,
+            $data['nomor_rekening'] ?? null,
+            $data['atas_nama'] ?? null,
+            $id
+        ]);
+        
+        $this->recalculateBalances(); // Also recalculate just to be safe
+        
+        return $result;
+    }
+
+    /**
      * Recalculate all balances from transactions
      */
     public function recalculateBalances() {

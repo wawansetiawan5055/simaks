@@ -197,6 +197,6 @@ Jika ada pertanyaan atau butuh bantuan:
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 2.3.5  
 **Last Updated**: 11 Desember 2025  
 **Created by**: Antigravity AI Assistant 🚀

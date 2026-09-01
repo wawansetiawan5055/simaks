@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jan 27, 2026 at 06:35 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Host: localhost
+-- Generation Time: Mar 01, 2026 at 04:43 PM
+-- Server version: 10.11.10-MariaDB-log
+-- PHP Version: 8.0.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -122,6 +122,23 @@ CREATE TABLE `agenda_pembiasaan` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `agenda_tugas_tambahan`
+--
+
+CREATE TABLE `agenda_tugas_tambahan` (
+  `id_agenda` int(11) NOT NULL,
+  `id_guru` int(11) NOT NULL,
+  `jenis_tugas_tambahan` varchar(50) NOT NULL,
+  `nama_kegiatan` varchar(255) NOT NULL,
+  `tanggal` date NOT NULL,
+  `keterangan` text DEFAULT NULL,
+  `id_ta` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `anggota_ekskul`
 --
 
@@ -208,21 +225,21 @@ INSERT INTO `app_config` (`config_key`, `config_value`) VALUES
 ('theme_accent_color', '#fa9200'),
 ('theme_body_bg', '#d1f0ee'),
 ('theme_color_body', '#242c38'),
-('theme_color_header', '#0ca2ed'),
+('theme_color_header', '#000000'),
 ('theme_color_sidebar_text', '#ffffff'),
 ('theme_color_small', '#64748b'),
 ('theme_color_subtitle', '#1e293b'),
 ('theme_color_table_content', '#000000'),
 ('theme_color_table_header', '#000000'),
-('theme_font_body', '0.85rem'),
-('theme_font_header', '1.5rem'),
+('theme_font_body', '0.8rem'),
+('theme_font_header', '1.2rem'),
 ('theme_font_size', '0.8rem'),
 ('theme_font_small', '0.75rem'),
-('theme_font_subtitle', '1rem'),
-('theme_font_table_content', '0.8rem'),
-('theme_font_table_header', '0.85rem'),
+('theme_font_subtitle', '0.9rem'),
+('theme_font_table_content', '0.75rem'),
+('theme_font_table_header', '0.8rem'),
 ('theme_footer_bg', '#ffffff'),
-('theme_menu_active_bg', '#0f0033'),
+('theme_menu_active_bg', '#000000'),
 ('theme_navbar_bg', '#ffffff'),
 ('theme_sidebar_bg', 'deep_carbon'),
 ('theme_table_header_bg', '#e87d02');
@@ -257,99 +274,104 @@ INSERT INTO `app_menu` (`id_menu`, `nama_menu`, `link`, `icon`, `parent_id`, `ur
 (11, 'Data Master', '#', 'fas fa-database', 0, 14, 'Aktif'),
 (12, 'Akademik', '#', 'fas fa-cogs', 0, 22, 'Aktif'),
 (20, 'ADMINISTRASI KEGIATAN', '#', '-', 0, 28, 'Aktif'),
-(21, 'Isi Jurnal KBM', 'index.php?mod=jurnal_kbm', 'far fa-circle', 4129, 37, 'Aktif'),
-(22, 'Absensi Siswa', 'index.php?mod=absensi_mapel', 'far fa-circle', 4129, 38, 'Aktif'),
-(23, 'Input Nilai Formatif', 'index.php?mod=input_nilai', 'far fa-circle', 4129, 39, 'Aktif'),
-(24, 'Input Nilai Sumatif', 'index.php?mod=penilaian_sumatif', 'far fa-circle', 4129, 40, 'Aktif'),
-(25, 'Catatan Kejadian Kelas', 'index.php?mod=catatan_kelas', 'far fa-circle', 4129, 41, 'Aktif'),
-(30, 'PIKET & KESISWAAN', '#', '', 0, 48, 'Aktif'),
-(31, 'Absensi Siswa Piket', 'index.php?mod=absensi_piket', 'fas fa-clipboard-list', 0, 50, 'Aktif'),
-(32, 'Absensi Guru', 'index.php?mod=absensi_guru', 'fas fa-user-check', 0, 49, 'Aktif'),
-(33, 'Catatan Kasus Siswa', 'index.php?mod=catatan_kasus', 'fas fa-exclamation-triangle', 0, 51, 'Aktif'),
-(40, 'CETAK LAPORAN', '#', '', 0, 74, 'Aktif'),
-(41, 'Laporan', '#', 'fas fa-file-alt', 0, 75, 'Aktif'),
-(50, 'PORTAL PPDB', '#', '', 0, 90, 'Aktif'),
-(51, 'Pendaftaran (PPDB)', '#', 'fas fa-user-plus', 0, 91, 'Aktif'),
-(60, 'MUTASI & KELULUSAN', '#', '', 0, 94, 'Aktif'),
-(61, 'Mutasi Masuk', 'index.php?mod=mutasi_masuk&act=index', 'fas fa-exchange-alt', 4209, 67, 'Aktif'),
-(62, 'Mutasi Keluar', 'index.php?mod=mutasi_siswa&act=form', 'fas fa-user-minus', 4209, 68, 'Aktif'),
-(63, 'Data Lulusan', '#', 'fas fa-graduation-cap', 0, 95, 'Aktif'),
+(21, 'Isi Jurnal KBM', 'index.php?mod=jurnal_kbm', 'far fa-circle', 4129, 39, 'Aktif'),
+(22, 'Absensi Siswa', 'index.php?mod=absensi_mapel', 'far fa-circle', 4129, 40, 'Aktif'),
+(23, 'Input Nilai Formatif', 'index.php?mod=input_nilai', 'far fa-circle', 4129, 41, 'Aktif'),
+(24, 'Input Nilai Sumatif', 'index.php?mod=penilaian_sumatif', 'far fa-circle', 4129, 42, 'Aktif'),
+(25, 'Catatan Kejadian Kelas', 'index.php?mod=catatan_kelas', 'far fa-circle', 4129, 43, 'Aktif'),
+(30, 'PIKET & KESISWAAN', '#', '', 0, 50, 'Aktif'),
+(31, 'Absensi Siswa Piket', 'index.php?mod=absensi_piket', 'fas fa-clipboard-list', 0, 52, 'Aktif'),
+(32, 'Absensi Guru', 'index.php?mod=absensi_guru', 'fas fa-user-check', 0, 51, 'Aktif'),
+(33, 'Catatan Kasus Siswa', 'index.php?mod=catatan_kasus', 'fas fa-exclamation-triangle', 0, 53, 'Aktif'),
+(40, 'CETAK LAPORAN', '#', '', 0, 81, 'Aktif'),
+(41, 'Laporan', '#', 'fas fa-file-alt', 0, 82, 'Aktif'),
+(50, 'PORTAL PPDB', '#', '', 0, 97, 'Aktif'),
+(51, 'Pendaftaran (PPDB)', '#', 'fas fa-user-plus', 0, 98, 'Aktif'),
+(60, 'MUTASI & KELULUSAN', '#', '', 0, 101, 'Aktif'),
+(61, 'Mutasi Masuk', 'index.php?mod=mutasi_masuk&act=index', 'fas fa-exchange-alt', 4209, 74, 'Aktif'),
+(62, 'Mutasi Keluar', 'index.php?mod=mutasi_siswa&act=form', 'fas fa-user-minus', 4209, 75, 'Aktif'),
+(63, 'Data Lulusan', '#', 'fas fa-graduation-cap', 0, 102, 'Aktif'),
 (113, 'Kelas', 'index.php?mod=kelas', 'far fa-circle', 11, 17, 'Aktif'),
 (114, 'Mata Pelajaran', 'index.php?mod=mapel', 'far fa-circle', 11, 18, 'Aktif'),
 (115, 'Master Kegiatan', 'index.php?mod=master_kegiatan', 'far fa-circle', 11, 19, 'Aktif'),
 (116, 'Master Jam', 'index.php?mod=master_jam', 'far fa-circle', 11, 20, 'Aktif'),
 (117, 'Tahun Pelajaran', 'index.php?mod=ta', 'far fa-circle', 11, 21, 'Aktif'),
 (121, 'Struktur Kurikulum', 'index.php?mod=struktur_kurikulum', 'far fa-circle', 12, 24, 'Aktif'),
-(122, 'Input CP dan TP', 'index.php?mod=manajemen_cp_tp', 'far fa-circle', 4128, 30, 'Aktif'),
+(122, 'Input CP dan TP', 'index.php?mod=manajemen_cp_tp', 'far fa-circle', 4128, 36, 'Aktif'),
 (123, 'Penugasan Guru', 'index.php?mod=penugasan_guru', 'far fa-circle', 12, 25, 'Aktif'),
 (124, 'Penempatan Siswa', 'index.php?mod=penempatan', 'far fa-circle', 12, 26, 'Aktif'),
 (125, 'Jadwal Pelajaran', 'index.php?mod=jadwal', 'far fa-circle', 12, 27, 'Aktif'),
-(411, 'Laporan Siswa', 'index.php?mod=laporan&act=siswa', 'far fa-circle', 41, 76, 'Aktif'),
-(412, 'Laporan Guru', 'index.php?mod=laporan&act=guru', 'far fa-circle', 41, 77, 'Aktif'),
-(413, 'Laporan Rombel', 'index.php?mod=laporan&act=kelas', 'far fa-circle', 41, 78, 'Aktif'),
-(414, 'Laporan Mapel', 'index.php?mod=laporan&act=mapel', 'far fa-circle', 41, 79, 'Aktif'),
-(415, 'Laporan Jurnal KBM', 'index.php?mod=laporan&act=jurnal', 'far fa-circle', 41, 80, 'Aktif'),
-(416, 'Laporan Absensi Siswa', 'index.php?mod=laporan&act=absensi_siswa_mapel', 'far fa-circle', 41, 81, 'Aktif'),
-(417, 'Laporan Absensi Piket', 'index.php?mod=laporan&act=absensi_siswa_piket', 'far fa-circle', 41, 82, 'Aktif'),
-(418, 'Laporan Absensi Guru', 'index.php?mod=laporan&act=absensi_guru', 'far fa-circle', 41, 83, 'Aktif'),
-(419, 'Laporan Catatan Kasus', 'index.php?mod=laporan&act=catatan_kasus', 'far fa-circle', 41, 84, 'Aktif'),
-(511, 'Formulir Pendaftaran', 'index.php?mod=ppdb&act=form', 'far fa-circle', 51, 92, 'Aktif'),
-(512, 'Verifikasi Pendaftar', 'index.php?mod=ppdb&act=index', 'far fa-circle', 51, 93, 'Aktif'),
-(631, 'Proses Kelulusan', 'index.php?mod=lulusan&act=proses', 'far fa-circle', 63, 96, 'Aktif'),
-(632, 'Data Alumni', 'index.php?mod=lulusan&act=index', 'far fa-circle', 63, 97, 'Aktif'),
-(4110, 'Laporan Catatan Kelas', 'index.php?mod=laporan&act=catatan_kelas', 'far fa-circle', 41, 85, 'Aktif'),
-(4111, 'Laporan PPDB', 'index.php?mod=laporan&act=ppdb', 'far fa-circle', 41, 86, 'Aktif'),
-(4112, 'Laporan Mutasi Masuk', 'index.php?mod=laporan&act=mutasi_masuk', 'far fa-circle', 41, 87, 'Aktif'),
-(4114, 'Laporan Jadwal', 'index.php?mod=laporan&act=jadwal_pelajaran', 'far fa-circle', 41, 89, 'Aktif'),
-(4115, 'Laporan Mutasi Keluar', 'index.php?mod=laporan&act=mutasi_keluar', 'far fa-circle', 41, 88, 'Aktif'),
+(411, 'Laporan Siswa', 'index.php?mod=laporan&act=siswa', 'far fa-circle', 41, 83, 'Aktif'),
+(412, 'Laporan Guru', 'index.php?mod=laporan&act=guru', 'far fa-circle', 41, 84, 'Aktif'),
+(413, 'Laporan Rombel', 'index.php?mod=laporan&act=kelas', 'far fa-circle', 41, 85, 'Aktif'),
+(414, 'Laporan Mapel', 'index.php?mod=laporan&act=mapel', 'far fa-circle', 41, 86, 'Aktif'),
+(415, 'Laporan Jurnal KBM', 'index.php?mod=laporan&act=jurnal', 'far fa-circle', 41, 87, 'Aktif'),
+(416, 'Laporan Absensi Siswa', 'index.php?mod=laporan&act=absensi_siswa_mapel', 'far fa-circle', 41, 88, 'Aktif'),
+(417, 'Laporan Absensi Piket', 'index.php?mod=laporan&act=absensi_siswa_piket', 'far fa-circle', 41, 89, 'Aktif'),
+(418, 'Laporan Absensi Guru', 'index.php?mod=laporan&act=absensi_guru', 'far fa-circle', 41, 90, 'Aktif'),
+(419, 'Laporan Catatan Kasus', 'index.php?mod=laporan&act=catatan_kasus', 'far fa-circle', 41, 91, 'Aktif'),
+(511, 'Formulir Pendaftaran', 'index.php?mod=ppdb&act=form', 'far fa-circle', 51, 99, 'Aktif'),
+(512, 'Verifikasi Pendaftar', 'index.php?mod=ppdb&act=index', 'far fa-circle', 51, 100, 'Aktif'),
+(631, 'Proses Kelulusan', 'index.php?mod=lulusan&act=proses', 'far fa-circle', 63, 103, 'Aktif'),
+(632, 'Data Alumni', 'index.php?mod=lulusan&act=index', 'far fa-circle', 63, 104, 'Aktif'),
+(4110, 'Laporan Catatan Kelas', 'index.php?mod=laporan&act=catatan_kelas', 'far fa-circle', 41, 92, 'Aktif'),
+(4111, 'Laporan PPDB', 'index.php?mod=laporan&act=ppdb', 'far fa-circle', 41, 93, 'Aktif'),
+(4112, 'Laporan Mutasi Masuk', 'index.php?mod=laporan&act=mutasi_masuk', 'far fa-circle', 41, 94, 'Aktif'),
+(4114, 'Laporan Jadwal', 'index.php?mod=laporan&act=jadwal_pelajaran', 'far fa-circle', 41, 96, 'Aktif'),
+(4115, 'Laporan Mutasi Keluar', 'index.php?mod=laporan&act=mutasi_keluar', 'far fa-circle', 41, 95, 'Aktif'),
 (4116, 'Manajemen Web', '#', 'fas fa-globe', 0, 9, 'Aktif'),
 (4117, 'Pengaturan', 'index.php?mod=landing_admin&act=settings', 'fas fa-cogs', 4116, 10, 'Aktif'),
 (4118, 'Berita & Pengumuman', 'index.php?mod=landing_admin&act=news', 'fas fa-newspaper', 4116, 11, 'Aktif'),
 (4119, 'Galeri Foto', 'index.php?mod=landing_admin&act=gallery', 'fas fa-images', 4116, 12, 'Aktif'),
 (4120, 'Manajemen Peran', 'index.php?mod=peran', 'fas fa-user-tag', 0, 6, 'Aktif'),
 (4121, 'Manajemen Menu', 'index.php?mod=app_menu', 'fas fa-list', 0, 8, 'Aktif'),
-(4124, 'Ekstrakurikuler', 'index.php?mod=ekskul', 'far fa-circle', 4130, 43, 'Aktif'),
-(4126, 'Kokurikuler', 'index.php?mod=kokulikuler', 'far fa-circle', 4130, 47, 'Aktif'),
-(4127, 'Pembiasaan Ibadah', 'index.php?mod=pembiasaan', 'far fa-circle', 4130, 46, 'Aktif'),
-(4128, 'Perangkat Pembelajaran', '#', 'fas fa-folder-open', 0, 29, 'Aktif'),
-(4129, 'Administrasi KBM', '#', 'fas fa-chalkboard-teacher', 0, 36, 'Aktif'),
-(4130, 'Administrasi Program', '#', 'fas fa-running', 0, 42, 'Aktif'),
-(4133, 'Input ATP', 'index.php?mod=perangkat&act=index&type=atp', 'far fa-circle', 4128, 31, 'Aktif'),
-(4134, 'Modul Ajar / RPP', 'index.php?mod=perangkat&act=index&type=modul_ajar', 'far fa-circle', 4128, 32, 'Aktif'),
-(4135, 'Program Semester', 'index.php?mod=perangkat&act=index&type=prosem', 'far fa-circle', 4128, 34, 'Aktif'),
-(4136, 'Program Tahunan', 'index.php?mod=perangkat&act=index&type=prota', 'far fa-circle', 4128, 33, 'Aktif'),
-(4137, 'Kewirausahaan', 'index.php?mod=kewirausahaan', 'far fa-circle', 4130, 44, 'Aktif'),
-(4138, 'Tahfidz Quran', 'index.php?mod=tahfidz', 'far fa-circle', 4130, 45, 'Aktif'),
-(4139, 'Manajemen Template', 'index.php?mod=template_dokumen&act=index', 'far fa-circle', 4128, 35, 'Aktif'),
+(4124, 'Ekstrakurikuler', 'index.php?mod=ekskul', 'far fa-circle', 4130, 45, 'Aktif'),
+(4126, 'Kokurikuler', 'index.php?mod=kokulikuler', 'far fa-circle', 4130, 49, 'Aktif'),
+(4127, 'Pembiasaan Ibadah', 'index.php?mod=pembiasaan', 'far fa-circle', 4130, 48, 'Aktif'),
+(4128, 'Perangkat Pembelajaran', '#', 'fas fa-folder-open', 0, 35, 'Aktif'),
+(4129, 'Administrasi KBM', '#', 'fas fa-chalkboard-teacher', 0, 38, 'Aktif'),
+(4130, 'Administrasi Program', '#', 'fas fa-running', 0, 44, 'Aktif'),
+(4133, 'Upload Perangkat KBM', 'index.php?mod=perangkat_upload', 'far fa-circle', 4128, 37, 'Aktif'),
+(4137, 'Kewirausahaan', 'index.php?mod=kewirausahaan', 'far fa-circle', 4130, 46, 'Aktif'),
+(4138, 'Tahfidz Quran', 'index.php?mod=tahfidz', 'far fa-circle', 4130, 47, 'Aktif'),
 (4140, 'Kalender Pendidikan', 'index.php?mod=kalender_akademik', 'far fa-calendar-alt', 12, 23, 'Aktif'),
-(4178, 'TATA USAHA', '#', NULL, 0, 52, 'Aktif'),
-(4179, 'Keuangan', '#', 'fas fa-money-bill-wave', 0, 53, 'Aktif'),
-(4180, 'Dashboard', 'index.php?mod=keuangan_dashboard', 'far fa-circle', 4179, 54, 'Aktif'),
-(4181, 'Transaksi Pemasukan', 'index.php?mod=keuangan_transaksi_masuk', 'far fa-circle', 4179, 55, 'Aktif'),
-(4182, 'Transaksi Pengeluaran', 'index.php?mod=keuangan_transaksi_keluar', 'far fa-circle', 4179, 56, 'Aktif'),
-(4195, 'Rekening Kas & Bank', 'index.php?mod=keuangan_master&act=rekening', 'fas fa-university', 4179, 62, 'Aktif'),
-(4196, 'Data Akun Transaksi', 'index.php?mod=keuangan_master&act=coa', 'fas fa-tags', 4179, 57, 'Aktif'),
+(4178, 'TATA USAHA', '#', NULL, 0, 57, 'Aktif'),
+(4179, 'Keuangan', '#', 'fas fa-money-bill-wave', 0, 58, 'Aktif'),
+(4180, 'Dashboard', 'index.php?mod=keuangan_dashboard', 'far fa-circle', 4179, 59, 'Aktif'),
+(4181, 'Transaksi Pemasukan', 'index.php?mod=keuangan_transaksi_masuk', 'far fa-circle', 4179, 60, 'Aktif'),
+(4182, 'Transaksi Pengeluaran', 'index.php?mod=keuangan_transaksi_keluar', 'far fa-circle', 4179, 61, 'Aktif'),
+(4195, 'Rekening Kas & Bank', 'index.php?mod=keuangan_master&act=rekening', 'fas fa-university', 4179, 67, 'Aktif'),
+(4196, 'Data Akun Transaksi', 'index.php?mod=keuangan_master&act=coa', 'fas fa-tags', 4179, 62, 'Aktif'),
 (4197, 'Group Keuangan', 'index.php?mod=keuangan_master&act=group', 'fas fa-folder', 4179, 61, 'Nonaktif'),
-(4198, 'Generate Tagihan Siswa', 'index.php?mod=keuangan_tagihan&act=index', 'fas fa-file-invoice-dollar', 4179, 60, 'Aktif'),
+(4198, 'Generate Tagihan Siswa', 'index.php?mod=keuangan_tagihan&act=index', 'fas fa-file-invoice-dollar', 4179, 65, 'Aktif'),
 (4204, 'Guru', 'index.php?mod=guru', 'fas fa-user-tie', 11, 15, 'Aktif'),
 (4205, 'Siswa', 'index.php?mod=siswa', 'fas fa-user-graduate', 11, 16, 'Aktif'),
-(4206, 'Manajemen GTK', '#', 'fas fa-chalkboard-teacher', 0, 63, 'Aktif'),
-(4207, 'Data Guru', 'index.php?mod=guru', 'fas fa-user-tie', 4206, 64, 'Aktif'),
-(4209, 'Manajemen Siswa', '#', 'fas fa-users', 0, 65, 'Aktif'),
-(4210, 'Data Siswa', 'index.php?mod=siswa', 'fas fa-user-graduate', 4209, 66, 'Aktif'),
+(4206, 'Manajemen GTK', '#', 'fas fa-chalkboard-teacher', 0, 70, 'Aktif'),
+(4207, 'Data Guru', 'index.php?mod=guru', 'fas fa-user-tie', 4206, 71, 'Aktif'),
+(4209, 'Manajemen Siswa', '#', 'fas fa-users', 0, 72, 'Aktif'),
+(4210, 'Data Siswa', 'index.php?mod=siswa', 'fas fa-user-graduate', 4209, 73, 'Aktif'),
 (4211, 'Audit Log', 'index.php?mod=audit_log', 'fas fa-history', 0, 7, 'Aktif'),
-(4212, 'Jurnal Umum', 'index.php?mod=keuangan_jurnal', 'fas fa-book', 4179, 61, 'Aktif'),
-(4213, 'Pembantu Penerimaan Kas', 'index.php?mod=keuangan_jurnal_pembantu', 'fas fa-file-invoice-dollar', 4179, 59, 'Aktif'),
-(4216, 'Aktivasi Biaya Sekolah', 'index.php?mod=keuangan_tarif&act=matrix', 'fas fa-th-large', 4179, 58, 'Aktif'),
-(4217, 'Pengaturan Tampilan', 'index.php?mod=app_config&act=index', 'fas fa-paint-brush', 4218, 99, 'Aktif'),
-(4218, 'PENGATURAN SISTEM', '#', 'fas fa-cogs', 0, 98, 'Aktif'),
-(4219, 'Buku Kas Umum (BKU)', 'index.php?mod=keuangan_bku', 'fas fa-book-open', 4179, 63, 'Aktif'),
-(4220, 'Manajemen Gaji', 'index.php?mod=keuangan_gaji', 'fas fa-money-check-alt', 4179, 64, 'Aktif'),
-(4221, 'Manajemen Surat', '#', 'fas fa-envelope-open-text', 0, 66, 'Aktif'),
-(4222, 'Dashboard Surat', 'index.php?mod=surat', 'fas fa-tachometer-alt', 4221, 1, 'Aktif'),
-(4223, 'Surat Masuk', 'index.php?mod=surat&act=masuk', 'fas fa-file-import', 4221, 2, 'Aktif'),
-(4224, 'Surat Keluar', 'index.php?mod=surat&act=keluar', 'fas fa-file-export', 4221, 3, 'Aktif'),
-(4225, 'Template Surat', 'index.php?mod=surat&act=template', 'fas fa-scroll', 4221, 4, 'Aktif');
+(4212, 'Jurnal Umum', 'index.php?mod=keuangan_jurnal', 'fas fa-book', 4179, 66, 'Aktif'),
+(4213, 'Pembantu Penerimaan Kas', 'index.php?mod=keuangan_jurnal_pembantu', 'fas fa-file-invoice-dollar', 4179, 64, 'Aktif'),
+(4216, 'Aktivasi Biaya Sekolah', 'index.php?mod=keuangan_tarif&act=matrix', 'fas fa-th-large', 4179, 63, 'Aktif'),
+(4217, 'Pengaturan Tampilan', 'index.php?mod=app_config&act=index', 'fas fa-paint-brush', 4218, 106, 'Aktif'),
+(4218, 'PENGATURAN SISTEM', '#', 'fas fa-cogs', 0, 105, 'Aktif'),
+(4219, 'Buku Kas Umum (BKU)', 'index.php?mod=keuangan_bku', 'fas fa-book-open', 4179, 68, 'Aktif'),
+(4220, 'Manajemen Gaji', 'index.php?mod=keuangan_gaji', 'fas fa-money-check-alt', 4179, 69, 'Aktif'),
+(4221, 'Manajemen Surat', '#', 'fas fa-envelope-open-text', 0, 76, 'Aktif'),
+(4222, 'Dashboard Surat', 'index.php?mod=surat', 'fas fa-tachometer-alt', 4221, 77, 'Aktif'),
+(4223, 'Surat Masuk', 'index.php?mod=surat&act=masuk', 'fas fa-file-import', 4221, 78, 'Aktif'),
+(4224, 'Surat Keluar', 'index.php?mod=surat&act=keluar', 'fas fa-file-export', 4221, 79, 'Aktif'),
+(4225, 'Template Surat', 'index.php?mod=surat&act=template', 'fas fa-scroll', 4221, 80, 'Aktif'),
+(4226, 'Administrasi Jabatan GTK', '#', 'fas fa-user-shield', 0, 29, 'Aktif'),
+(4227, 'Waka Kurikulum', 'index.php?mod=tugas_tambahan&jenis=kurikulum', 'far fa-circle', 4226, 30, 'Aktif'),
+(4228, 'Waka Kesiswaan', 'index.php?mod=tugas_tambahan&jenis=kesiswaan', 'far fa-circle', 4226, 31, 'Aktif'),
+(4229, 'Wali Kelas', 'index.php?mod=tugas_tambahan&jenis=walas', 'far fa-circle', 4226, 34, 'Aktif'),
+(4231, 'Kepala LAB', 'index.php?mod=tugas_tambahan&jenis=kepala_lab', 'fas fa-laptop-code', 4226, 32, 'Aktif'),
+(4232, 'Kepala Perpustakaan', 'index.php?mod=tugas_tambahan&jenis=kepala_perpus', 'fas fa-book', 4226, 33, 'Aktif'),
+(4233, 'LAB & PERPUS', '#', 'header', 0, 54, 'Aktif'),
+(4234, 'Manajemen Lab', 'index.php?mod=manajemen_lab', 'fas fa-laptop-code', 0, 55, 'Aktif'),
+(4235, 'Manajemen Perpus', 'index.php?mod=manajemen_perpus', 'fas fa-book', 0, 56, 'Aktif');
 
 -- --------------------------------------------------------
 
@@ -455,7 +477,65 @@ INSERT INTO `audit_log` (`id_log`, `id_pengguna`, `aksi`, `target_tabel`, `deskr
 (55, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-27 10:27:40'),
 (56, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-27 11:56:54'),
 (57, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2026-01-27 11:57:42'),
-(58, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.29', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-27 12:19:18');
+(58, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.29', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-27 12:19:18'),
+(59, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-30 09:19:47'),
+(60, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-30 10:34:23'),
+(61, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-31 09:13:17'),
+(62, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.13', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36', '2026-01-31 11:20:05'),
+(63, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.35', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 09:40:00'),
+(64, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.35', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 12:08:57'),
+(65, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 13:27:32'),
+(66, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 15:39:30'),
+(67, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:01:21'),
+(68, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:02:39'),
+(69, 0, 'LOGIN_FAILED', NULL, 'Gagal login dengan username: admin23', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:05:45'),
+(70, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:05:53'),
+(71, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:27:12'),
+(72, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 16:27:14'),
+(73, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.2', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-05 18:43:19'),
+(74, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-07 11:05:54'),
+(75, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.9', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-07 11:33:00'),
+(76, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.17', 'Mozilla/5.0 (X11; CrOS x86_64 14989.107.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36', '2026-02-07 11:53:00'),
+(77, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 08:17:58'),
+(78, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:36:25'),
+(79, 0, 'LOGIN_FAILED', NULL, 'Gagal login dengan username: 3202112004860004', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:36:48'),
+(80, 0, 'LOGIN_FAILED', NULL, 'Gagal login dengan username: 3202112004860004', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:37:04'),
+(81, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:37:08'),
+(82, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:38:16'),
+(83, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:38:19'),
+(84, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:39:42'),
+(85, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:39:44'),
+(86, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:43:00'),
+(87, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:43:03'),
+(88, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:57:52'),
+(89, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:57:55'),
+(90, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:59:54'),
+(91, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 10:59:58'),
+(92, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:00:25'),
+(93, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:00:28'),
+(94, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:04:31'),
+(95, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:04:34'),
+(96, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:06:56'),
+(97, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:07:22'),
+(98, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:17:33'),
+(99, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 11:17:36'),
+(100, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 12:46:58'),
+(101, 25, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 12:47:01'),
+(102, 25, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 13:23:03'),
+(103, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-14 13:23:07'),
+(104, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-26 11:26:15'),
+(105, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-26 15:14:21'),
+(106, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-02-26 15:52:58'),
+(107, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 10:23:10'),
+(108, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 10:26:29'),
+(109, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 10:33:48'),
+(110, 1, 'LOGOUT', NULL, 'User keluar dari sistem', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 12:36:12'),
+(111, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 12:36:32'),
+(112, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 12:49:42'),
+(113, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.6', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 12:52:23'),
+(114, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 14:19:10'),
+(115, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 15:10:25'),
+(116, 1, 'LOGIN', NULL, 'User masuk ke sistem (Login Sukses)', '192.168.1.100', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-01 15:29:44');
 
 -- --------------------------------------------------------
 
@@ -469,6 +549,14 @@ CREATE TABLE `capaian_pembelajaran` (
   `fase` enum('A','B','C','D','E','F') NOT NULL COMMENT 'Contoh: E untuk kelas X, F untuk XI-XII',
   `deskripsi_cp` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `capaian_pembelajaran`
+--
+
+INSERT INTO `capaian_pembelajaran` (`id_cp`, `id_mapel`, `fase`, `deskripsi_cp`) VALUES
+(1, 4, 'E', 'Deskripsi CP 1'),
+(2, 4, 'E', 'Deskrpsi CP 2');
 
 -- --------------------------------------------------------
 
@@ -501,6 +589,303 @@ CREATE TABLE `catatan_kelas` (
   `tanggal` date NOT NULL,
   `catatan_kejadian` text DEFAULT NULL,
   `waktu_input` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_bank_soal`
+--
+
+CREATE TABLE `cbt_bank_soal` (
+  `id_bank` int(10) UNSIGNED NOT NULL,
+  `nama_bank` varchar(150) NOT NULL,
+  `id_mapel` int(10) UNSIGNED NOT NULL,
+  `id_user` int(10) UNSIGNED NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_jadwal`
+--
+
+CREATE TABLE `cbt_jadwal` (
+  `id_jadwal` int(10) UNSIGNED NOT NULL,
+  `nama_ujian` varchar(200) NOT NULL,
+  `id_paket` int(10) UNSIGNED NOT NULL,
+  `id_kelas` int(10) UNSIGNED NOT NULL,
+  `tanggal_mulai` datetime NOT NULL,
+  `tanggal_selesai` datetime NOT NULL,
+  `durasi_menit` smallint(5) UNSIGNED DEFAULT 90,
+  `pin_proktor` varchar(10) DEFAULT NULL,
+  `status` enum('draft','aktif','selesai') DEFAULT 'draft',
+  `passing_grade` tinyint(3) UNSIGNED DEFAULT 0,
+  `catatan` text DEFAULT NULL,
+  `id_user` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_jawaban`
+--
+
+CREATE TABLE `cbt_jawaban` (
+  `id_jawaban` bigint(20) UNSIGNED NOT NULL,
+  `id_peserta` int(10) UNSIGNED NOT NULL,
+  `id_soal` int(10) UNSIGNED NOT NULL,
+  `id_jadwal` int(10) UNSIGNED NOT NULL,
+  `jawaban_pg` char(1) DEFAULT NULL,
+  `jawaban_essay` text DEFAULT NULL,
+  `is_ragu` tinyint(1) DEFAULT 0,
+  `is_benar` tinyint(1) DEFAULT NULL,
+  `skor_essay` decimal(5,2) DEFAULT NULL,
+  `waktu_jawab` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_kelas`
+--
+
+CREATE TABLE `cbt_kelas` (
+  `id_kelas` int(10) UNSIGNED NOT NULL,
+  `nama_kelas` varchar(50) NOT NULL,
+  `tingkat` varchar(10) DEFAULT NULL,
+  `jurusan` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `cbt_kelas`
+--
+
+INSERT INTO `cbt_kelas` (`id_kelas`, `nama_kelas`, `tingkat`, `jurusan`, `created_at`) VALUES
+(1, 'X.1', 'X', NULL, '2026-03-01 08:29:16'),
+(2, 'X.2', 'X', NULL, '2026-03-01 08:29:16'),
+(3, 'X.1', 'X', NULL, '2026-03-01 08:29:16'),
+(4, 'X.2', 'X', NULL, '2026-03-01 08:29:16'),
+(5, 'XI.1', 'XI', NULL, '2026-03-01 08:29:16'),
+(6, 'XI.2', 'XI', NULL, '2026-03-01 08:29:16'),
+(7, 'X.1', 'X', NULL, '2026-03-01 08:29:16'),
+(8, 'X.2', 'X', NULL, '2026-03-01 08:29:16'),
+(9, 'XII.1', 'XII', NULL, '2026-03-01 08:29:16'),
+(10, 'X.1', 'X', NULL, '2026-03-01 08:29:16'),
+(11, 'X.2', 'X', NULL, '2026-03-01 08:29:16'),
+(12, 'XI.1', 'XI', NULL, '2026-03-01 08:29:16'),
+(13, 'XI.2', 'XI', NULL, '2026-03-01 08:29:16'),
+(14, 'XII.1', 'XII', NULL, '2026-03-01 08:29:16'),
+(15, 'X.1', 'X', NULL, '2026-03-01 08:29:16'),
+(16, 'X.2', 'X', NULL, '2026-03-01 08:29:16'),
+(17, 'X.3', 'X', NULL, '2026-03-01 08:29:16'),
+(18, 'X.4', 'X', NULL, '2026-03-01 08:29:16'),
+(19, 'XI.1', 'XI', NULL, '2026-03-01 08:29:16'),
+(20, 'XI.2', 'XI', NULL, '2026-03-01 08:29:16'),
+(21, 'XII.1', 'XII', NULL, '2026-03-01 08:29:16'),
+(22, 'XII.2', 'XII', NULL, '2026-03-01 08:29:16');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_log_aktivitas`
+--
+
+CREATE TABLE `cbt_log_aktivitas` (
+  `id_log` bigint(20) UNSIGNED NOT NULL,
+  `id_peserta` int(10) UNSIGNED NOT NULL,
+  `id_jadwal` int(10) UNSIGNED NOT NULL,
+  `jenis_log` enum('login','pindah_tab','fullscreen_exit','submit','timeout','reset') NOT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `log_time` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_mapel`
+--
+
+CREATE TABLE `cbt_mapel` (
+  `id_mapel` int(10) UNSIGNED NOT NULL,
+  `kode_mapel` varchar(20) DEFAULT NULL,
+  `nama_mapel` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `cbt_mapel`
+--
+
+INSERT INTO `cbt_mapel` (`id_mapel`, `kode_mapel`, `nama_mapel`, `created_at`) VALUES
+(1, NULL, 'Pendidikan Agama Islam dan Budi Pekerti', '2026-03-01 08:33:27'),
+(2, NULL, 'Pendidikan Pancasila', '2026-03-01 08:33:27'),
+(3, NULL, 'Bahasa Indonesia', '2026-03-01 08:33:27'),
+(4, NULL, 'Matematika', '2026-03-01 08:33:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_nilai`
+--
+
+CREATE TABLE `cbt_nilai` (
+  `id_nilai` int(10) UNSIGNED NOT NULL,
+  `id_peserta` int(10) UNSIGNED NOT NULL,
+  `id_jadwal` int(10) UNSIGNED NOT NULL,
+  `id_siswa` int(10) UNSIGNED NOT NULL,
+  `nilai_pg` decimal(5,2) DEFAULT 0.00,
+  `nilai_essay` decimal(5,2) DEFAULT 0.00,
+  `nilai_akhir` decimal(5,2) DEFAULT 0.00,
+  `status_lulus` tinyint(1) DEFAULT NULL,
+  `dihitung_pada` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_paket`
+--
+
+CREATE TABLE `cbt_paket` (
+  `id_paket` int(10) UNSIGNED NOT NULL,
+  `nama_paket` varchar(150) NOT NULL,
+  `id_mapel` int(10) UNSIGNED NOT NULL,
+  `id_bank` int(10) UNSIGNED NOT NULL,
+  `acak_soal` tinyint(1) DEFAULT 1,
+  `acak_opsi` tinyint(1) DEFAULT 1,
+  `jml_soal_pg` tinyint(3) UNSIGNED DEFAULT 0,
+  `jml_soal_essay` tinyint(3) UNSIGNED DEFAULT 0,
+  `jml_soal_tf` tinyint(3) UNSIGNED DEFAULT 0,
+  `keterangan` text DEFAULT NULL,
+  `id_user` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_peserta`
+--
+
+CREATE TABLE `cbt_peserta` (
+  `id_peserta` int(10) UNSIGNED NOT NULL,
+  `id_jadwal` int(10) UNSIGNED NOT NULL,
+  `id_siswa` int(10) UNSIGNED NOT NULL,
+  `token` varchar(64) DEFAULT NULL,
+  `status` enum('belum','login','mengerjakan','selesai','timeout') DEFAULT 'belum',
+  `waktu_mulai` datetime DEFAULT NULL,
+  `waktu_selesai` datetime DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_siswa`
+--
+
+CREATE TABLE `cbt_siswa` (
+  `id_siswa` int(10) UNSIGNED NOT NULL,
+  `nis` varchar(20) NOT NULL,
+  `nama_siswa` varchar(100) NOT NULL,
+  `id_kelas` int(10) UNSIGNED DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `foto` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_soal`
+--
+
+CREATE TABLE `cbt_soal` (
+  `id_soal` int(10) UNSIGNED NOT NULL,
+  `id_bank` int(10) UNSIGNED NOT NULL,
+  `nomor_urut` smallint(5) UNSIGNED DEFAULT 1,
+  `tipe_soal` enum('pg','essay','tf') NOT NULL DEFAULT 'pg',
+  `pertanyaan` longtext NOT NULL,
+  `bobot` tinyint(3) UNSIGNED DEFAULT 1,
+  `tingkat_kesulitan` enum('mudah','sedang','sulit') DEFAULT 'sedang',
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_soal_media`
+--
+
+CREATE TABLE `cbt_soal_media` (
+  `id_media` int(10) UNSIGNED NOT NULL,
+  `id_soal` int(10) UNSIGNED NOT NULL,
+  `tipe_media` enum('gambar','audio','video','pdf') NOT NULL,
+  `nama_file` varchar(255) NOT NULL,
+  `path_file` varchar(500) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_soal_opsi`
+--
+
+CREATE TABLE `cbt_soal_opsi` (
+  `id_opsi` int(10) UNSIGNED NOT NULL,
+  `id_soal` int(10) UNSIGNED NOT NULL,
+  `label` char(1) NOT NULL,
+  `isi_opsi` text NOT NULL,
+  `is_benar` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cbt_users`
+--
+
+CREATE TABLE `cbt_users` (
+  `id_user` int(10) UNSIGNED NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `role` enum('superadmin','admin','guru') NOT NULL DEFAULT 'guru',
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+--
+-- Dumping data for table `cbt_users`
+--
+
+INSERT INTO `cbt_users` (`id_user`, `username`, `password`, `nama`, `role`, `is_active`, `created_at`) VALUES
+(1, 'admin', '$2y$10$5yms98QCnd1nSnvSMaNe9Oyg80dBYtHH/bR83HKG6dTUoyIdpLvRK', 'Administrator CBT', 'admin', 1, '2026-02-26 06:23:10');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dokumen_tugas_tambahan`
+--
+
+CREATE TABLE `dokumen_tugas_tambahan` (
+  `id_dokumen` int(11) NOT NULL,
+  `id_guru` int(11) NOT NULL,
+  `jenis_tugas_tambahan` varchar(50) NOT NULL,
+  `kategori_dokumen` varchar(50) NOT NULL,
+  `nama_dokumen` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `id_ta` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -557,7 +942,8 @@ CREATE TABLE `ekstrakurikuler` (
 --
 
 INSERT INTO `ekstrakurikuler` (`id_ekskul`, `nama_ekskul`, `kategori`, `id_guru_pembina`, `hari`, `jam_mulai`, `jam_selesai`, `status`) VALUES
-(1, 'Englis Club', 'Ekstrakurikuler', 11, 'Sabtu', '14:00:00', '15:00:00', 'Aktif');
+(1, 'Englis Club', 'Ekstrakurikuler', 11, 'Sabtu', '14:00:00', '15:00:00', 'Aktif'),
+(2, 'Futsal', 'Ekstrakurikuler', 7, 'Sabtu', '14:24:00', '14:24:00', 'Aktif');
 
 -- --------------------------------------------------------
 
@@ -773,21 +1159,6 @@ INSERT INTO `hak_akses` (`id_akses`, `id_peran`, `id_menu`, `can_create`, `can_r
 (698, 9, 4133, 1, 1, 1, 1),
 (699, 15, 4133, 1, 1, 1, 1),
 (700, 14, 4133, 1, 1, 1, 1),
-(702, 3, 4134, 1, 1, 1, 1),
-(704, 8, 4134, 1, 1, 1, 1),
-(705, 9, 4134, 1, 1, 1, 1),
-(706, 15, 4134, 1, 1, 1, 1),
-(707, 14, 4134, 1, 1, 1, 1),
-(709, 3, 4135, 1, 1, 1, 1),
-(711, 8, 4135, 1, 1, 1, 1),
-(712, 9, 4135, 1, 1, 1, 1),
-(713, 15, 4135, 1, 1, 1, 1),
-(714, 14, 4135, 1, 1, 1, 1),
-(716, 3, 4136, 1, 1, 1, 1),
-(718, 8, 4136, 1, 1, 1, 1),
-(719, 9, 4136, 1, 1, 1, 1),
-(720, 15, 4136, 1, 1, 1, 1),
-(721, 14, 4136, 1, 1, 1, 1),
 (778, 3, 4137, 1, 1, 1, 1),
 (780, 8, 4137, 1, 1, 1, 1),
 (781, 9, 4137, 1, 1, 1, 1),
@@ -829,82 +1200,6 @@ INSERT INTO `hak_akses` (`id_akses`, `id_peran`, `id_menu`, `can_create`, `can_r
 (1325, 2, 4114, 1, 1, 1, 1),
 (1326, 2, 511, 1, 1, 1, 1),
 (1327, 2, 632, 1, 1, 1, 1),
-(1331, 1, 1, 1, 1, 1, 1),
-(1332, 1, 2, 1, 1, 1, 1),
-(1333, 1, 3, 1, 1, 1, 1),
-(1334, 1, 4, 1, 1, 1, 1),
-(1335, 1, 5, 1, 1, 1, 1),
-(1336, 1, 4120, 1, 1, 1, 1),
-(1337, 1, 4211, 1, 1, 1, 1),
-(1338, 1, 4121, 1, 1, 1, 1),
-(1339, 1, 4117, 1, 1, 1, 1),
-(1340, 1, 4118, 1, 1, 1, 1),
-(1341, 1, 4119, 1, 1, 1, 1),
-(1342, 1, 4204, 1, 1, 1, 1),
-(1343, 1, 4205, 1, 1, 1, 1),
-(1344, 1, 113, 1, 1, 1, 1),
-(1345, 1, 114, 1, 1, 1, 1),
-(1346, 1, 115, 1, 1, 1, 1),
-(1347, 1, 116, 1, 1, 1, 1),
-(1348, 1, 117, 1, 1, 1, 1),
-(1349, 1, 4140, 1, 1, 1, 1),
-(1350, 1, 121, 1, 1, 1, 1),
-(1351, 1, 123, 1, 1, 1, 1),
-(1352, 1, 124, 1, 1, 1, 1),
-(1353, 1, 125, 1, 1, 1, 1),
-(1354, 1, 122, 1, 1, 1, 1),
-(1355, 1, 4133, 1, 1, 1, 1),
-(1356, 1, 4134, 1, 1, 1, 1),
-(1357, 1, 4136, 1, 1, 1, 1),
-(1358, 1, 4135, 1, 1, 1, 1),
-(1359, 1, 4139, 1, 1, 1, 1),
-(1360, 1, 21, 1, 1, 1, 1),
-(1361, 1, 22, 1, 1, 1, 1),
-(1362, 1, 23, 1, 1, 1, 1),
-(1363, 1, 24, 1, 1, 1, 1),
-(1364, 1, 25, 1, 1, 1, 1),
-(1365, 1, 4124, 1, 1, 1, 1),
-(1366, 1, 4137, 1, 1, 1, 1),
-(1367, 1, 4138, 1, 1, 1, 1),
-(1368, 1, 4127, 1, 1, 1, 1),
-(1369, 1, 4126, 1, 1, 1, 1),
-(1370, 1, 32, 1, 1, 1, 1),
-(1371, 1, 31, 1, 1, 1, 1),
-(1372, 1, 33, 1, 1, 1, 1),
-(1373, 1, 4180, 1, 1, 1, 1),
-(1374, 1, 4181, 1, 1, 1, 1),
-(1375, 1, 4182, 1, 1, 1, 1),
-(1376, 1, 4196, 1, 1, 1, 1),
-(1377, 1, 4216, 1, 1, 1, 1),
-(1378, 1, 4213, 1, 1, 1, 1),
-(1379, 1, 4198, 1, 1, 1, 1),
-(1380, 1, 4197, 1, 1, 1, 1),
-(1381, 1, 4212, 1, 1, 1, 1),
-(1382, 1, 4195, 1, 1, 1, 1),
-(1383, 1, 4207, 1, 1, 1, 1),
-(1384, 1, 4210, 1, 1, 1, 1),
-(1385, 1, 61, 1, 1, 1, 1),
-(1386, 1, 62, 1, 1, 1, 1),
-(1391, 1, 411, 1, 1, 1, 1),
-(1392, 1, 412, 1, 1, 1, 1),
-(1393, 1, 413, 1, 1, 1, 1),
-(1394, 1, 414, 1, 1, 1, 1),
-(1395, 1, 415, 1, 1, 1, 1),
-(1396, 1, 416, 1, 1, 1, 1),
-(1397, 1, 417, 1, 1, 1, 1),
-(1398, 1, 418, 1, 1, 1, 1),
-(1399, 1, 419, 1, 1, 1, 1),
-(1400, 1, 4110, 1, 1, 1, 1),
-(1401, 1, 4111, 1, 1, 1, 1),
-(1402, 1, 4112, 1, 1, 1, 1),
-(1403, 1, 4115, 1, 1, 1, 1),
-(1404, 1, 4114, 1, 1, 1, 1),
-(1405, 1, 511, 1, 1, 1, 1),
-(1406, 1, 512, 1, 1, 1, 1),
-(1407, 1, 631, 1, 1, 1, 1),
-(1408, 1, 632, 1, 1, 1, 1),
-(1409, 1, 4217, 1, 1, 1, 1),
-(1410, 1, 4218, 1, 1, 1, 1),
 (1411, 4, 1, 0, 1, 0, 0),
 (1412, 4, 4204, 1, 1, 1, 1),
 (1413, 4, 4205, 0, 1, 1, 0),
@@ -917,9 +1212,6 @@ INSERT INTO `hak_akses` (`id_akses`, `id_peran`, `id_menu`, `can_create`, `can_r
 (1420, 4, 125, 0, 1, 0, 0),
 (1421, 4, 122, 1, 1, 1, 1),
 (1422, 4, 4133, 1, 1, 1, 1),
-(1423, 4, 4134, 1, 1, 1, 1),
-(1424, 4, 4136, 1, 1, 1, 1),
-(1425, 4, 4135, 1, 1, 1, 1),
 (1426, 4, 21, 1, 1, 1, 1),
 (1427, 4, 22, 1, 1, 1, 1),
 (1428, 4, 23, 1, 1, 1, 1),
@@ -928,7 +1220,91 @@ INSERT INTO `hak_akses` (`id_akses`, `id_peran`, `id_menu`, `can_create`, `can_r
 (1431, 4, 415, 1, 1, 1, 1),
 (1432, 4, 416, 1, 1, 1, 1),
 (1433, 4, 418, 1, 1, 1, 1),
-(1434, 4, 4110, 1, 1, 1, 1);
+(1434, 4, 4110, 1, 1, 1, 1),
+(1517, 1, 1, 1, 1, 1, 1),
+(1518, 1, 2, 1, 1, 1, 1),
+(1519, 1, 3, 1, 1, 1, 1),
+(1520, 1, 4, 1, 1, 1, 1),
+(1521, 1, 5, 1, 1, 1, 1),
+(1522, 1, 4120, 1, 1, 1, 1),
+(1523, 1, 4211, 1, 1, 1, 1),
+(1524, 1, 4121, 1, 1, 1, 1),
+(1525, 1, 4117, 1, 1, 1, 1),
+(1526, 1, 4118, 1, 1, 1, 1),
+(1527, 1, 4119, 1, 1, 1, 1),
+(1528, 1, 4204, 1, 1, 1, 1),
+(1529, 1, 4205, 1, 1, 1, 1),
+(1530, 1, 113, 1, 1, 1, 1),
+(1531, 1, 114, 1, 1, 1, 1),
+(1532, 1, 115, 1, 1, 1, 1),
+(1533, 1, 116, 1, 1, 1, 1),
+(1534, 1, 117, 1, 1, 1, 1),
+(1535, 1, 4140, 1, 1, 1, 1),
+(1536, 1, 121, 1, 1, 1, 1),
+(1537, 1, 123, 1, 1, 1, 1),
+(1538, 1, 124, 1, 1, 1, 1),
+(1539, 1, 125, 1, 1, 1, 1),
+(1540, 1, 4227, 1, 1, 1, 1),
+(1541, 1, 4228, 1, 1, 1, 1),
+(1542, 1, 4231, 1, 1, 1, 1),
+(1543, 1, 4232, 1, 1, 1, 1),
+(1544, 1, 4229, 1, 1, 1, 1),
+(1545, 1, 122, 1, 1, 1, 1),
+(1546, 1, 4133, 1, 1, 1, 1),
+(1547, 1, 21, 1, 1, 1, 1),
+(1548, 1, 22, 1, 1, 1, 1),
+(1549, 1, 23, 1, 1, 1, 1),
+(1550, 1, 24, 1, 1, 1, 1),
+(1551, 1, 25, 1, 1, 1, 1),
+(1552, 1, 4124, 1, 1, 1, 1),
+(1553, 1, 4137, 1, 1, 1, 1),
+(1554, 1, 4138, 1, 1, 1, 1),
+(1555, 1, 4127, 1, 1, 1, 1),
+(1556, 1, 4126, 1, 1, 1, 1),
+(1557, 1, 32, 1, 1, 1, 1),
+(1558, 1, 31, 1, 1, 1, 1),
+(1559, 1, 33, 1, 1, 1, 1),
+(1560, 1, 4234, 1, 1, 1, 1),
+(1561, 1, 4235, 1, 1, 1, 1),
+(1562, 1, 4180, 1, 1, 1, 1),
+(1563, 1, 4181, 1, 1, 1, 1),
+(1564, 1, 4182, 1, 1, 1, 1),
+(1565, 1, 4197, 1, 1, 1, 1),
+(1566, 1, 4196, 1, 1, 1, 1),
+(1567, 1, 4216, 1, 1, 1, 1),
+(1568, 1, 4213, 1, 1, 1, 1),
+(1569, 1, 4198, 1, 1, 1, 1),
+(1570, 1, 4212, 1, 1, 1, 1),
+(1571, 1, 4195, 1, 1, 1, 1),
+(1572, 1, 4219, 1, 1, 1, 1),
+(1573, 1, 4220, 1, 1, 1, 1),
+(1574, 1, 4207, 1, 1, 1, 1),
+(1575, 1, 4210, 1, 1, 1, 1),
+(1576, 1, 61, 1, 1, 1, 1),
+(1577, 1, 62, 1, 1, 1, 1),
+(1578, 1, 4222, 1, 1, 1, 1),
+(1579, 1, 4223, 1, 1, 1, 1),
+(1580, 1, 4224, 1, 1, 1, 1),
+(1581, 1, 4225, 1, 1, 1, 1),
+(1582, 1, 411, 1, 1, 1, 1),
+(1583, 1, 412, 1, 1, 1, 1),
+(1584, 1, 413, 1, 1, 1, 1),
+(1585, 1, 414, 1, 1, 1, 1),
+(1586, 1, 415, 1, 1, 1, 1),
+(1587, 1, 416, 1, 1, 1, 1),
+(1588, 1, 417, 1, 1, 1, 1),
+(1589, 1, 418, 1, 1, 1, 1),
+(1590, 1, 419, 1, 1, 1, 1),
+(1591, 1, 4110, 1, 1, 1, 1),
+(1592, 1, 4111, 1, 1, 1, 1),
+(1593, 1, 4112, 1, 1, 1, 1),
+(1594, 1, 4115, 1, 1, 1, 1),
+(1595, 1, 4114, 1, 1, 1, 1),
+(1596, 1, 511, 1, 1, 1, 1),
+(1597, 1, 512, 1, 1, 1, 1),
+(1598, 1, 631, 1, 1, 1, 1),
+(1599, 1, 632, 1, 1, 1, 1),
+(1600, 1, 4217, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -943,6 +1319,16 @@ CREATE TABLE `jadwal_mengajar` (
   `hari_kbm` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu') DEFAULT NULL,
   `id_jam` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jadwal_mengajar`
+--
+
+INSERT INTO `jadwal_mengajar` (`id_jadwal_mengajar`, `id_guru_mapel`, `id_kelas`, `hari_kbm`, `id_jam`) VALUES
+(15, 8, 15, 'Sabtu', 5),
+(16, 8, 15, 'Sabtu', 6),
+(17, 8, 15, 'Sabtu', 7),
+(18, 8, 15, 'Sabtu', 8);
 
 -- --------------------------------------------------------
 
@@ -967,7 +1353,10 @@ CREATE TABLE `jam_pelajaran` (
 --
 
 INSERT INTO `jam_pelajaran` (`id_jam`, `urutan`, `label_jam_ke`, `jam_mulai`, `jam_selesai`, `durasi_menit`, `id_kegiatan`, `nama_kegiatan_custom`, `jenis_kegiatan`) VALUES
-(5, 1, '1', '08:00:00', '08:35:00', 35, 14, NULL, 'KBM');
+(5, 1, '1', '08:00:00', '08:35:00', 35, 14, NULL, 'KBM'),
+(6, 2, '2', '08:35:00', '09:10:00', 35, 14, NULL, 'KBM'),
+(7, 3, '5', '10:40:00', '11:15:00', 35, 14, NULL, 'KBM'),
+(8, 4, '6', '11:15:00', '11:50:00', 35, 14, NULL, 'KBM');
 
 -- --------------------------------------------------------
 
@@ -1546,7 +1935,7 @@ CREATE TABLE `keuangan_rekening` (
 --
 
 INSERT INTO `keuangan_rekening` (`id_rekening`, `kode_rekening`, `nama_rekening`, `tipe`, `nama_bank`, `nomor_rekening`, `atas_nama`, `saldo_awal`, `saldo_akhir`, `is_active`, `keterangan`, `created_at`, `updated_at`) VALUES
-(1, 'KAS-001', 'Kas Tunai', 'KAS', NULL, NULL, NULL, 0.00, 150000.00, 1, 'Kas tunai bendahara sekolah', '2026-01-07 04:57:47', '2026-01-19 03:30:25'),
+(1, 'KAS-001', 'Kas Tunai', 'KAS', NULL, NULL, NULL, 0.00, 325000.00, 1, 'Kas tunai bendahara sekolah', '2026-01-07 04:57:47', '2026-01-31 07:32:38'),
 (2, 'BANK-001', 'Bank Sekolah (Operasional)', 'BANK', 'BRI', '0000-0000-0000-0000', 'NAMA SEKOLAH', 0.00, 0.00, 1, 'Rekening operasional - GANTI NOMOR!', '2026-01-07 04:57:47', '2026-01-07 04:57:47'),
 (3, 'BANK-002', 'Bank Sekolah (Dana BOS)', 'BANK', 'BNI', '0000-0000-0000', 'NAMA SEKOLAH', 0.00, 0.00, 1, 'Rekening BOS - GANTI NOMOR!', '2026-01-07 04:57:47', '2026-01-07 04:57:47');
 
@@ -1884,7 +2273,8 @@ CREATE TABLE `keuangan_transaksi` (
 
 INSERT INTO `keuangan_transaksi` (`id_transaksi`, `no_bukti`, `tanggal`, `tipe`, `id_jenis`, `id_rekening`, `id_siswa`, `id_tagihan`, `jumlah`, `metode_pembayaran`, `referensi`, `keterangan`, `bukti_file`, `id_pengguna`, `created_at`, `updated_at`) VALUES
 (1, 'BM.260118.4301.001', '2026-01-18', 'MASUK', 8, 1, 48, 1, 75000.00, 'TUNAI', NULL, 'Periode 2026-01', NULL, 1, '2026-01-18 14:08:57', '2026-01-18 14:08:57'),
-(2, 'BM.260119.4301.001', '2026-01-19', 'MASUK', 8, 1, 49, 7, 75000.00, 'TUNAI', NULL, 'Periode 2026-01', NULL, 1, '2026-01-19 03:30:25', '2026-01-19 03:30:25');
+(2, 'BM.260119.4301.001', '2026-01-19', 'MASUK', 8, 1, 49, 7, 75000.00, 'TUNAI', NULL, 'Periode 2026-01', NULL, 1, '2026-01-19 03:30:25', '2026-01-19 03:30:25'),
+(3, 'BM.260131.4201.001', '2026-01-31', 'MASUK', 5, 1, 150, NULL, 175000.00, 'TUNAI', NULL, '', NULL, 1, '2026-01-31 07:32:38', '2026-01-31 07:32:38');
 
 -- --------------------------------------------------------
 
@@ -2099,6 +2489,24 @@ CREATE TABLE `kokulikuler_nilai` (
 CREATE TABLE `kokulikuler_profil` (
   `id_kokulikuler` int(11) NOT NULL,
   `id_profil` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lab_inventaris`
+--
+
+CREATE TABLE `lab_inventaris` (
+  `id_inventaris` int(11) NOT NULL,
+  `nama_barang` varchar(255) NOT NULL,
+  `merek_tipe` varchar(255) DEFAULT NULL,
+  `jumlah_total` int(11) DEFAULT 0,
+  `kondisi_baik` int(11) DEFAULT 0,
+  `kondisi_rusak` int(11) DEFAULT 0,
+  `keterangan` text DEFAULT NULL,
+  `id_ta` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -2817,7 +3225,71 @@ INSERT INTO `penempatan_siswa` (`id_penempatan`, `id_siswa`, `id_kelas`, `id_ta`
 (480, 204, 16, 5, NULL, 'Aktif'),
 (481, 209, 16, 5, NULL, 'Aktif'),
 (482, 212, 16, 5, NULL, 'Aktif'),
-(483, 220, 16, 5, NULL, 'Aktif');
+(483, 220, 16, 5, NULL, 'Aktif'),
+(484, 109, 17, 5, NULL, 'Aktif'),
+(485, 110, 17, 5, NULL, 'Aktif'),
+(486, 113, 17, 5, NULL, 'Aktif'),
+(487, 115, 17, 5, NULL, 'Aktif'),
+(488, 117, 17, 5, NULL, 'Aktif'),
+(489, 121, 17, 5, NULL, 'Aktif'),
+(490, 120, 17, 5, NULL, 'Aktif'),
+(491, 122, 17, 5, NULL, 'Aktif'),
+(492, 123, 17, 5, NULL, 'Aktif'),
+(493, 127, 17, 5, NULL, 'Aktif'),
+(494, 130, 17, 5, NULL, 'Aktif'),
+(495, 132, 17, 5, NULL, 'Aktif'),
+(496, 133, 17, 5, NULL, 'Aktif'),
+(497, 136, 17, 5, NULL, 'Aktif'),
+(498, 139, 17, 5, NULL, 'Aktif'),
+(499, 145, 17, 5, NULL, 'Aktif'),
+(500, 158, 17, 5, NULL, 'Aktif'),
+(501, 160, 17, 5, NULL, 'Aktif'),
+(502, 173, 17, 5, NULL, 'Aktif'),
+(503, 187, 17, 5, NULL, 'Aktif'),
+(504, 194, 17, 5, NULL, 'Aktif'),
+(505, 197, 17, 5, NULL, 'Aktif'),
+(506, 210, 17, 5, NULL, 'Aktif'),
+(507, 213, 17, 5, NULL, 'Aktif'),
+(508, 218, 17, 5, NULL, 'Aktif'),
+(509, 205, 17, 5, NULL, 'Aktif'),
+(510, 116, 18, 5, NULL, 'Aktif'),
+(511, 118, 18, 5, NULL, 'Aktif'),
+(512, 124, 18, 5, NULL, 'Aktif'),
+(513, 128, 18, 5, NULL, 'Aktif'),
+(514, 129, 18, 5, NULL, 'Aktif'),
+(515, 137, 18, 5, NULL, 'Aktif'),
+(516, 140, 18, 5, NULL, 'Aktif'),
+(517, 141, 18, 5, NULL, 'Aktif'),
+(518, 143, 18, 5, NULL, 'Aktif'),
+(519, 146, 18, 5, NULL, 'Aktif'),
+(520, 148, 18, 5, NULL, 'Aktif'),
+(521, 159, 18, 5, NULL, 'Aktif'),
+(522, 161, 18, 5, NULL, 'Aktif'),
+(523, 163, 18, 5, NULL, 'Aktif'),
+(524, 169, 18, 5, NULL, 'Aktif'),
+(525, 164, 18, 5, NULL, 'Aktif'),
+(526, 170, 18, 5, NULL, 'Aktif'),
+(527, 172, 18, 5, NULL, 'Aktif'),
+(528, 184, 18, 5, NULL, 'Aktif'),
+(529, 186, 18, 5, NULL, 'Aktif'),
+(530, 185, 18, 5, NULL, 'Aktif'),
+(531, 193, 18, 5, NULL, 'Aktif'),
+(532, 196, 18, 5, NULL, 'Aktif'),
+(533, 188, 18, 5, NULL, 'Aktif'),
+(534, 200, 18, 5, NULL, 'Aktif'),
+(535, 177, 18, 5, NULL, 'Aktif'),
+(536, 199, 18, 5, NULL, 'Aktif'),
+(537, 201, 18, 5, NULL, 'Aktif'),
+(538, 198, 18, 5, NULL, 'Aktif'),
+(539, 207, 18, 5, NULL, 'Aktif'),
+(540, 211, 18, 5, NULL, 'Aktif'),
+(541, 208, 18, 5, NULL, 'Aktif'),
+(542, 216, 18, 5, NULL, 'Aktif'),
+(543, 217, 18, 5, NULL, 'Aktif'),
+(544, 221, 18, 5, NULL, 'Aktif'),
+(545, 222, 18, 5, NULL, 'Aktif'),
+(546, 219, 18, 5, NULL, 'Aktif'),
+(547, 203, 18, 5, NULL, 'Aktif');
 
 -- --------------------------------------------------------
 
@@ -2857,7 +3329,7 @@ INSERT INTO `pengguna` (`id_pengguna`, `username`, `password`, `nama_pengguna`, 
 (22, '3202121505740001', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Roni Paslah', NULL, NULL, '2026-01-18 08:44:28'),
 (23, '3202121507870003', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Saepudin', NULL, NULL, '2026-01-18 08:44:28'),
 (24, '3202125907970003', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Tini Sumartini', NULL, NULL, '2026-01-18 08:44:28'),
-(25, '3202112004860004', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Wawan Setiawan', NULL, NULL, '2026-01-18 08:44:28'),
+(25, '3202112004860004', '$2y$10$OpOEY1qHwefG7iRcW7djYuU3sgEOyhEAz5DxLtloX6JjG1nSxyn7W', 'Wawan Setiawan', '', NULL, '2026-01-18 08:44:28'),
 (26, '3205111912900002', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Zaenal Mutaqin Ahirudin', NULL, NULL, '2026-01-18 08:44:28'),
 (27, '3217072309950002', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Zaidan Ahmad Rabbani', NULL, NULL, '2026-01-18 08:44:28'),
 (28, '20', '$2y$10$dHxaqHkQ3ITY1cRq2iuJ6.G2pYkK2Jy5ZLgwQ/PLGKPlpAMo2GjkG', 'Usep Sanusi', NULL, NULL, '2026-01-18 08:44:28'),
@@ -3076,9 +3548,50 @@ CREATE TABLE `perangkat_pembelajaran` (
   `mapel` varchar(100) DEFAULT NULL,
   `kelas` varchar(50) DEFAULT NULL,
   `judul` varchar(255) NOT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `tipe_file` varchar(50) DEFAULT NULL,
+  `ukuran_file` int(11) DEFAULT NULL,
   `konten_html` longtext DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `perpus_buku`
+--
+
+CREATE TABLE `perpus_buku` (
+  `id_buku` int(11) NOT NULL,
+  `kode_buku` varchar(50) DEFAULT NULL,
+  `judul_buku` varchar(255) NOT NULL,
+  `pengarang` varchar(255) DEFAULT NULL,
+  `penerbit` varchar(255) DEFAULT NULL,
+  `tahun_terbit` year(4) DEFAULT NULL,
+  `jumlah_stok` int(11) DEFAULT 0,
+  `lokasi_rak` varchar(100) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `perpus_peminjaman`
+--
+
+CREATE TABLE `perpus_peminjaman` (
+  `id_peminjaman` int(11) NOT NULL,
+  `id_buku` int(11) NOT NULL,
+  `peminjam_tipe` enum('Guru','Siswa') NOT NULL,
+  `id_peminjam` int(11) NOT NULL,
+  `tgl_pinjam` date NOT NULL,
+  `tgl_kembali_rencana` date NOT NULL,
+  `tgl_kembali_real` date DEFAULT NULL,
+  `status` enum('Dipinjam','Kembali','Terlambat') DEFAULT 'Dipinjam',
+  `catatan` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -3843,120 +4356,120 @@ INSERT INTO `siswa` (`id_siswa`, `nama`, `nisn`, `nipd`, `nik`, `jk`, `tempat_la
 (87, 'SITI NURLAELA', '0087595301', '242510037', '3202126101080008', 'Perempuan', 'Sukabumi', '2008-01-21', 'SMP ISLAM NURUL FIKRI', 'Aktif', 1, NULL),
 (88, 'SITI SUWANSAH', '0075499469', '242510038', '3202115612070005', 'Perempuan', 'Sukabumi', '2007-12-16', 'SMP ISLAM NURUL FIKRI', 'Aktif', 1, NULL),
 (89, 'SITI ZAHRA QURATULAINI', '0095122768', '242510039', '3202116506090001', 'Perempuan', 'Sukabumi', '2011-01-06', 'SMP PLUS AL-BASYARI', 'Aktif', 1, NULL),
-(109, 'ABDUL MUIZ', '3092646133', '252610001', '3202132011090006', '', 'Sukabumi', '2009-11-20', NULL, 'Aktif', 5, NULL),
-(110, 'ADRIAN MAULANA YUSUP', '0092931522', '252610002', '3202142711090003', '', 'Sukabumi', '2009-11-27', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(111, 'AGIS MUTIARA', '0095780821', '252610003', '3202126808090003', '', 'Sukabumi', '2009-08-28', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(112, 'AGUS RAMDANI', '0096593025', '252610004', '3202113108090004', '', 'Sukabumi', '2009-08-31', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(113, 'AIRA PUTRI ADITIYA', '0099755704', '252610005', '3202064108090002', '', 'Sukabumi', '2009-08-01', 'SMP NEGERI 2 BOJONGGENTENG', 'Aktif', 5, NULL),
-(114, 'ALDI SAPUTRA', '0089675328', '252610006', '3202281511080001', '', 'Sukabumi', '2008-11-15', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(115, 'AMELDA', '0094447260', '252610007', '3202134607090001', '', 'Sukabumi', '2009-07-06', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(116, 'AMELIA', '0087663921', '252610008', '3202136312080007', '', 'Sukabumi', '2008-12-23', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
-(117, 'ANDIKA MAULANA', '3091137244', '252610009', '3202132003090003', '', 'Sukabumi', '2009-03-20', 'SMPS ISLAM INSAN KAMIL MANDIRI', 'Aktif', 5, NULL),
-(118, 'ANISA', '3086466602', '252610010', '3202146007080001', '', 'Sukabumi', '2008-07-20', NULL, 'Aktif', 5, NULL),
-(119, 'ANISA PITRI', '0083380895', '252610011', '3202096009080001', '', 'Sukabumi', '2008-09-20', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(120, 'ANISA RAHMA MUSTIKA', '0086222783', '252610012', '3202136610080002', '', 'Sukabumi', '2008-10-26', 'SMP NEGERI 1 PARUNGKUDA', 'Aktif', 5, NULL),
-(121, 'ANISA SAFITRI', '3101261006', '252610013', '3202146404100001', '', 'Sukabumi', '2010-04-24', NULL, 'Aktif', 5, NULL),
-(122, 'ARYASATYA FIRMANSYAH', '0067504067', '252610014', '3202100105060004', '', 'Sukabumi', '2006-05-01', 'SMP NEGERI 2 CIKEMBAR', 'Aktif', 5, NULL),
-(123, 'AULIA DEWI SRI WULANDARI', '3108366273', '252610015', '3202134204100002', '', 'Sukabumi', '2010-04-02', NULL, 'Aktif', 5, NULL),
-(124, 'AWALIAH', '3106589031', '252610016', '3202136503100002', '', 'Sukabumi', '2010-03-25', NULL, 'Aktif', 5, NULL),
-(125, 'BAYHAQI ALKAFARO', '0109599808', '252610017', '3202111605100007', '', 'Sukabumi', '2010-05-16', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(126, 'BINTANG FURQON', '          ', '252610018', '3301130612080006', '', 'Malang', '2006-12-06', NULL, 'Aktif', 5, NULL),
-(127, 'DESTI ANJANI', '0056410894', '252610019', '3202145912050003', '', 'Sukabumi', '2005-12-19', NULL, 'Aktif', 5, NULL),
-(128, 'DIKI AGUSTIAN', '0069503994', '252610020', '3202141608060002', '', 'Sukabumi', '2006-08-16', 'SMP NEGERI 1 PARAKANSALAK', 'Aktif', 5, NULL),
-(129, 'DINI PUTRI ANDRIANI', '0097968668', '252610021', '3202145810090001', '', 'Sukabumi', '2009-10-18', NULL, 'Aktif', 5, NULL),
-(130, 'EDWAR GUPRIYAN', '3089716573', '252610022', '3202141610080003', '', 'Sukabumi', '2008-10-16', NULL, 'Aktif', 5, NULL),
-(131, 'ELIYA YULIANI', '0104684933', '252610023', '3202125806100003', '', 'Sukabumi', '2010-06-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(132, 'ELSI', '0082591669', '252610024', '3202146507080003', '', 'Sukabumi', '2008-07-25', NULL, 'Aktif', 5, NULL),
-(133, 'FABIAN YUSUF', '3093879901', '252610025', '3202141909090002', '', 'Sukabumi', '2009-09-19', NULL, 'Aktif', 5, NULL),
-(134, 'FADHIL ABDILLAH', '0107965418', '252610026', '3202110601100001', '', 'Sukabumi', '2010-01-06', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(135, 'FAIRUS MUTIARAHIM', '0107660632', '252610027', '3202115101100002', '', 'Sukabumi', '2010-01-11', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(136, 'FAUZIAH', '0082973002', '252610028', '3202136103080002', '', 'Sukabumi', '2008-03-21', 'SMP ISLAM AL QUDSIYAH', 'Aktif', 5, NULL),
-(137, 'FERA JULIANTI', '0105238344', '252610029', '3202185007100004', '', 'Sukabumi', '2010-07-10', 'SMP NEGERI 2 KALAPANUNGGAL', 'Aktif', 5, NULL),
-(138, 'GHEA ANANDA AVRIANTY', '0107833156', '252610030', '3202125404100003', '', 'Sukabumi', '2010-04-14', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(139, 'GRESIA SUMAROU', '0088748192', '252610031', '3202145605080003', '', 'Sukabumi', '2008-05-16', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
-(140, 'HABIBAH', '0083788513', '252610032', '3202195006070001', '', 'Sukabumi', '2008-02-11', 'PKBM ANGGREK', 'Aktif', 5, NULL),
-(141, 'HAIKAL GALIH MULYANA', '3108334256', '252610033', '3202061407100001', '', 'Sukabumi', '2010-07-14', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(142, 'HERA IDA', '0085842308', '252610034', '3202124606080004', '', 'Sukabumi', '2008-06-06', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(143, 'HERDI', '0109278369', '252610035', '3202182601100001', '', 'Sukabumi', '2010-01-26', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(144, 'HILDA MUTIARA ZULFA', '0099368150', '252610036', '3216216810090006', '', 'Bekasi', '2009-10-28', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(145, 'ICA', '0107143054', '252610037', '3202145003100001', '', 'Sukabumi', '2010-03-10', NULL, 'Aktif', 5, NULL),
-(146, 'INDAH ANJANI', '0063676488', '252610038', '3202186812060001', '', 'Sukabumi', '2006-12-28', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
-(147, 'INDRI YULIANTI', '0099835840', '252610039', '3202117008090006', '', 'Sukabumi', '2009-08-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(148, 'INDRIYANI', '0095556290', '252610040', '3202144408090001', '', 'Sukabumi', '2009-08-04', NULL, 'Aktif', 5, NULL),
-(149, 'IRMAN MAULANA', '0094272850', '252610041', '3202121210090002', '', 'Sukabumi', '2009-10-12', 'SMP ISLAM CENDIKIA', 'Aktif', 5, NULL),
-(150, 'ISMA', '0108779297', '252610042', '3202124404100001', '', 'Sukabumi', '2010-04-04', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(151, 'JELITA SURYA SABRINA PUTRI', '0094510709', '252610043', '3202114512090002', '', 'Sukabumi', '2009-12-05', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(152, 'JIAN BAAMI HABTI', '3105275586', '252610044', '3202111801100002', '', 'Sukabumi', '2010-01-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(153, 'KASANDRA AQUINI', '0096216878', '252610045', '3202126607090001', '', 'Sukabumi', '2009-07-26', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(154, 'KESYA PUTRI NATAPLAWIRA', '0089846692', '252610046', '3202335605080001', '', 'Sukabumi', '2008-05-16', 'SMP N 1 KOTA SUKABUMI', 'Aktif', 5, NULL),
-(155, 'LUSI WIDIA MAULIDA', '0097279667', '252610047', '3201275304080002', '', 'Bogor', '2009-03-13', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(156, 'LUTFI ALFIANTI', '3091820543', '252610048', '3202315111090001', '', 'Sukabumi', '2009-11-11', NULL, 'Aktif', 5, NULL),
-(157, 'LUTHVIANI ULFA', '0097646759', '252610049', '3202117004090005', '', 'Sukabumi', '2009-04-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(158, 'M. DZUBIAN SYAFIQ ABDILLAH', '0099587391', '252610050', '3202130407090003', '', 'Sukabumi', '2009-07-04', 'SMP NEGERI 1 PARUNGKUDA', 'Aktif', 5, NULL),
-(159, 'M. FAHRI SUGANDA', '0106286817', '252610051', '3202140205100001', '', 'Sukabumi', '2010-05-02', NULL, 'Aktif', 5, NULL),
-(160, 'M. RIPAL ALHUSAERI', '0092517806', '252610052', '3202142701100001', '', 'Sukabumi', '2010-01-27', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
-(161, 'MAEDASARI', '0097809406', '252610053', '3202144812090001', '', 'Sukabumi', '2009-12-08', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(162, 'MARWAN SETIAWAN', '3094009694', '252610054', '3202272706090001', '', 'Sukabumi', '2009-06-27', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(163, 'MELISA APRILLIANI', '3101211123', '252610055', '3202146204100001', '', 'Sukabumi', '2010-04-22', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
-(164, 'MOH. RIFKI RIZKY ARRAHMAN', '0093182092', '252610056', '3202142606090001', '', 'Sukabumi', '2009-06-26', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(165, 'MONA MUTIARA', '0103932240', '252610057', '3202124301100002', '', 'Sukabumi', '2010-01-03', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(166, 'MUCHAMMAD FAISAL', '0109697708', '252610058', '3202112101100009', '', 'Sukabumi', '2010-01-21', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(167, 'MUHAMMAD FATHURROHMAN', '0103248529', '252610059', '3201271901100002', '', 'Bogor', '2010-01-19', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(168, 'MUHAMMAD IBNU MUBAROK AZZEIN', '0119632593', '252610060', '3201273001110001', '', 'Bogor', '2011-01-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(169, 'MUHAMMAD RAFLI AL AZHARI', '3083264206', '252610061', '3202132908080003', '', 'Sukabumi', '2008-08-29', 'SMP NEGERI 2 PARUNGKUDA', 'Aktif', 5, NULL),
-(170, 'MUHAMMAD RISKY', '0101275699', '252610062', '3202102302100008', '', 'Sukabumi', '2010-02-23', 'SMP NEGERI 2 CIKEMBAR', 'Aktif', 5, NULL),
-(171, 'MUHAMMAD TUGRIL ARRAIHAN', '3091958637', '252610063', '3202122203090007', '', 'Sukabumi', '2009-03-22', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(172, 'MUHKLISIHIN', '0103596568', '252610064', '3202182803100003', '', 'Sukabumi', '2010-03-28', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(173, 'MUTIARA LAILA PUTRI', '0105179179', '252610065', '3202144609100001', '', 'Sukabumi', '2010-09-06', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(174, 'NABILLAH MEGA FIKRIANI', '0098152876', '252610066', '3202116506090005', '', 'Sukabumi', '2009-06-25', 'SMP AZZAINIYYAH', 'Aktif', 5, NULL),
-(175, 'NADIA MARDIANA', '0107573886', '252610067', '3202126107100002', '', 'Sukabumi', '2010-07-21', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(176, 'NAILA FITRI RAHMADHANI', '0095303568', '252610068', '3202125709090003', '', 'Sukabumi', '2009-09-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(177, 'NITA MAULANI', '0089102130', '252610069', '3202196403080002', '', 'Sukabumi', '2008-03-24', 'PKBM ANGGREK', 'Aktif', 5, NULL),
-(178, 'NOVITA ILMIRA DWI PURNAMA', '0099066129', '252610070', '3202117011090003', '', 'Sukabumi', '2009-11-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(179, 'NUR WAHID SALIM', '0092492057', '252610071', '3202282209090003', '', 'Sukabumi', '2009-09-22', 'SMP IT MADANI', 'Aktif', 5, NULL),
-(180, 'NURAENI', '0088250631', '252610072', '3202114306080005', '', 'Sukabumi', '2008-06-03', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(181, 'NURHAIFA', '0094887757', '252610073', '3202316011090002', '', 'Sukabumi', '2009-11-20', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(182, 'NURIL YAHDIK', '0093068546', '252610074', '3202121907090002', '', 'Sukabumi', '2009-07-19', NULL, 'Aktif', 5, NULL),
-(183, 'NURUL AZMI', '0098346836', '252610075', '3202296309090001', '', 'Sukabumi', '2009-09-23', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(184, 'PAHMI AJIDIN', '0038078737', '252610076', '3202142202090002', '', 'Sukabumi', '2009-02-22', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
-(185, 'PAHRI RAMADHAN', '0099372913', '252610077', '3202143008090001', '', 'Sukabumi', '2009-08-30', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(186, 'PANDI', '0085457271', '252610078', '3202130802080003', '', 'Sukabumi', '2008-02-08', 'SMPS ISLAM INSAN KAMIL MANDIRI', 'Aktif', 5, NULL),
-(187, 'PIONA ELDI OKTAVIA', '3086810012', '252610079', '3202134210080004', '', 'Sukabumi', '2008-10-02', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
-(188, 'PUTRI AMELIA', '0087974126', '252610080', '3202136504080002', '', 'Sukabumi', '2008-04-25', 'SMP PGRI PARUNGKUDA', 'Aktif', 5, NULL),
-(189, 'RAIHAN CAHYA MAULID', '0108770955', '252610081', '3202111103100001', '', 'Sukabumi', '2010-03-11', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(190, 'RANDI', '0109178444', '252610082', '3202113001100006', '', 'Sukabumi', '2010-01-30', 'SMP IT MADANI', 'Aktif', 5, NULL),
-(191, 'RAPLI MAULANA', '0108047231', '252610083', '3202110201100004', '', 'Sukabumi', '2010-01-02', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(192, 'RASNAMILA', '0091861319', '252610084', '3202116008090004', '', 'Sukabumi', '2009-08-20', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(193, 'RATIH MAULIDA', '0103957465', '252610085', '3202146702100001', '', 'Sukabumi', '2010-02-27', NULL, 'Aktif', 5, NULL),
-(194, 'REHAN NURJAELANI', '3096979240', '252610086', '3202130606090005', '', 'Sukabumi', '2009-06-06', NULL, 'Aktif', 5, NULL),
-(195, 'REHAN SOMANTRI', '0092294359', '252610087', '3202121705090002', '', 'Sukabumi', '2009-05-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(196, 'RENDIYAWAN', '0102111932', '252610088', '3202290109100003', '', 'Sukabumi', '2010-09-01', NULL, 'Aktif', 5, NULL),
-(197, 'RISA FITRIANI', '0094943147', '252610089', '3202146009090003', '', 'Sukabumi', '2009-09-20', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(198, 'RISMA JUNITA', '0093101241', '252610090', '3202145006090001', '', 'Sukabumi', '2009-06-10', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
-(199, 'ROBY ARDIANSYAH', '0095721154', '252610091', '3202131105090002', '', 'Sukabumi', '2009-05-11', 'SMP NEGERI 2 PARUNGKUDA', 'Aktif', 5, NULL),
-(200, 'SAEPURROHIM KARIM', '3093399442', '252610092', '3202060709090002', '', 'Sukabumi', '2009-09-07', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(201, 'SALMAN ALFARISI SYA`AR', '3092640096', '252610093', '3202141111090004', '', 'Sukabumi', '2009-11-11', NULL, 'Aktif', 5, NULL),
-(202, 'SIFA SILFIANA', '0099813984', '252610094', '3202115805090001', '', 'Sukabumi', '2009-05-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(203, 'SILVIA WAVIQ RAMADHANI', '0082778203', '252610095', '3201254209080004', '', 'Bogor', '2008-09-02', 'SMP ISLAM AL BAROKAH', 'Aktif', 5, NULL),
-(204, 'SITI FATIMAH AZ-ZAHRA', NULL, '252610096', NULL, '', 'Sukabumi', NULL, NULL, 'Aktif', 5, NULL),
-(205, 'SITI MASNONEH', '3105548859', '252610097', '3202144202100001', '', 'Sukabumi', '2010-02-02', NULL, 'Aktif', 5, NULL),
-(206, 'SITI MUNIFAH SIRIN', '0084999054', '252610098', '3202127005080003', '', 'Sukabumi', '2008-05-30', 'SMP IT TAHSIN', 'Aktif', 5, NULL),
-(207, 'SITI NURHALISA', '0095433011', '252610099', '3202136006090005', '', 'Sukabumi', '2009-06-20', NULL, 'Aktif', 5, NULL),
-(208, 'SITI PATIMAH', '0093589815', '252610100', '3202137006080004', '', 'Sukabumi', '2008-06-30', NULL, 'Aktif', 5, NULL),
-(209, 'SITI PATIMAH', '0105415145', '252610101', '3202114503100007', '', 'Sukabumi', '2010-03-05', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(210, 'SITI SALMA', '0094288959', '252610102', '3202146411090004', '', 'Sukabumi', '2009-11-24', NULL, 'Aktif', 5, NULL),
-(211, 'SITI SHOPIA ULFA', '3103432560', '252610103', '3202134405100001', '', 'Sukabumi', '2010-05-04', NULL, 'Aktif', 5, NULL),
-(212, 'SITI SYARIFAH MARDHOTILAH', '0101013848', '252610104', '3201276704100001', '', 'Bogor', '2010-04-27', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(213, 'SRY MARLINA', '0087957830', '252610105', '3202134711080001', '', 'Sukabumi', '2008-11-07', ' ', 'Aktif', 5, NULL),
-(214, 'SUSAN MEILANI', '0091536546', '252610106', '3202126305090006', '', 'Sukabumi', '2009-05-23', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(215, 'SYIFA RACHMAWATI AWALIYAH', '0109796338', '252610107', '3202125702100002', '', 'Sukabumi', '2010-02-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
-(216, 'WANGI', '3095898697', '252610108', '3202144412090003', '', 'Sukabumi', '2009-12-04', 'SMP ISLAM TERPADU AL JABHATUL ISLAMIYAH', 'Aktif', 5, NULL),
-(217, 'WILDAN', '3094374335', '252610109', '3275012706090004', '', 'Bekasi', '2009-06-27', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(218, 'WILDANSYAH DWI KUSUMA', '0105575590', '252610110', '3202142406100004', '', 'Sukabumi', '2010-06-24', NULL, 'Aktif', 5, NULL),
-(219, 'WINDI RAMADANI', '0098044990', '252610111', '3202184804100001', '', 'Sukabumi', '2010-04-08', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
-(220, 'YUNI', '0105322682', '252610112', '3202315604100001', '', 'Sukabumi', '2010-04-16', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
-(221, 'ZIDAN SYAHRIL ARYANSA', '3101276123', '252610113', '3202140501100001', '', 'Sukabumi', '2010-01-05', NULL, 'Aktif', 5, NULL),
-(222, 'ZIRA PUSPITA', '0103534124', '252610114', '3202186706100001', '', 'Sukabumi', '2010-06-27', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL);
+(109, 'ABDUL MUIZ', '3092646133', '252610001', '3202132011090006', 'Laki-laki', 'Sukabumi', '2009-11-20', NULL, 'Aktif', 5, NULL),
+(110, 'ADRIAN MAULANA YUSUP', '0092931522', '252610002', '3202142711090003', 'Laki-laki', 'Sukabumi', '2009-11-27', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(111, 'AGIS MUTIARA', '0095780821', '252610003', '3202126808090003', 'Perempuan', 'Sukabumi', '2009-08-28', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(112, 'AGUS RAMDANI', '0096593025', '252610004', '3202113108090004', 'Laki-laki', 'Sukabumi', '2009-08-31', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(113, 'AIRA PUTRI ADITIYA', '0099755704', '252610005', '3202064108090002', 'Perempuan', 'Sukabumi', '2009-08-01', 'SMP NEGERI 2 BOJONGGENTENG', 'Aktif', 5, NULL),
+(114, 'ALDI SAPUTRA', '0089675328', '252610006', '3202281511080001', 'Laki-laki', 'Sukabumi', '2008-11-15', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(115, 'AMELDA', '0094447260', '252610007', '3202134607090001', 'Perempuan', 'Sukabumi', '2009-07-06', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(116, 'AMELIA', '0087663921', '252610008', '3202136312080007', 'Perempuan', 'Sukabumi', '2008-12-23', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
+(117, 'ANDIKA MAULANA', '3091137244', '252610009', '3202132003090003', 'Laki-laki', 'Sukabumi', '2009-03-20', 'SMPS ISLAM INSAN KAMIL MANDIRI', 'Aktif', 5, NULL),
+(118, 'ANISA', '3086466602', '252610010', '3202146007080001', 'Perempuan', 'Sukabumi', '2008-07-20', NULL, 'Aktif', 5, NULL),
+(119, 'ANISA PITRI', '0083380895', '252610011', '3202096009080001', 'Perempuan', 'Sukabumi', '2008-09-20', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(120, 'ANISA RAHMA MUSTIKA', '0086222783', '252610012', '3202136610080002', 'Perempuan', 'Sukabumi', '2008-10-26', 'SMP NEGERI 1 PARUNGKUDA', 'Aktif', 5, NULL),
+(121, 'ANISA SAFITRI', '3101261006', '252610118', '3202146404100001', 'Perempuan', 'Sukabumi', '2010-04-24', '', 'Aktif', 5, NULL),
+(122, 'ARYASATYA FIRMANSYAH', '0067504067', '252610014', '3202100105060004', 'Laki-laki', 'Sukabumi', '2006-05-01', 'SMP NEGERI 2 CIKEMBAR', 'Aktif', 5, NULL),
+(123, 'AULIA DEWI SRI WULANDARI', '3108366273', '252610015', '3202134204100002', 'Perempuan', 'Sukabumi', '2010-04-02', NULL, 'Aktif', 5, NULL),
+(124, 'AWALIAH', '3106589031', '252610016', '3202136503100002', 'Perempuan', 'Sukabumi', '2010-03-25', NULL, 'Aktif', 5, NULL),
+(125, 'BAYHAQI ALKAFARO', '0109599808', '252610017', '3202111605100007', 'Laki-laki', 'Sukabumi', '2010-05-16', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(126, 'BINTANG FURQON', '          ', '252610018', '3301130612080006', 'Laki-laki', 'Malang', '2006-12-06', NULL, 'Aktif', 5, NULL),
+(127, 'DESTI ANJANI', '0056410894', '252610019', '3202145912050003', 'Perempuan', 'Sukabumi', '2005-12-19', NULL, 'Aktif', 5, NULL),
+(128, 'DIKI AGUSTIAN', '0069503994', '252610020', '3202141608060002', 'Laki-laki', 'Sukabumi', '2006-08-16', 'SMP NEGERI 1 PARAKANSALAK', 'Aktif', 5, NULL),
+(129, 'DINI PUTRI ANDRIANI', '0097968668', '252610021', '3202145810090001', 'Perempuan', 'Sukabumi', '2009-10-18', NULL, 'Aktif', 5, NULL),
+(130, 'EDWAR GUPRIYAN', '3089716573', '252610022', '3202141610080003', 'Laki-laki', 'Sukabumi', '2008-10-16', NULL, 'Aktif', 5, NULL),
+(131, 'ELIYA YULIANI', '0104684933', '252610023', '3202125806100003', 'Perempuan', 'Sukabumi', '2010-06-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(132, 'ELSI', '0082591669', '252610024', '3202146507080003', 'Perempuan', 'Sukabumi', '2008-07-25', NULL, 'Aktif', 5, NULL),
+(133, 'FABIAN YUSUF', '3093879901', '252610025', '3202141909090002', 'Laki-laki', 'Sukabumi', '2009-09-19', NULL, 'Aktif', 5, NULL),
+(134, 'FADHIL ABDILLAH', '0107965418', '252610026', '3202110601100001', 'Laki-laki', 'Sukabumi', '2010-01-06', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(135, 'FAIRUS MUTIARAHIM', '0107660632', '252610027', '3202115101100002', 'Perempuan', 'Sukabumi', '2010-01-11', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(136, 'FAUZIAH', '0082973002', '252610028', '3202136103080002', 'Perempuan', 'Sukabumi', '2008-03-21', 'SMP ISLAM AL QUDSIYAH', 'Aktif', 5, NULL),
+(137, 'FERA JULIANTI', '0105238344', '252610029', '3202185007100004', 'Perempuan', 'Sukabumi', '2010-07-10', 'SMP NEGERI 2 KALAPANUNGGAL', 'Aktif', 5, NULL),
+(138, 'GHEA ANANDA AVRIANTY', '0107833156', '252610030', '3202125404100003', 'Perempuan', 'Sukabumi', '2010-04-14', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(139, 'GRESIA SUMAROU', '0088748192', '252610031', '3202145605080003', 'Perempuan', 'Sukabumi', '2008-05-16', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
+(140, 'HABIBAH', '0083788513', '252610032', '3202195006070001', 'Perempuan', 'Sukabumi', '2008-02-11', 'PKBM ANGGREK', 'Aktif', 5, NULL),
+(141, 'HAIKAL GALIH MULYANA', '3108334256', '252610033', '3202061407100001', 'Laki-laki', 'Sukabumi', '2010-07-14', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(142, 'HERA IDA', '0085842308', '252610034', '3202124606080004', 'Perempuan', 'Sukabumi', '2008-06-06', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(143, 'HERDI', '0109278369', '252610035', '3202182601100001', 'Laki-laki', 'Sukabumi', '2010-01-26', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(144, 'HILDA MUTIARA ZULFA', '0099368150', '252610036', '3216216810090006', 'Perempuan', 'Bekasi', '2009-10-28', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(145, 'ICA', '0107143054', '252610037', '3202145003100001', 'Perempuan', 'Sukabumi', '2010-03-10', NULL, 'Aktif', 5, NULL),
+(146, 'INDAH ANJANI', '0063676488', '252610038', '3202186812060001', 'Perempuan', 'Sukabumi', '2006-12-28', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
+(147, 'INDRI YULIANTI', '0099835840', '252610039', '3202117008090006', 'Perempuan', 'Sukabumi', '2009-08-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(148, 'INDRIYANI', '0095556290', '252610040', '3202144408090001', 'Perempuan', 'Sukabumi', '2009-08-04', NULL, 'Aktif', 5, NULL),
+(149, 'IRMAN MAULANA', '0094272850', '252610041', '3202121210090002', 'Laki-laki', 'Sukabumi', '2009-10-12', 'SMP ISLAM CENDIKIA', 'Aktif', 5, NULL),
+(150, 'ISMA', '0108779297', '252610042', '3202124404100001', 'Perempuan', 'Sukabumi', '2010-04-04', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(151, 'JELITA SURYA SABRINA PUTRI', '0094510709', '252610043', '3202114512090002', 'Perempuan', 'Sukabumi', '2009-12-05', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(152, 'JIAN BAAMI HABTI', '3105275586', '252610044', '3202111801100002', 'Laki-laki', 'Sukabumi', '2010-01-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(153, 'KASANDRA AQUINI', '0096216878', '252610045', '3202126607090001', 'Perempuan', 'Sukabumi', '2009-07-26', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(154, 'KESYA PUTRI NATAPLAWIRA', '0089846692', '252610046', '3202335605080001', 'Perempuan', 'Sukabumi', '2008-05-16', 'SMP N 1 KOTA SUKABUMI', 'Aktif', 5, NULL),
+(155, 'LUSI WIDIA MAULIDA', '0097279667', '252610047', '3201275304080002', 'Perempuan', 'Bogor', '2009-03-13', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(156, 'LUTFI ALFIANTI', '3091820543', '252610048', '3202315111090001', 'Perempuan', 'Sukabumi', '2009-11-11', NULL, 'Aktif', 5, NULL),
+(157, 'LUTHVIANI ULFA', '0097646759', '252610049', '3202117004090005', 'Perempuan', 'Sukabumi', '2009-04-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(158, 'M. DZUBIAN SYAFIQ ABDILLAH', '0099587391', '252610050', '3202130407090003', 'Laki-laki', 'Sukabumi', '2009-07-04', 'SMP NEGERI 1 PARUNGKUDA', 'Aktif', 5, NULL),
+(159, 'M. FAHRI SUGANDA', '0106286817', '252610051', '3202140205100001', 'Laki-laki', 'Sukabumi', '2010-05-02', NULL, 'Aktif', 5, NULL),
+(160, 'M. RIPAL ALHUSAERI', '0092517806', '252610052', '3202142701100001', 'Laki-laki', 'Sukabumi', '2010-01-27', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
+(161, 'MAEDASARI', '0097809406', '252610053', '3202144812090001', 'Perempuan', 'Sukabumi', '2009-12-08', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(162, 'MARWAN SETIAWAN', '3094009694', '252610054', '3202272706090001', 'Laki-laki', 'Sukabumi', '2009-06-27', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(163, 'MELISA APRILLIANI', '3101211123', '252610055', '3202146204100001', 'Perempuan', 'Sukabumi', '2010-04-22', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
+(164, 'MOH. RIFKI RIZKY ARRAHMAN', '0093182092', '252610056', '3202142606090001', 'Laki-laki', 'Sukabumi', '2009-06-26', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(165, 'MONA MUTIARA', '0103932240', '252610057', '3202124301100002', 'Perempuan', 'Sukabumi', '2010-01-03', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(166, 'MUCHAMMAD FAISAL', '0109697708', '252610058', '3202112101100009', 'Laki-laki', 'Sukabumi', '2010-01-21', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(167, 'MUHAMMAD FATHURROHMAN', '0103248529', '252610059', '3201271901100002', 'Laki-laki', 'Bogor', '2010-01-19', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(168, 'MUHAMMAD IBNU MUBAROK AZZEIN', '0119632593', '252610060', '3201273001110001', 'Laki-laki', 'Bogor', '2011-01-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(169, 'MUHAMMAD RAFLI AL AZHARI', '3083264206', '252610061', '3202132908080003', 'Laki-laki', 'Sukabumi', '2008-08-29', 'SMP NEGERI 2 PARUNGKUDA', 'Aktif', 5, NULL),
+(170, 'MUHAMMAD RISKY', '0101275699', '252610062', '3202102302100008', 'Laki-laki', 'Sukabumi', '2010-02-23', 'SMP NEGERI 2 CIKEMBAR', 'Aktif', 5, NULL),
+(171, 'MUHAMMAD TUGRIL ARRAIHAN', '3091958637', '252610063', '3202122203090007', 'Laki-laki', 'Sukabumi', '2009-03-22', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(172, 'MUHKLISIHIN', '0103596568', '252610064', '3202182803100003', 'Laki-laki', 'Sukabumi', '2010-03-28', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(173, 'MUTIARA LAILA PUTRI', '0105179179', '252610065', '3202144609100001', 'Perempuan', 'Sukabumi', '2010-09-06', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(174, 'NABILLAH MEGA FIKRIANI', '0098152876', '252610066', '3202116506090005', 'Perempuan', 'Sukabumi', '2009-06-25', 'SMP AZZAINIYYAH', 'Aktif', 5, NULL),
+(175, 'NADIA MARDIANA', '0107573886', '252610067', '3202126107100002', 'Perempuan', 'Sukabumi', '2010-07-21', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(176, 'NAILA FITRI RAHMADHANI', '0095303568', '252610068', '3202125709090003', 'Perempuan', 'Sukabumi', '2009-09-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(177, 'NITA MAULANI', '0089102130', '252610069', '3202196403080002', 'Perempuan', 'Sukabumi', '2008-03-24', 'PKBM ANGGREK', 'Aktif', 5, NULL),
+(178, 'NOVITA ILMIRA DWI PURNAMA', '0099066129', '252610070', '3202117011090003', 'Perempuan', 'Sukabumi', '2009-11-30', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(179, 'NUR WAHID SALIM', '0092492057', '252610071', '3202282209090003', 'Laki-laki', 'Sukabumi', '2009-09-22', 'SMP IT MADANI', 'Aktif', 5, NULL),
+(180, 'NURAENI', '0088250631', '252610072', '3202114306080005', 'Perempuan', 'Sukabumi', '2008-06-03', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(181, 'NURHAIFA', '0094887757', '252610073', '3202316011090002', 'Perempuan', 'Sukabumi', '2009-11-20', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(182, 'NURIL YAHDIK', '0093068546', '252610074', '3202121907090002', 'Laki-laki', 'Sukabumi', '2009-07-19', NULL, 'Aktif', 5, NULL),
+(183, 'NURUL AZMI', '0098346836', '252610075', '3202296309090001', 'Perempuan', 'Sukabumi', '2009-09-23', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(184, 'PAHMI AJIDIN', '0038078737', '252610076', '3202142202090002', 'Laki-laki', 'Sukabumi', '2009-02-22', 'SMP ISLAM TERPADU AL - MUTAQIN', 'Aktif', 5, NULL),
+(185, 'PAHRI RAMADHAN', '0099372913', '252610077', '3202143008090001', 'Laki-laki', 'Sukabumi', '2009-08-30', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(186, 'PANDI', '0085457271', '252610078', '3202130802080003', 'Laki-laki', 'Sukabumi', '2008-02-08', 'SMPS ISLAM INSAN KAMIL MANDIRI', 'Aktif', 5, NULL),
+(187, 'PIONA ELDI OKTAVIA', '3086810012', '252610079', '3202134210080004', 'Perempuan', 'Sukabumi', '2008-10-02', 'SMP ISLAM YPI PARUNGKUDA', 'Aktif', 5, NULL),
+(188, 'PUTRI AMELIA', '0087974126', '252610080', '3202136504080002', 'Perempuan', 'Sukabumi', '2008-04-25', 'SMP PGRI PARUNGKUDA', 'Aktif', 5, NULL),
+(189, 'RAIHAN CAHYA MAULID', '0108770955', '252610081', '3202111103100001', 'Laki-laki', 'Sukabumi', '2010-03-11', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(190, 'RANDI', '0109178444', '252610082', '3202113001100006', 'Laki-laki', 'Sukabumi', '2010-01-30', 'SMP IT MADANI', 'Aktif', 5, NULL),
+(191, 'RAPLI MAULANA', '0108047231', '252610083', '3202110201100004', 'Laki-laki', 'Sukabumi', '2010-01-02', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(192, 'RASNAMILA', '0091861319', '252610084', '3202116008090004', 'Perempuan', 'Sukabumi', '2009-08-20', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(193, 'RATIH MAULIDA', '0103957465', '252610085', '3202146702100001', 'Perempuan', 'Sukabumi', '2010-02-27', NULL, 'Aktif', 5, NULL),
+(194, 'REHAN NURJAELANI', '3096979240', '252610086', '3202130606090005', 'Laki-laki', 'Sukabumi', '2009-06-06', NULL, 'Aktif', 5, NULL),
+(195, 'REHAN SOMANTRI', '0092294359', '252610087', '3202121705090002', 'Laki-laki', 'Sukabumi', '2009-05-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(196, 'RENDIYAWAN', '0102111932', '252610088', '3202290109100003', 'Laki-laki', 'Sukabumi', '2010-09-01', NULL, 'Aktif', 5, NULL),
+(197, 'RISA FITRIANI', '0094943147', '252610089', '3202146009090003', 'Perempuan', 'Sukabumi', '2009-09-20', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(198, 'RISMA JUNITA', '0093101241', '252610090', '3202145006090001', 'Perempuan', 'Sukabumi', '2009-06-10', 'SMP NEGERI 1 BOJONGGENTENG', 'Aktif', 5, NULL),
+(199, 'ROBY ARDIANSYAH', '0095721154', '252610091', '3202131105090002', 'Laki-laki', 'Sukabumi', '2009-05-11', 'SMP NEGERI 2 PARUNGKUDA', 'Aktif', 5, NULL),
+(200, 'SAEPURROHIM KARIM', '3093399442', '252610092', '3202060709090002', 'Laki-laki', 'Sukabumi', '2009-09-07', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(201, 'SALMAN ALFARISI SYA`AR', '3092640096', '252610093', '3202141111090004', 'Laki-laki', 'Sukabumi', '2009-11-11', NULL, 'Aktif', 5, NULL),
+(202, 'SIFA SILFIANA', '0099813984', '252610094', '3202115805090001', 'Perempuan', 'Sukabumi', '2009-05-18', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(203, 'SILVIA WAVIQ RAMADHANI', '0082778203', '252610095', '3201254209080004', 'Perempuan', 'Bogor', '2008-09-02', 'SMP ISLAM AL BAROKAH', 'Aktif', 5, NULL),
+(204, 'SITI FATIMAH AZ-ZAHRA', '0101196391', '252610113', '3202126503100004', 'Perempuan', 'Sukabumi', '2010-03-25', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(205, 'SITI MASNONEH', '3105548859', '252610115', '3202144202100001', 'Perempuan', 'Sukabumi', '2010-02-02', '', 'Aktif', 5, NULL),
+(206, 'SITI MUNIFAH SIRIN', '0084999054', '252610098', '3202127005080003', 'Perempuan', 'Sukabumi', '2008-05-30', 'SMP IT TAHSIN', 'Aktif', 5, NULL),
+(207, 'SITI NURHALISA', '0095433011', '252610099', '3202136006090005', 'Perempuan', 'Sukabumi', '2009-06-20', NULL, 'Aktif', 5, NULL),
+(208, 'SITI PATIMAH', '0093589815', '252610100', '3202137006080004', 'Perempuan', 'Sukabumi', '2008-06-30', NULL, 'Aktif', 5, NULL),
+(209, 'SITI PATIMAH', '0105415145', '252610101', '3202114503100007', 'Perempuan', 'Sukabumi', '2010-03-05', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(210, 'SITI SALMA', '0094288959', '252610102', '3202146411090004', 'Perempuan', 'Sukabumi', '2009-11-24', NULL, 'Aktif', 5, NULL),
+(211, 'SITI SHOPIA ULFA', '3103432560', '252610103', '3202134405100001', 'Perempuan', 'Sukabumi', '2010-05-04', NULL, 'Aktif', 5, NULL),
+(212, 'SITI SYARIFAH MARDHOTILAH', '0101013848', '252610104', '3201276704100001', 'Perempuan', 'Bogor', '2010-04-27', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(213, 'SRY MARLINA', '0087957830', '252610105', '3202134711080001', 'Perempuan', 'Sukabumi', '2008-11-07', ' ', 'Aktif', 5, NULL),
+(214, 'SUSAN MEILANI', '0091536546', '252610106', '3202126305090006', 'Perempuan', 'Sukabumi', '2009-05-23', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(215, 'SYIFA RACHMAWATI AWALIYAH', '0109796338', '252610107', '3202125702100002', 'Perempuan', 'Sukabumi', '2010-02-17', 'SMP IT DARUL IBTIDA', 'Aktif', 5, NULL),
+(216, 'WANGI', '3095898697', '252610114', '3202144412090003', 'Perempuan', 'Sukabumi', '2009-12-04', 'SMP ISLAM TERPADU AL JABHATUL ISLAMIYAH', 'Aktif', 5, NULL),
+(217, 'WILDAN', '3094374335', '252610109', '3275012706090004', 'Laki-laki', 'Bekasi', '2009-06-27', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(218, 'WILDANSYAH DWI KUSUMA', '0105575590', '252610110', '3202142406100004', 'Laki-laki', 'Sukabumi', '2010-06-24', NULL, 'Aktif', 5, NULL),
+(219, 'WINDI RAMADANI', '0098044990', '252610111', '3202184804100001', 'Perempuan', 'Sukabumi', '2010-04-08', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL),
+(220, 'YUNI', '0105322682', '252610112', '3202315604100001', 'Perempuan', 'Sukabumi', '2010-04-16', 'SMP ISLAM NURUL FIKRI', 'Aktif', 5, NULL),
+(221, 'ZIDAN SYAHRIL ARYANSA', '3101276123', '252610113', '3202140501100001', 'Laki-laki', 'Sukabumi', '2010-01-05', NULL, 'Aktif', 5, NULL),
+(222, 'ZIRA PUSPITA', '0103534124', '252610114', '3202186706100001', 'Perempuan', 'Sukabumi', '2010-06-27', 'SMP BAET EL ANSHAR', 'Aktif', 5, NULL);
 
 -- --------------------------------------------------------
 
@@ -4082,7 +4595,7 @@ INSERT INTO `struktur_kurikulum` (`id_struktur`, `id_mapel`, `tingkat`, `kelompo
 (13, 1, 'X', 'Mata Pelajaran Wajib', 3, 5),
 (14, 2, 'X', 'Mata Pelajaran Wajib', 2, 5),
 (15, 3, 'X', 'Mata Pelajaran Wajib', 3, 5),
-(16, 4, 'X', 'Mata Pelajaran Wajib', 3, 5),
+(16, 4, 'X', 'Mata Pelajaran Wajib', 4, 5),
 (17, 1, 'XI', 'Mata Pelajaran Wajib', 3, 5),
 (18, 2, 'XI', 'Mata Pelajaran Wajib', 2, 5),
 (19, 3, 'XI', 'Mata Pelajaran Wajib', 3, 5),
@@ -4271,6 +4784,18 @@ CREATE TABLE `tujuan_pembelajaran` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `tujuan_pembelajaran`
+--
+
+INSERT INTO `tujuan_pembelajaran` (`id_tp`, `id_mapel`, `id_cp`, `kode_tp`, `deskripsi_tp`) VALUES
+(1, 4, 1, 'E.1.1', 'Deskripsi TP 1.1'),
+(2, 4, 1, 'E.1.2', 'Deskripsi TP 1.2'),
+(3, 4, 1, 'E.1.3', 'Deskripsi TP 1.3'),
+(4, 4, 2, 'E.2.1', 'Deskripsi TP 2.1'),
+(5, 4, 2, 'E.2.2', 'Deskripsi TP 2.2'),
+(6, 4, 2, 'E.2.3', 'Deskripsi TP 2.3');
+
+--
 -- Indexes for dumped tables
 --
 
@@ -4327,6 +4852,15 @@ ALTER TABLE `agenda_kokulikuler`
 ALTER TABLE `agenda_pembiasaan`
   ADD PRIMARY KEY (`id_agenda`),
   ADD KEY `id_pembiasaan` (`id_pembiasaan`);
+
+--
+-- Indexes for table `agenda_tugas_tambahan`
+--
+ALTER TABLE `agenda_tugas_tambahan`
+  ADD PRIMARY KEY (`id_agenda`),
+  ADD KEY `id_guru` (`id_guru`),
+  ADD KEY `id_ta` (`id_ta`),
+  ADD KEY `jenis_tugas_tambahan` (`jenis_tugas_tambahan`);
 
 --
 -- Indexes for table `anggota_ekskul`
@@ -4416,6 +4950,121 @@ ALTER TABLE `catatan_kelas`
   ADD PRIMARY KEY (`id_catatan_kelas`),
   ADD KEY `id_jadwal_mengajar` (`id_jadwal_mengajar`),
   ADD KEY `id_ta` (`id_ta`);
+
+--
+-- Indexes for table `cbt_bank_soal`
+--
+ALTER TABLE `cbt_bank_soal`
+  ADD PRIMARY KEY (`id_bank`),
+  ADD KEY `id_mapel` (`id_mapel`);
+
+--
+-- Indexes for table `cbt_jadwal`
+--
+ALTER TABLE `cbt_jadwal`
+  ADD PRIMARY KEY (`id_jadwal`),
+  ADD KEY `id_paket` (`id_paket`),
+  ADD KEY `id_kelas` (`id_kelas`);
+
+--
+-- Indexes for table `cbt_jawaban`
+--
+ALTER TABLE `cbt_jawaban`
+  ADD PRIMARY KEY (`id_jawaban`),
+  ADD UNIQUE KEY `uq_peserta_soal` (`id_peserta`,`id_soal`),
+  ADD KEY `id_peserta` (`id_peserta`),
+  ADD KEY `id_jadwal` (`id_jadwal`),
+  ADD KEY `id_soal` (`id_soal`);
+
+--
+-- Indexes for table `cbt_kelas`
+--
+ALTER TABLE `cbt_kelas`
+  ADD PRIMARY KEY (`id_kelas`);
+
+--
+-- Indexes for table `cbt_log_aktivitas`
+--
+ALTER TABLE `cbt_log_aktivitas`
+  ADD PRIMARY KEY (`id_log`),
+  ADD KEY `id_peserta` (`id_peserta`),
+  ADD KEY `id_jadwal` (`id_jadwal`);
+
+--
+-- Indexes for table `cbt_mapel`
+--
+ALTER TABLE `cbt_mapel`
+  ADD PRIMARY KEY (`id_mapel`);
+
+--
+-- Indexes for table `cbt_nilai`
+--
+ALTER TABLE `cbt_nilai`
+  ADD PRIMARY KEY (`id_nilai`),
+  ADD UNIQUE KEY `id_peserta` (`id_peserta`),
+  ADD KEY `id_jadwal` (`id_jadwal`),
+  ADD KEY `id_siswa` (`id_siswa`);
+
+--
+-- Indexes for table `cbt_paket`
+--
+ALTER TABLE `cbt_paket`
+  ADD PRIMARY KEY (`id_paket`),
+  ADD KEY `id_bank` (`id_bank`);
+
+--
+-- Indexes for table `cbt_peserta`
+--
+ALTER TABLE `cbt_peserta`
+  ADD PRIMARY KEY (`id_peserta`),
+  ADD UNIQUE KEY `uq_jadwal_siswa` (`id_jadwal`,`id_siswa`),
+  ADD KEY `id_jadwal` (`id_jadwal`),
+  ADD KEY `id_siswa` (`id_siswa`);
+
+--
+-- Indexes for table `cbt_siswa`
+--
+ALTER TABLE `cbt_siswa`
+  ADD PRIMARY KEY (`id_siswa`),
+  ADD UNIQUE KEY `nis` (`nis`),
+  ADD KEY `id_kelas` (`id_kelas`);
+
+--
+-- Indexes for table `cbt_soal`
+--
+ALTER TABLE `cbt_soal`
+  ADD PRIMARY KEY (`id_soal`),
+  ADD KEY `id_bank` (`id_bank`);
+
+--
+-- Indexes for table `cbt_soal_media`
+--
+ALTER TABLE `cbt_soal_media`
+  ADD PRIMARY KEY (`id_media`),
+  ADD KEY `id_soal` (`id_soal`);
+
+--
+-- Indexes for table `cbt_soal_opsi`
+--
+ALTER TABLE `cbt_soal_opsi`
+  ADD PRIMARY KEY (`id_opsi`),
+  ADD KEY `id_soal` (`id_soal`);
+
+--
+-- Indexes for table `cbt_users`
+--
+ALTER TABLE `cbt_users`
+  ADD PRIMARY KEY (`id_user`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `dokumen_tugas_tambahan`
+--
+ALTER TABLE `dokumen_tugas_tambahan`
+  ADD PRIMARY KEY (`id_dokumen`),
+  ADD KEY `id_guru` (`id_guru`),
+  ADD KEY `id_ta` (`id_ta`),
+  ADD KEY `jenis_tugas_tambahan` (`jenis_tugas_tambahan`);
 
 --
 -- Indexes for table `ekskul_galeri`
@@ -4733,6 +5382,12 @@ ALTER TABLE `kokulikuler_profil`
   ADD PRIMARY KEY (`id_kokulikuler`,`id_profil`);
 
 --
+-- Indexes for table `lab_inventaris`
+--
+ALTER TABLE `lab_inventaris`
+  ADD PRIMARY KEY (`id_inventaris`);
+
+--
 -- Indexes for table `landing_gallery`
 --
 ALTER TABLE `landing_gallery`
@@ -4939,6 +5594,21 @@ ALTER TABLE `perangkat_pembelajaran`
   ADD PRIMARY KEY (`id_perangkat`),
   ADD KEY `id_guru` (`id_guru`),
   ADD KEY `id_ta` (`id_ta`);
+
+--
+-- Indexes for table `perpus_buku`
+--
+ALTER TABLE `perpus_buku`
+  ADD PRIMARY KEY (`id_buku`),
+  ADD UNIQUE KEY `kode_buku` (`kode_buku`);
+
+--
+-- Indexes for table `perpus_peminjaman`
+--
+ALTER TABLE `perpus_peminjaman`
+  ADD PRIMARY KEY (`id_peminjaman`),
+  ADD KEY `id_buku` (`id_buku`),
+  ADD KEY `id_peminjam` (`id_peminjam`);
 
 --
 -- Indexes for table `ppdb_pendaftaran`
@@ -5170,6 +5840,12 @@ ALTER TABLE `agenda_pembiasaan`
   MODIFY `id_agenda` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `agenda_tugas_tambahan`
+--
+ALTER TABLE `agenda_tugas_tambahan`
+  MODIFY `id_agenda` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `anggota_ekskul`
 --
 ALTER TABLE `anggota_ekskul`
@@ -5191,19 +5867,19 @@ ALTER TABLE `anggota_pembiasaan`
 -- AUTO_INCREMENT for table `app_menu`
 --
 ALTER TABLE `app_menu`
-  MODIFY `id_menu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4226;
+  MODIFY `id_menu` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4236;
 
 --
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT for table `capaian_pembelajaran`
 --
 ALTER TABLE `capaian_pembelajaran`
-  MODIFY `id_cp` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_cp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `catatan_kasus`
@@ -5216,6 +5892,96 @@ ALTER TABLE `catatan_kasus`
 --
 ALTER TABLE `catatan_kelas`
   MODIFY `id_catatan_kelas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `cbt_bank_soal`
+--
+ALTER TABLE `cbt_bank_soal`
+  MODIFY `id_bank` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_jadwal`
+--
+ALTER TABLE `cbt_jadwal`
+  MODIFY `id_jadwal` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_jawaban`
+--
+ALTER TABLE `cbt_jawaban`
+  MODIFY `id_jawaban` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_kelas`
+--
+ALTER TABLE `cbt_kelas`
+  MODIFY `id_kelas` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `cbt_log_aktivitas`
+--
+ALTER TABLE `cbt_log_aktivitas`
+  MODIFY `id_log` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_mapel`
+--
+ALTER TABLE `cbt_mapel`
+  MODIFY `id_mapel` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `cbt_nilai`
+--
+ALTER TABLE `cbt_nilai`
+  MODIFY `id_nilai` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_paket`
+--
+ALTER TABLE `cbt_paket`
+  MODIFY `id_paket` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_peserta`
+--
+ALTER TABLE `cbt_peserta`
+  MODIFY `id_peserta` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_siswa`
+--
+ALTER TABLE `cbt_siswa`
+  MODIFY `id_siswa` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_soal`
+--
+ALTER TABLE `cbt_soal`
+  MODIFY `id_soal` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_soal_media`
+--
+ALTER TABLE `cbt_soal_media`
+  MODIFY `id_media` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_soal_opsi`
+--
+ALTER TABLE `cbt_soal_opsi`
+  MODIFY `id_opsi` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cbt_users`
+--
+ALTER TABLE `cbt_users`
+  MODIFY `id_user` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `dokumen_tugas_tambahan`
+--
+ALTER TABLE `dokumen_tugas_tambahan`
+  MODIFY `id_dokumen` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `ekskul_galeri`
@@ -5233,7 +5999,7 @@ ALTER TABLE `ekskul_program_kerja`
 -- AUTO_INCREMENT for table `ekstrakurikuler`
 --
 ALTER TABLE `ekstrakurikuler`
-  MODIFY `id_ekskul` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_ekskul` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `galeri_pembiasaan`
@@ -5257,19 +6023,19 @@ ALTER TABLE `guru_mapel`
 -- AUTO_INCREMENT for table `hak_akses`
 --
 ALTER TABLE `hak_akses`
-  MODIFY `id_akses` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1435;
+  MODIFY `id_akses` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1601;
 
 --
 -- AUTO_INCREMENT for table `jadwal_mengajar`
 --
 ALTER TABLE `jadwal_mengajar`
-  MODIFY `id_jadwal_mengajar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_jadwal_mengajar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `jam_pelajaran`
 --
 ALTER TABLE `jam_pelajaran`
-  MODIFY `id_jam` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_jam` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `jurnal_ekstrakurikuler`
@@ -5407,7 +6173,7 @@ ALTER TABLE `keuangan_tarif_ekskul`
 -- AUTO_INCREMENT for table `keuangan_transaksi`
 --
 ALTER TABLE `keuangan_transaksi`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `kewirausahaan`
@@ -5464,6 +6230,12 @@ ALTER TABLE `kokulikuler_nilai`
   MODIFY `id_nilai` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `lab_inventaris`
+--
+ALTER TABLE `lab_inventaris`
+  MODIFY `id_inventaris` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `landing_gallery`
 --
 ALTER TABLE `landing_gallery`
@@ -5479,7 +6251,7 @@ ALTER TABLE `landing_news`
 -- AUTO_INCREMENT for table `login_attempts`
 --
 ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `mapel`
@@ -5545,7 +6317,7 @@ ALTER TABLE `pembiasaan`
 -- AUTO_INCREMENT for table `penempatan_siswa`
 --
 ALTER TABLE `penempatan_siswa`
-  MODIFY `id_penempatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=484;
+  MODIFY `id_penempatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=548;
 
 --
 -- AUTO_INCREMENT for table `pengguna`
@@ -5600,6 +6372,18 @@ ALTER TABLE `peran`
 --
 ALTER TABLE `perangkat_pembelajaran`
   MODIFY `id_perangkat` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `perpus_buku`
+--
+ALTER TABLE `perpus_buku`
+  MODIFY `id_buku` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `perpus_peminjaman`
+--
+ALTER TABLE `perpus_peminjaman`
+  MODIFY `id_peminjaman` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `ppdb_pendaftaran`
@@ -5749,7 +6533,7 @@ ALTER TABLE `tracer_study`
 -- AUTO_INCREMENT for table `tujuan_pembelajaran`
 --
 ALTER TABLE `tujuan_pembelajaran`
-  MODIFY `id_tp` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_tp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables

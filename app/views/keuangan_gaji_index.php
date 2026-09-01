@@ -1,18 +1,24 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-            <div>
-                <h2 class="fw-bold m-0 text-dark"><i class="fas fa-money-check-alt text-primary mr-2"></i> Manajemen Gaji (Payroll)</h2>
-                <p class="text-muted small mb-0">Kelola penggajian guru dan staf.</p>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-money-check-alt"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Manajemen Gaji &amp; Payroll GTK
+                    </h4>
+                </div>
             </div>
-            <div class="text-end">
-                <a href="index.php?mod=keuangan_gaji&act=setting" class="btn btn-default border shadow-sm mr-2">
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <a href="<?= BASE_URL ?>keuangan_gaji/setting" class="btn btn-outline-secondary btn-sm rounded-pill px-3 font-weight-bold shadow-sm mr-1">
                     <i class="fas fa-cog mr-1"></i> Setting Tarif
                 </a>
-                <button type="button" class="btn btn-primary shadow-sm" data-toggle="modal" data-target="#modalGenerate">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 font-weight-bold shadow-sm" data-toggle="modal" data-target="#modalGenerate">
                     <i class="fas fa-plus mr-1"></i> Buat Gaji Baru
                 </button>
             </div>
@@ -60,7 +66,7 @@
                                     </span>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <a href="index.php?mod=keuangan_gaji&act=detail&id=<?= $row['id_gaji'] ?>" class="btn btn-sm btn-info shadow-sm" title="Lihat Detail">
+                                    <a href="<?= BASE_URL ?>keuangan_gaji/detail?id=<?= $row['id_gaji'] ?>" class="btn btn-sm btn-info shadow-sm" title="Lihat Detail">
                                         <i class="fas fa-eye"></i> Detail
                                     </a>
                                 </td>
@@ -86,7 +92,7 @@
                 <h5 class="modal-title font-weight-bold">Buat Hitungan Gaji Baru</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
-            <form action="index.php?mod=keuangan_gaji&act=generate" method="post">
+            <form action="<?= BASE_URL ?>keuangan_gaji/generate" method="post">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Bulan</label>

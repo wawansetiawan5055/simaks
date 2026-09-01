@@ -50,7 +50,7 @@ include __DIR__ . '/partials/header.php';
                 <h1><i class="fas fa-pray mr-2"></i> Pembiasaan: <strong><?= htmlspecialchars($pembiasaan['nama_kegiatan']) ?></strong></h1>
             </div>
             <div class="col-sm-6 text-end">
-                <a href="index.php?mod=pembiasaan" class="btn btn-secondary btn-sm float-right">
+                <a href="<?= BASE_URL ?>pembiasaan" class="btn btn-secondary btn-sm float-right">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </div>
@@ -64,27 +64,27 @@ include __DIR__ . '/partials/header.php';
             <div class="card-header p-0 pt-1 border-bottom-0">
                 <ul class="nav nav-tabs" id="pembiasaanTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'program' || $tab == '' || $tab == 'kegiatan') ? 'active' : '' ?>" href="index.php?mod=pembiasaan&act=index&id=<?= $id ?>&tab=program">
+                        <a class="nav-link <?= ($tab == 'program' || $tab == '' || $tab == 'kegiatan') ? 'active' : '' ?>" href="<?= BASE_URL ?>pembiasaan/index/<?= $id ?>/program">
                             <i class="fas fa-file-signature"></i> Program Kerja
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'anggota') ? 'active' : '' ?>" href="index.php?mod=pembiasaan&act=index&id=<?= $id ?>&tab=anggota">
+                        <a class="nav-link <?= ($tab == 'anggota') ? 'active' : '' ?>" href="<?= BASE_URL ?>pembiasaan/index/<?= $id ?>/anggota">
                             <i class="fas fa-users"></i> Anggota
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="index.php?mod=pembiasaan&act=index&id=<?= $id ?>&tab=jurnal">
+                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="<?= BASE_URL ?>pembiasaan/index/<?= $id ?>/jurnal">
                             <i class="fas fa-book"></i> Jurnal & Absensi
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'galeri') ? 'active' : '' ?>" href="index.php?mod=pembiasaan&act=index&id=<?= $id ?>&tab=galeri">
+                        <a class="nav-link <?= ($tab == 'galeri') ? 'active' : '' ?>" href="<?= BASE_URL ?>pembiasaan/index/<?= $id ?>/galeri">
                             <i class="fas fa-images"></i> Galeri
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'penilaian' || $tab == 'nilai') ? 'active' : '' ?>" href="index.php?mod=pembiasaan&act=index&id=<?= $id ?>&tab=penilaian">
+                        <a class="nav-link <?= ($tab == 'penilaian' || $tab == 'nilai') ? 'active' : '' ?>" href="<?= BASE_URL ?>pembiasaan/index/<?= $id ?>/penilaian">
                             <i class="fas fa-star"></i> Penilaian
                         </a>
                     </li>
@@ -150,7 +150,7 @@ include __DIR__ . '/partials/header.php';
                                                                             </button>
                                                                         <?php endif; ?>
                                                                         <button class="btn btn-xs btn-warning p-1" onclick='editAgenda(<?= json_encode($ag) ?>)' title="Edit" style="line-height: 1;"><i class="fas fa-edit fa-xs"></i></button>
-                                                                        <a href="index.php?mod=pembiasaan&act=agenda_delete&id_pembiasaan=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
+                                                                        <a href="<?= BASE_URL ?>pembiasaan/agenda_delete?id_pembiasaan=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -195,7 +195,7 @@ include __DIR__ . '/partials/header.php';
                                                                         <button class="btn btn-xs btn-info p-1" onclick="previewFile('<?= $pr['file_path'] ?>', 'pdf', '<?= htmlspecialchars($pr['nama_agenda']) ?>')" title="Lihat File" style="line-height: 1;">
                                                                             <i class="fas fa-eye fa-xs"></i>
                                                                         </button>
-                                                                        <a href="index.php?mod=pembiasaan&act=agenda_delete&id_pembiasaan=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
+                                                                        <a href="<?= BASE_URL ?>pembiasaan/agenda_delete?id_pembiasaan=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
                                                                             <i class="fas fa-trash fa-xs"></i>
                                                                         </a>
                                                                     </div>
@@ -286,10 +286,10 @@ include __DIR__ . '/partials/header.php';
                         <div class="mb-3 d-flex justify-content-between">
                              <h5>Jurnal & Absensi Kegiatan</h5>
                              <div>
-                                 <a href="index.php?mod=pembiasaan&act=rekap_form&id_pembiasaan=<?= $id ?>" class="btn btn-outline-primary btn-sm mr-1">
+                                 <a href="<?= BASE_URL ?>pembiasaan/rekap_form?id_pembiasaan=<?= $id ?>" class="btn btn-outline-primary btn-sm mr-1">
                                     <i class="fas fa-table"></i> Rekap Absensi Manual
                                 </a>
-                                 <a href="index.php?mod=pembiasaan&act=jurnal_form&id_pembiasaan=<?= $id ?>" class="btn btn-primary btn-sm">
+                                 <a href="<?= BASE_URL ?>pembiasaan/jurnal_form?id_pembiasaan=<?= $id ?>" class="btn btn-primary btn-sm">
                                     <i class="fas fa-plus"></i> Isi Jurnal & Absensi Harian
                                 </a>
                             </div>
@@ -322,8 +322,8 @@ include __DIR__ . '/partials/header.php';
                                                 <td><?= htmlspecialchars($ji['keterangan']) ?></td>
                                                 <td><?= $hadir_count ?> Siswa</td>
                                                 <td>
-                                                    <a href="index.php?mod=pembiasaan&act=jurnal_form&id_pembiasaan=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i></a>
-                                                    <a href="index.php?mod=pembiasaan&act=jurnal_delete&id_pembiasaan=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
+                                                    <a href="<?= BASE_URL ?>pembiasaan/jurnal_form?id_pembiasaan=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-warning"><i class="fas fa-edit"></i></a>
+                                                    <a href="<?= BASE_URL ?>pembiasaan/jurnal_delete?id_pembiasaan=<?= $id ?>&id_jurnal=<?= $ji['id_jurnal'] ?>" class="btn btn-xs btn-danger" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -353,7 +353,7 @@ include __DIR__ . '/partials/header.php';
                                         <div class="card h-100 shadow-sm">
                                             <div class="position-relative">
                                                 <img src="<?= $g['file_path'] ?>" class="card-img-top img-gallery" alt="<?= htmlspecialchars($g['judul']) ?>" onclick="previewFile('<?= $g['file_path'] ?>', 'image', '<?= htmlspecialchars($g['judul']) ?>')">
-                                                <a href="index.php?mod=pembiasaan&act=galeri_delete&id_pembiasaan=<?= $id ?>&id_galeri=<?= $g['id_galeri'] ?>" class="btn btn-danger btn-xs position-absolute" style="top:5px; right:5px; opacity:0.8;" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
+                                                <a href="<?= BASE_URL ?>pembiasaan/galeri_delete?id_pembiasaan=<?= $id ?>&id_galeri=<?= $g['id_galeri'] ?>" class="btn btn-danger btn-xs position-absolute" style="top:5px; right:5px; opacity:0.8;" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
                                             </div>
                                             <div class="card-body p-2 text-center">
                                                 <small class="text-muted d-block"><?= DateHelper::formatTanggal($g['created_at'], 'short') ?></small>
@@ -413,13 +413,36 @@ include __DIR__ . '/partials/header.php';
                                 </form>
                             </div>
                             
-                            <form action="index.php?mod=pembiasaan&act=penilaian_save" method="POST">
+                            <form action="<?= BASE_URL ?>pembiasaan/penilaian_save" method="POST">
                                 <input type="hidden" name="id_pembiasaan" value="<?= $id ?>">
                                 <input type="hidden" name="bulan" value="<?= $bulan ?>">
                                 <input type="hidden" name="tahun" value="<?= $tahun ?>">
                                 
                                 <div class="card-body p-0 table-responsive">
-                                    <table class="table table-bordered table-striped table-hover">
+                                    <?php
+                                    // Ekstrak list kelas unik untuk filter
+                                    $kelas_list_penilaian = [];
+                                    if (!empty($anggota_list)) {
+                                        foreach ($anggota_list as $a) {
+                                            if (!empty($a['nama_kelas']) && !in_array($a['nama_kelas'], $kelas_list_penilaian)) {
+                                                $kelas_list_penilaian[] = $a['nama_kelas'];
+                                            }
+                                        }
+                                        sort($kelas_list_penilaian);
+                                    }
+                                    ?>
+                                    <?php if (!empty($kelas_list_penilaian)): ?>
+                                    <div class="p-3 bg-light border-bottom">
+                                        <label class="mb-0 mr-2">Filter Kelas:</label>
+                                        <select id="filter_kelas_penilaian" class="form-control form-control-sm d-inline-block w-auto" onchange="filterKelasPenilaian()">
+                                            <option value="all">Semua Kelas</option>
+                                            <?php foreach ($kelas_list_penilaian as $k): ?>
+                                                <option value="<?= htmlspecialchars($k) ?>"><?= htmlspecialchars($k) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <?php endif; ?>
+                                    <table class="table table-bordered table-striped table-hover mb-0">
                                         <thead class="bg-light">
                                             <tr>
                                                 <th width="5%">No</th>
@@ -454,8 +477,8 @@ include __DIR__ . '/partials/header.php';
                                                     elseif ($persen >= 70) $color_class = 'text-warning font-weight-bold';
                                                     else $color_class = 'text-danger font-weight-bold';
                                                 ?>
-                                                <tr>
-                                                    <td class="text-center"><?= $i + 1 ?></td>
+                                                <tr class="penilaian-row" data-kelas="<?= htmlspecialchars($a['nama_kelas'] ?? '') ?>">
+                                                    <td class="text-center nomor-urut"><?= $i + 1 ?></td>
                                                     <td>
                                                         <strong><?= htmlspecialchars($a['nama_siswa']) ?></strong><br>
                                                         <small class="text-muted"><?= htmlspecialchars($a['nama_kelas'] ?? '-') ?></small>
@@ -519,6 +542,23 @@ include __DIR__ . '/partials/header.php';
                             }
                         });
                     });
+
+                    function filterKelasPenilaian() {
+                        var selected = document.getElementById('filter_kelas_penilaian').value;
+                        var rows = document.querySelectorAll('.penilaian-row');
+                        var visibleCount = 0;
+                        
+                        rows.forEach(function(row) {
+                            if (selected === 'all' || row.getAttribute('data-kelas') === selected) {
+                                row.style.display = '';
+                                visibleCount++;
+                                // Update nomor urut agar tetap rapi saat di-filter
+                                row.querySelector('.nomor-urut').textContent = visibleCount;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
                     </script>
                     <?php endif; ?>
 
@@ -534,7 +574,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalUploadProker" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=pembiasaan&act=program_upload" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>pembiasaan/program_upload" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_pembiasaan" value="<?= $id ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Program Kerja</h5>
@@ -566,7 +606,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalAgenda" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=pembiasaan&act=agenda_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>pembiasaan/agenda_save" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_pembiasaan" value="<?= $id ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Agenda Kegiatan</h5>
@@ -613,28 +653,82 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalGaleri" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=pembiasaan&act=galeri_upload" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>pembiasaan/galeri_upload" method="post" enctype="multipart/form-data" id="formGaleriPem">
                 <input type="hidden" name="id_pembiasaan" value="<?= $id ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title">Upload Foto Dokumentasi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title font-weight-bold"><i class="fas fa-camera text-primary mr-1"></i> Dokumentasi Foto Kegiatan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="stopPemCamera()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Judul / Caption</label>
-                        <input type="text" name="judul" class="form-control" required placeholder="Contoh: Kegiatan Jumat Berkah">
+                        <label class="small font-weight-bold">Judul / Caption Kegiatan</label>
+                        <input type="text" name="judul" class="form-control" required placeholder="Contoh: Kegiatan Jumat Berkah / Sholat Berjamaah">
                     </div>
-                    <div class="form-group">
-                        <label>File Foto</label>
-                        <input type="file" name="file_upload" class="form-control" accept="image/*" required>
-                        <small class="text-muted">Format: JPG, PNG, GIF. Max 2MB.</small>
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold">Foto Dokumentasi</label>
+                        <ul class="nav nav-pills mb-2" role="tablist" style="display: flex; gap: 4px;">
+                            <li class="nav-item" style="flex: 1;">
+                                <a class="nav-link active text-center font-weight-bold" id="tab-pem-upload-link" data-toggle="pill" href="#tab-pem-upload" role="tab" onclick="stopPemCamera()" style="font-size: 0.78rem; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px;">
+                                    <i class="fas fa-folder-open mr-1"></i> Unggah
+                                </a>
+                            </li>
+                            <li class="nav-item" style="flex: 1;">
+                                <a class="nav-link text-center font-weight-bold" id="tab-pem-camera-link" data-toggle="pill" href="#tab-pem-camera" role="tab" onclick="startPemCamera()" style="font-size: 0.78rem; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px;">
+                                    <i class="fas fa-camera mr-1"></i> Kamera
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border rounded p-2 bg-light" style="border-radius: 10px;">
+                            <!-- Tab Upload -->
+                            <div class="tab-pane fade show active" id="tab-pem-upload" role="tabpanel">
+                                <div class="custom-file">
+                                    <input type="file" name="file_upload" class="custom-file-input" id="pemFileUpload" accept="image/*" onchange="previewPemFile(this)">
+                                    <label class="custom-file-label" for="pemFileUpload" style="font-size:0.8rem;">Pilih file gambar...</label>
+                                </div>
+                                <img id="previewPemImg" class="img-fluid rounded mt-2 shadow-sm" style="display:none; max-height:160px; width:100%; object-fit:cover;">
+                            </div>
+
+                            <!-- Tab Camera -->
+                            <div class="tab-pane fade" id="tab-pem-camera" role="tabpanel">
+                                <div style="background:#0f172a; border-radius:8px; overflow:hidden; position:relative; text-align:center;">
+                                    <video id="pemVideo" autoplay playsinline muted style="width:100%; max-height:180px; object-fit:cover; display:none; background:#000;"></video>
+                                    <canvas id="pemCanvas" style="display:none;"></canvas>
+
+                                    <div id="pemControls" class="p-2 d-flex justify-content-center align-items-center flex-wrap" style="gap: 6px; background: rgba(15, 23, 42, 0.9); display: none !important;">
+                                        <button type="button" class="btn btn-xs btn-primary rounded-pill px-3 font-weight-bold" id="btnSnapPem" onclick="takePemSnapshot()">
+                                            <i class="fas fa-camera mr-1"></i> Jepret
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-light rounded-pill px-2.5 font-weight-bold" onclick="switchPemFacing()">
+                                            <i class="fas fa-sync-alt mr-1"></i> Balik
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-warning rounded-pill px-2.5 font-weight-bold" id="btnRetakePem" onclick="retakePemSnapshot()" style="display:none;">
+                                            <i class="fas fa-redo mr-1"></i> Ulangi
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-1.5 text-center">
+                                    <input type="file" id="nativePemInput" accept="image/*" capture="environment" style="display:none;" onchange="previewNativePem(this)">
+                                    <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-3 font-weight-bold btn-block" onclick="document.getElementById('nativePemInput').click()">
+                                        <i class="fas fa-camera-retro mr-1"></i> Buka Aplikasi Kamera
+                                    </button>
+                                </div>
+
+                                <div id="pemCapturedBox" class="mt-2 text-center" style="display:none;">
+                                    <small class="text-success font-weight-bold d-block mb-1"><i class="fas fa-check-circle mr-1"></i> Foto Siap Disimpan:</small>
+                                    <img id="pemCapturedPreview" class="img-fluid rounded shadow-sm" style="max-height:140px; width:100%; object-fit:cover;" src="">
+                                </div>
+                                <input type="hidden" name="foto_cam_data" id="fotoPemCamData" value="">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="stopPemCamera()">Batal</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold">Simpan Foto</button>
                 </div>
             </form>
         </div>
@@ -676,7 +770,7 @@ $(document).ready(function() {
             const studentId = ui.item.data('id');
             let action = (targetList === 'list-right') ? 'add' : 'remove';
             
-            $.post('index.php?mod=pembiasaan&act=update_anggota', {
+            $.post('<?= BASE_URL ?>pembiasaan/update_anggota', {
                 action: action, id_pembiasaan: id_pem, student_ids: [studentId]
             }, function(res) {
                  if(res.status === 'success') {
@@ -695,7 +789,7 @@ $(document).ready(function() {
     function loadStudents() {
         var q = $('#search-left').val();
         var k = $('#filter-kelas').val();
-        $.getJSON('index.php?mod=pembiasaan&act=search_students', {id_pembiasaan: id_pem, q: q, id_kelas: k}, function(res){
+        $.getJSON('<?= BASE_URL ?>pembiasaan/search_students', {id_pembiasaan: id_pem, q: q, id_kelas: k}, function(res){
             if(res.status === 'success'){
                 $('#list-left').empty();
                 res.data.forEach(s => {
@@ -746,4 +840,136 @@ $('#modalAgenda').on('hidden.bs.modal', function () {
 function confirmDelete(e) {
     if(!confirm('Apakah anda yakin ingin menghapus data ini?')) e.preventDefault();
 }
+
+// ============================================================
+// 📸 LIVE CAMERA HANDLER UNTUK MODAL GALERI PEMBIASAAN
+// ============================================================
+let pemStream = null;
+let pemFacing = "environment";
+
+function previewPemFile(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = e => {
+            $('#previewPemImg').attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function startPemCamera() {
+    stopPemCamera();
+    const video = document.getElementById('pemVideo');
+    const controls = document.getElementById('pemControls');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('nativePemInput').click();
+        return;
+    }
+
+    video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+
+    try {
+        pemStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: pemFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        });
+    } catch (e) {
+        try {
+            pemStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        } catch (err) {
+            console.warn("Camera stream failed", err);
+            document.getElementById('nativePemInput').click();
+            return;
+        }
+    }
+
+    if (pemStream) {
+        video.srcObject = pemStream;
+        video.onloadedmetadata = () => {
+            video.play();
+            video.style.display = 'block';
+            controls.style.setProperty('display', 'flex', 'important');
+        };
+    }
+}
+
+function stopPemCamera() {
+    if (pemStream) {
+        pemStream.getTracks().forEach(t => t.stop());
+        pemStream = null;
+    }
+    const video = document.getElementById('pemVideo');
+    if (video) {
+        video.srcObject = null;
+        video.style.display = 'none';
+    }
+    const controls = document.getElementById('pemControls');
+    if (controls) controls.style.setProperty('display', 'none', 'important');
+}
+
+function switchPemFacing() {
+    pemFacing = (pemFacing === "environment") ? "user" : "environment";
+    startPemCamera();
+}
+
+function takePemSnapshot() {
+    const video = document.getElementById('pemVideo');
+    const canvas = document.getElementById('pemCanvas');
+    const preview = document.getElementById('pemCapturedPreview');
+    const previewBox = document.getElementById('pemCapturedBox');
+    const hiddenInput = document.getElementById('fotoPemCamData');
+    const btnSnap = document.getElementById('btnSnapPem');
+    const btnRetake = document.getElementById('btnRetakePem');
+
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 480;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+
+    const base64 = canvas.toDataURL('image/jpeg', 0.88);
+    hiddenInput.value = base64;
+    preview.src = base64;
+    previewBox.style.display = 'block';
+
+    video.pause();
+    btnSnap.style.display = 'none';
+    btnRetake.style.display = 'inline-block';
+}
+
+function retakePemSnapshot() {
+    const video = document.getElementById('pemVideo');
+    const previewBox = document.getElementById('pemCapturedBox');
+    const hiddenInput = document.getElementById('fotoPemCamData');
+    const btnSnap = document.getElementById('btnSnapPem');
+    const btnRetake = document.getElementById('btnRetakePem');
+
+    hiddenInput.value = '';
+    previewBox.style.display = 'none';
+    btnSnap.style.display = 'inline-block';
+    btnRetake.style.display = 'none';
+    video.play();
+}
+
+function previewNativePem(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = e => {
+            let base64 = e.target.result;
+            document.getElementById('fotoPemCamData').value = base64;
+            document.getElementById('pemCapturedPreview').src = base64;
+            document.getElementById('pemCapturedBox').style.display = 'block';
+            stopPemCamera();
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$('#modalGaleri').on('hidden.bs.modal', function () {
+    stopPemCamera();
+});
 </script>

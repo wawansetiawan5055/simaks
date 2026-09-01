@@ -2,20 +2,21 @@
 require_once __DIR__ . '/../helpers/DateHelper.php';
 include __DIR__ . '/partials/header.php';
 ?>
-<section class="content-header">
+<div class="content-header p-0 pt-3">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Mutasi Siswa Keluar</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3 px-4 flex-wrap" style="gap: 12px;">
+            <div>
+                <h2 class="m-0 font-weight-bold text-dark"><i class="fas fa-user-minus text-danger mr-2"></i> Mutasi Siswa Keluar</h2>
+                <p class="text-muted small mb-0">Pencatatan dan arsip data siswa mutasi keluar, pindah sekolah, atau drop out.</p>
             </div>
-            <div class="col-sm-6 text-right">
-                <button type="button" class="btn btn-danger" onclick="openModalAdd()">
-                    <i class="fas fa-plus-circle"></i> Tambah Mutasi Keluar
+            <div>
+                <button type="button" class="btn btn-danger btn-sm px-3 shadow-sm font-weight-bold" style="border-radius: 8px;" onclick="openModalAdd()">
+                    <i class="fas fa-plus-circle mr-1"></i> Tambah Mutasi Keluar
                 </button>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -81,7 +82,7 @@ include __DIR__ . '/partials/header.php';
                                         onclick="openModalEdit('<?= $r['id_siswa'] ?>', '<?= htmlspecialchars($r['nama']) ?>')">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <a href="index.php?mod=mutasi_siswa&act=batal&id_siswa=<?= $r['id_siswa'] ?>"
+                                    <a href="<?= BASE_URL ?>mutasi_siswa/batal?id_siswa=<?= $r['id_siswa'] ?>"
                                         class="btn btn-xs btn-outline-secondary"
                                         onclick="return confirm('⚠️ Batalkan mutasi siswa ini? \nSiswa akan dikembalikan ke status Aktif dan masuk kembali ke kelas asalnya.')">
                                         <i class="fas fa-undo"></i> Batal
@@ -112,7 +113,7 @@ include __DIR__ . '/partials/header.php';
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="form-mutasi" action="index.php?mod=mutasi_siswa&act=save" method="POST">
+            <form id="form-mutasi" action="<?= BASE_URL ?>mutasi_siswa/save" method="POST">
                 <input type="hidden" name="is_edit" id="is_edit" value="0">
                 <div class="modal-body">
                     <div id="section-pilih-siswa">
@@ -218,7 +219,7 @@ include __DIR__ . '/partials/header.php';
         idEdit.name = 'id_siswa'; // Match controller expectation
 
         // Fetch mutation data
-        fetch(`index.php?mod=mutasi_siswa&act=get_mutation_api&id_siswa=${idSiswa}`)
+        fetch(`<?= BASE_URL ?>mutasi_siswa/get_mutation_api?id_siswa=${idSiswa}`)
             .then(response => response.json())
             .then(result => {
                 if (result.status === 'success') {
@@ -249,7 +250,7 @@ include __DIR__ . '/partials/header.php';
 
         kelasAsalInput.value = idKelas;
 
-        fetch(`index.php?mod=mutasi_siswa&act=get_siswa_api&id_kelas=${idKelas}`)
+        fetch(`<?= BASE_URL ?>mutasi_siswa/get_siswa_api?id_kelas=${idKelas}`)
             .then(response => response.json())
             .then(data => {
                 siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';

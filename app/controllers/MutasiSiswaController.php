@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config/helper.php';
 require_once __DIR__ . '/../models/MutasiSiswaModel.php';
 require_once __DIR__ . '/../models/KelasModel.php';
 
@@ -69,16 +70,18 @@ function mutasi_siswa_save($pdo)
 // Endpoint API untuk mengambil siswa per kelas
 function mutasi_siswa_get_siswa_api($pdo)
 {
+    header('Content-Type: application/json');
+    if (ob_get_length() > 0) ob_clean();
     if (!is_logged_in()) {
         echo json_encode([]);
-        return;
-    } // Keamanan dasar
+        exit;
+    }
 
-    $id_kelas = $_GET['id_kelas'] ?? 0;
-    $id_ta = $_SESSION['id_ta_aktif'] ?? 0;
+    $id_kelas = (int)($_GET['id_kelas'] ?? 0);
+    $id_ta = (int)($_SESSION['id_ta_aktif'] ?? $_SESSION['id_ta_viewing'] ?? 0);
 
     $siswa = MutasiSiswaModel::getSiswaAktifByKelas($pdo, $id_kelas, $id_ta);
-    echo json_encode($siswa);
+    echo json_encode($siswa ?: []);
     exit;
 }
 

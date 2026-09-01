@@ -45,7 +45,7 @@ class SiswaApiController {
 
     private static function getSiswaByKelas($pdo) {
         $id_kelas = $_GET['id_kelas'] ?? 0;
-        $id_ta = $_SESSION['id_ta_aktif'] ?? 0;
+        $id_ta = $_GET['id_ta'] ?? $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
         
         if (!$id_kelas || !$id_ta) {
             echo json_encode(['status' => 'error', 'msg' => 'Parameter tidak lengkap']);

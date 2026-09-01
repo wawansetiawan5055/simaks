@@ -7,7 +7,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php?mod=dashboard">Home</a></li>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard">Home</a></li>
                     <li class="breadcrumb-item active">Profil Guru</li>
                 </ol>
             </div>
@@ -52,7 +52,7 @@
                                 </td>
                                 <td><?= htmlspecialchars($g['status_kepegawaian'] ?? '-') ?></td>
                                 <td>
-                                    <a href="index.php?mod=profil_guru&act=detail&id=<?= $g['id_guru'] ?>"
+                                    <a href="<?= BASE_URL ?>profil_guru/detail?id=<?= $g['id_guru'] ?>"
                                         class="btn btn-sm btn-primary">
                                         <i class="fas fa-user-edit"></i> Kelola Profil
                                     </a>

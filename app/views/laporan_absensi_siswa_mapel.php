@@ -1,11 +1,29 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
-<div class="container-fluid">
-  <h2 class="mt-4 mb-3" style="font-size: 1.75rem; font-weight: 600;">Laporan Absensi Siswa Mapel</h2>
+<div class="content-header pt-3 mb-2">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Laporan Presensi Siswa Mapel
+          </h4>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+          <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+          <li class="breadcrumb-item active text-primary font-weight-bold">Laporan Presensi</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Form Filter -->
-  <form method="get" id="filterForm" class="mb-3">
-    <input type="hidden" name="mod" value="laporan">
-    <input type="hidden" name="act" value="absensi_siswa_mapel">
+  <form method="get" action="<?= BASE_URL ?>laporan/absensi_siswa_mapel" id="filterForm" class="mb-3">
 
     <div class="filter-box">
       <div class="row align-items-end">
@@ -122,12 +140,12 @@
     $queryParamsArray = array_diff_key($_GET, ['mod' => '', 'act' => '']);
     $query_params = http_build_query($queryParamsArray);
     ?>
-    <a href="index.php?mod=laporan&act=absensi_siswa_mapel_export_excel&<?= $query_params ?>" class="btn btn-success btn-sm"><i
+    <a href="<?= BASE_URL ?>laporan/absensi_siswa_mapel_export_excel?<?= $query_params ?>" class="btn btn-success btn-sm"><i
         class="fas fa-file-excel"></i> Export Excel</a>
-    <a href="index.php?mod=laporan&act=absensi_siswa_mapel_export_pdf&<?= $query_params ?>" class="btn btn-danger btn-sm"><i
+    <a href="<?= BASE_URL ?>laporan/absensi_siswa_mapel_export_pdf?<?= $query_params ?>" class="btn btn-danger btn-sm"><i
         class="fas fa-file-pdf"></i> Export PDF</a>
     <button type="button"
-      onclick="showReportPreview('index.php?mod=laporan&act=absensi_siswa_mapel_print&<?= $query_params ?>', 'Laporan Absensi')"
+      onclick="showReportPreview('<?= BASE_URL ?>laporan/absensi_siswa_mapel_print?<?= $query_params ?>', 'Laporan Absensi')"
       class="btn btn-info btn-sm"><i class="fas fa-print"></i> Cetak</button>
   </div>
 

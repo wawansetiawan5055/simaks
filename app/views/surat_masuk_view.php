@@ -1,16 +1,24 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-            <div>
-                <h2 class="fw-bold m-0 text-dark"><i class="fas fa-file-import text-primary mr-2"></i> Surat Masuk</h2>
-                <p class="text-muted small mb-0">Arsip digital surat yang diterima oleh sekolah.</p>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-file-import"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Arsip Surat Masuk
+                    </h4>
+                </div>
             </div>
-            <button type="button" class="btn btn-primary shadow-sm" data-toggle="modal" data-target="#modalAddSuratMasuk">
-                <i class="fas fa-plus mr-1"></i> Catat Surat Masuk
-            </button>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-primary btn-sm shadow-sm font-weight-bold rounded-pill px-3" data-toggle="modal" data-target="#modalAddSuratMasuk">
+                    <i class="fas fa-plus mr-1"></i> Catat Surat Masuk
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -83,7 +91,7 @@
 <div class="modal fade" id="modalAddSuratMasuk" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" style="border-radius: 15px;">
-            <form action="index.php?mod=surat&act=save_masuk" method="POST" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>surat/save_masuk" method="POST" enctype="multipart/form-data">
                 <div class="modal-header border-0 px-4 pt-4">
                     <h5 class="modal-title fw-bold text-primary"><i class="fas fa-file-import mr-2"></i> Catat Surat Masuk</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

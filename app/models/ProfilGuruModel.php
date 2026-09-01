@@ -18,26 +18,27 @@ class ProfilGuruModel {
             $sql = "UPDATE profil_guru SET 
                     gelar_depan = ?, gelar_belakang = ?, alamat_lengkap = ?, 
                     no_hp = ?, email_pribadi = ?, nama_ibu_kandung = ?, 
-                    pendidikan_terakhir = ? 
+                    pendidikan_terakhir = ?, sertifikasi = ?, mapel_sertifikasi = ? 
                     WHERE id_guru = ?";
             $stmt = $pdo->prepare($sql);
             return $stmt->execute([
                 $data['gelar_depan'], $data['gelar_belakang'], $data['alamat_lengkap'],
                 $data['no_hp'], $data['email_pribadi'], $data['nama_ibu_kandung'],
-                $data['pendidikan_terakhir'], $data['id_guru']
+                $data['pendidikan_terakhir'], $data['sertifikasi'], $data['mapel_sertifikasi'], $data['id_guru']
             ]);
         } else {
             // Insert
             $sql = "INSERT INTO profil_guru (
                     id_guru, gelar_depan, gelar_belakang, alamat_lengkap, 
-                    no_hp, email_pribadi, nama_ibu_kandung, pendidikan_terakhir
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    no_hp, email_pribadi, nama_ibu_kandung, pendidikan_terakhir,
+                    sertifikasi, mapel_sertifikasi
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
             return $stmt->execute([
                 $data['id_guru'],
                 $data['gelar_depan'], $data['gelar_belakang'], $data['alamat_lengkap'],
                 $data['no_hp'], $data['email_pribadi'], $data['nama_ibu_kandung'],
-                $data['pendidikan_terakhir']
+                $data['pendidikan_terakhir'], $data['sertifikasi'], $data['mapel_sertifikasi']
             ]);
         }
     }

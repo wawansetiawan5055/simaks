@@ -16,7 +16,7 @@
         <h3 class="card-title"><?= $kelas ? 'Edit' : 'Input' ?> Kelas</h3>
       </div>
 
-      <form action="index.php?mod=kelas&act=save" method="POST">
+      <form action="<?= BASE_URL ?>kelas/save" method="POST">
         <div class="card-body">
           <?php if ($kelas): ?>
             <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
@@ -51,14 +51,20 @@
               }
               ?>
             </select>
-            <small class="form-text text-muted">Pilihan tingkat disesuaikan dengan jenjang sekolah (SD/SMP/SMA) pada
-              profil sekolah.</small>
+          <div class="form-group">
+            <label for="jenis_kelas">Jenis Program / Status Kelas</label>
+            <select name="jenis_kelas" id="jenis_kelas" class="form-control" required>
+              <option value="reguler" <?= (isset($kelas['jenis_kelas']) && $kelas['jenis_kelas'] == 'reguler') ? 'selected' : '' ?>>🏫 Reguler (Sekolah Induk Pusat - 5 Hari)</option>
+              <option value="pjj" <?= (isset($kelas['jenis_kelas']) && $kelas['jenis_kelas'] == 'pjj') ? 'selected' : '' ?>>🌐 Pendidikan Jarak Jauh (PJJ / Terbuka - Hybrid)</option>
+              <option value="menginduk" <?= (isset($kelas['jenis_kelas']) && $kelas['jenis_kelas'] == 'menginduk') ? 'selected' : '' ?>>🤝 Sekolah Menginduk (Mitra Filial - 6 Hari)</option>
+            </select>
+            <small class="form-text text-muted">Digunakan untuk klasifikasi otomatis pada jadwal pelajaran, presensi, dan koordinator lokasi.</small>
           </div>
         </div>
 
         <div class="card-footer">
           <button type="submit" class="btn btn-success">Simpan</button>
-          <a href="index.php?mod=kelas" class="btn btn-secondary">Batal</a>
+          <a href="<?= BASE_URL ?>kelas" class="btn btn-secondary">Batal</a>
         </div>
       </form>
     </div>

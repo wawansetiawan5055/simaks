@@ -7,6 +7,17 @@ function pengguna_index($pdo) {
     $guru_users = ManajemenPenggunaModel::getUsersByType($pdo, 'guru');
     $siswa_users = ManajemenPenggunaModel::getUsersByType($pdo, 'siswa');
     $sistem_users = ManajemenPenggunaModel::getUsersByType($pdo, 'sistem');
+
+    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
+    $stmt_k = $pdo->prepare("
+        SELECT DISTINCT k.id_kelas, k.nama_kelas, k.tingkat
+        FROM kelas k
+        JOIN penempatan_siswa ps ON k.id_kelas = ps.id_kelas
+        WHERE ps.id_ta = ?
+        ORDER BY k.tingkat, k.nama_kelas
+    ");
+    $stmt_k->execute([$id_ta]);
+    $kelas_list = $stmt_k->fetchAll(PDO::FETCH_ASSOC);
     
     include __DIR__ . '/../views/manajemen_pengguna_index.php';
 }
@@ -77,4 +88,34 @@ function pengguna_delete($pdo, $id) {
         $_SESSION['pesan_error'] = "Gagal menghapus: " . $e->getMessage();
     }
     redirect('index.php?mod=manajemen_pengguna');
+}
+
+function pengguna_print_kartu($pdo) {
+    if (!has_role('Admin')) redirect('index.php');
+
+    $id_pengguna = $_GET['id'] ?? null;
+    $type = $_GET['type'] ?? 'all';
+    $id_kelas = $_GET['id_kelas'] ?? '';
+    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
+
+    $stmt_k = $pdo->prepare("
+        SELECT DISTINCT k.id_kelas, k.nama_kelas, k.tingkat
+        FROM kelas k
+        JOIN penempatan_siswa ps ON k.id_kelas = ps.id_kelas
+        WHERE ps.id_ta = ?
+        ORDER BY k.tingkat, k.nama_kelas
+    ");
+    $stmt_k->execute([$id_ta]);
+    $kelas_list = $stmt_k->fetchAll(PDO::FETCH_ASSOC);
+
+    $users_data = [];
+    if ($id_pengguna) {
+        $single = ManajemenPenggunaModel::getUserDetailForCard($pdo, $id_pengguna);
+        if ($single) $users_data[] = $single;
+    } else {
+        $users_data = ManajemenPenggunaModel::getUsersForCard($pdo, $type, $id_kelas);
+    }
+
+    $kop = get_kop_laporan($pdo);
+    include __DIR__ . '/../views/manajemen_pengguna_print_kartu.php';
 }

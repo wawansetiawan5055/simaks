@@ -179,6 +179,60 @@ function ppdb_promote_massal($pdo) {
 }
 
 /**
+ * Tampilkan halaman form Re-Generate NIPD Massal
+ * GET: index.php?mod=ppdb&act=regenerate_nipd
+ */
+function ppdb_regenerate_nipd_form($pdo) {
+    if (!check_access('ppdb', 'read')) redirect('index.php');
+
+    $list_ta = PpdbModel::getAllTa($pdo);
+
+    // Jika ada id_ta di parameter, tampilkan preview
+    $id_ta_dipilih = isset($_GET['id_ta']) ? (int)$_GET['id_ta'] : null;
+    $preview_data   = null;
+    $error_preview  = null;
+
+    if ($id_ta_dipilih) {
+        try {
+            $preview_data = PpdbModel::previewRegenerateNipd($pdo, $id_ta_dipilih);
+        } catch (Exception $e) {
+            $error_preview = $e->getMessage();
+        }
+    }
+
+    include __DIR__ . '/../views/ppdb_regenerate_nipd.php';
+}
+
+/**
+ * Eksekusi Re-Generate NIPD Massal (POST)
+ * POST: index.php?mod=ppdb&act=regenerate_nipd_exec
+ */
+function ppdb_regenerate_nipd_exec($pdo) {
+    if (!check_access('ppdb', 'update')) {
+        $_SESSION['pesan_error'] = "Akses ditolak.";
+        redirect('index.php?mod=ppdb&act=regenerate_nipd');
+        return;
+    }
+
+    $id_ta = isset($_POST['id_ta']) ? (int)$_POST['id_ta'] : 0;
+    if (!$id_ta) {
+        $_SESSION['pesan_error'] = "Tahun ajaran tidak valid.";
+        redirect('index.php?mod=ppdb&act=regenerate_nipd');
+        return;
+    }
+
+    try {
+        $hasil = PpdbModel::regenerateNipdMassal($pdo, $id_ta);
+        $_SESSION['pesan_sukses'] = "✅ Berhasil! NIPD {$hasil['jumlah']} siswa untuk TA \"{$hasil['nama_ta']}\" telah di-regenerate ulang secara urut alfabet.";
+        $_SESSION['nipd_regen_preview'] = $hasil['preview']; // Simpan untuk ditampilkan
+    } catch (Exception $e) {
+        $_SESSION['pesan_error'] = "Gagal regenerasi NIPD: " . $e->getMessage();
+    }
+
+    redirect('index.php?mod=ppdb&act=regenerate_nipd&id_ta=' . $id_ta . '&done=1');
+}
+
+/**
  * Download Template Excel untuk Import PPDB
  */
 function ppdb_get_template($pdo) {
@@ -216,9 +270,14 @@ function ppdb_get_template($pdo) {
 
     $writer = new Xlsx($spreadsheet);
     
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment;filename="Template_Import_PPDB.xlsx"');
     header('Cache-Control: max-age=0');
+    header('Pragma: public');
     
     $writer->save('php://output');
     exit;
@@ -253,14 +312,13 @@ function ppdb_import($pdo) {
                     if (is_numeric($row['F'])) {
                         $tgl_lahir = Date::excelToDateTimeObject($row['F'])->format('Y-m-d');
                     } else {
-                        // Assume it's already string YYYY-MM-DD
-                        $tgl_lahir = date('Y-m-d', strtotime($row['F']));
+                        $tgl_lahir = PpdbModel::normalizeDateForSql($row['F']);
                     }
                 }
 
                 // Normalize Gender
                 $jk_raw = strtoupper($row['D'] ?? '');
-                $jk_normalized = ($jk_raw == 'L' || $jk_raw == 'LAKI-LAKI') ? 'Laki-laki' : (($jk_raw == 'P' || $jk_raw == 'PEREMPUAN') ? 'Perempuan' : $jk_raw);
+                $jk_normalized = ($jk_raw == 'L' || $jk_raw == 'LAKI-LAKI' || $jk_raw == 'LAKI' || $jk_raw == 'PRIA') ? 'L' : (($jk_raw == 'P' || $jk_raw == 'PEREMPUAN' || $jk_raw == 'WANITA') ? 'P' : 'L');
 
                 $list_pendaftar[] = [
                     'nama_lengkap' => $row['A'],

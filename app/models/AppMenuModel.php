@@ -237,4 +237,72 @@ class AppMenuModel {
             return false;
         }
     }
+
+    /**
+     * Memastikan grup menu 'Layanan Murid' serta sub-menunya tersedia di app_menu dan hak_akses
+     */
+    public static function syncLayananMuridMenu(PDO $pdo) {
+        try {
+            // 1. Cek / Buat Grup Menu 'Layanan Murid'
+            $stmt = $pdo->prepare("SELECT id_menu FROM app_menu WHERE nama_menu = 'Layanan Murid' OR nama_menu = 'LAYANAN MURID' LIMIT 1");
+            $stmt->execute();
+            $id_layanan = $stmt->fetchColumn();
+
+            if (!$id_layanan) {
+                // Letakkan sebelum / sekitar ADMINISTRASI PROGRAM atau TATA USAHA
+                $stmt_urutan = $pdo->query("SELECT MAX(urutan) FROM app_menu WHERE parent_id = 0");
+                $max_u = (int)$stmt_urutan->fetchColumn();
+
+                $stmt_ins = $pdo->prepare("INSERT INTO app_menu (nama_menu, link, icon, parent_id, urutan, status) VALUES ('Layanan Murid', '#', 'fas fa-hands-helping', 0, ?, 'Aktif')");
+                $stmt_ins->execute([$max_u + 1]);
+                $id_layanan = $pdo->lastInsertId();
+            } else {
+                // Pastikan icon dan link grup benar
+                $pdo->prepare("UPDATE app_menu SET link = '#', icon = 'fas fa-hands-helping', status = 'Aktif' WHERE id_menu = ?")->execute([$id_layanan]);
+            }
+
+            // 2. Cek / Pindahkan / Buat 'Bimbingan dan Konseling' di bawah Layanan Murid
+            $stmt_bk = $pdo->prepare("SELECT id_menu FROM app_menu WHERE (link = 'catatan_kasus' OR link = 'bk') LIMIT 1");
+            $stmt_bk->execute();
+            $id_bk = $stmt_bk->fetchColumn();
+
+            if ($id_bk) {
+                $pdo->prepare("UPDATE app_menu SET nama_menu = 'Bimbingan dan Konseling', parent_id = ?, icon = 'fas fa-comments', urutan = 1, status = 'Aktif' WHERE id_menu = ?")->execute([$id_layanan, $id_bk]);
+            } else {
+                $stmt_ins_bk = $pdo->prepare("INSERT INTO app_menu (nama_menu, link, icon, parent_id, urutan, status) VALUES ('Bimbingan dan Konseling', 'catatan_kasus', 'fas fa-comments', ?, 1, 'Aktif')");
+                $stmt_ins_bk->execute([$id_layanan]);
+                $id_bk = $pdo->lastInsertId();
+            }
+
+            // 3. Cek / Pindahkan / Buat 'Kesehatan (UKS)' di bawah Layanan Murid
+            $stmt_uks = $pdo->prepare("SELECT id_menu FROM app_menu WHERE (link = 'uks' OR link = 'manajemen_uks') LIMIT 1");
+            $stmt_uks->execute();
+            $id_uks = $stmt_uks->fetchColumn();
+
+            if ($id_uks) {
+                $pdo->prepare("UPDATE app_menu SET nama_menu = 'Kesehatan (UKS)', parent_id = ?, icon = 'fas fa-heartbeat', urutan = 2, status = 'Aktif' WHERE id_menu = ?")->execute([$id_layanan, $id_uks]);
+            } else {
+                $stmt_ins_uks = $pdo->prepare("INSERT INTO app_menu (nama_menu, link, icon, parent_id, urutan, status) VALUES ('Kesehatan (UKS)', 'uks', 'fas fa-heartbeat', ?, 2, 'Aktif')");
+                $stmt_ins_uks->execute([$id_layanan]);
+                $id_uks = $pdo->lastInsertId();
+            }
+
+            // 4. Pastikan Hak Akses (hak_akses) aktif untuk peran-peran utama
+            $roles = $pdo->query("SELECT id_peran FROM peran")->fetchAll(PDO::FETCH_COLUMN);
+            $stmt_grant = $pdo->prepare("
+                INSERT INTO hak_akses (id_peran, id_menu, can_read, can_create, can_update, can_delete) 
+                VALUES (?, ?, 1, 1, 1, 1)
+                ON DUPLICATE KEY UPDATE can_read = 1
+            ");
+            
+            $target_menus = array_filter([$id_layanan, $id_bk, $id_uks]);
+            foreach ($roles as $r_id) {
+                foreach ($target_menus as $m_id) {
+                    $stmt_grant->execute([$r_id, $m_id]);
+                }
+            }
+        } catch (Exception $e) {
+            error_log("Sync Layanan Murid Menu Error: " . $e->getMessage());
+        }
+    }
 }

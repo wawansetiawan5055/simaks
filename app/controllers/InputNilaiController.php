@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../models/NilaiModel.php';
 require_once __DIR__ . '/../models/JurnalKbmModel.php';
 require_once __DIR__ . '/../models/CpTpModel.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 function input_nilai_index($pdo)
 {
@@ -35,6 +40,7 @@ function input_nilai_index($pdo)
     $cp_list = [];
     $tp_list = [];
     $siswa_nilai = [];
+    $materi_lms_list = [];
     $nama_mapel_terpilih = '';
 
     if ($id_kelas_filter) {
@@ -75,6 +81,11 @@ function input_nilai_index($pdo)
                     }
                 }
             }
+
+            // Ambil daftar modul LMS untuk opsi Tarik Nilai Formatif
+            $stmt_mat = $pdo->prepare("SELECT id_materi, judul_materi FROM lms_materi WHERE id_mapel = ? ORDER BY id_materi DESC");
+            $stmt_mat->execute([$id_mapel_asli]);
+            $materi_lms_list = $stmt_mat->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 
@@ -88,7 +99,8 @@ function input_nilai_index($pdo)
         'id_cp_filter',
         'tp_list',
         'id_tp_filter',
-        'siswa_nilai'
+        'siswa_nilai',
+        'materi_lms_list'
     );
     extract($data_for_view);
 
@@ -128,4 +140,124 @@ function input_nilai_save($pdo)
         $_SESSION['pesan_error'] = "Gagal menyimpan nilai: " . $e->getMessage();
     }
     redirect("index.php?mod=input_nilai&id_kelas={$id_kelas}&id_guru_mapel={$id_guru_mapel}&id_cp={$_POST['id_cp']}&id_tp={$id_tp}");
+}
+function input_nilai_template($pdo)
+{
+    $id_kelas = $_GET['id_kelas'] ?? 0;
+    $id_guru_mapel = $_GET['id_guru_mapel'] ?? 0;
+    $id_ta = $_SESSION['id_ta_aktif'] ?? 0;
+    $id_tp = $_GET['id_tp'] ?? 0;
+
+    if (!$id_kelas || !$id_guru_mapel || !$id_tp) {
+        die("Data tidak lengkap untuk generate template.");
+    }
+
+    $siswa_nilai = NilaiModel::getSiswaWithNilai($pdo, $id_kelas, $id_guru_mapel, $id_ta, $id_tp);
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Style headers
+    $headerStyle = [
+        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0A500']],
+        'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+    ];
+
+    $sheet->setCellValue('A1', 'NO');
+    $sheet->setCellValue('B1', 'ID_PENEMPATAN');
+    $sheet->setCellValue('C1', 'NAMA SISWA');
+    $sheet->setCellValue('D1', 'NISN');
+    $sheet->setCellValue('E1', 'NILAI (0-100)');
+    $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+
+    // Hide ID_PENEMPATAN column (still needed for processing)
+    $sheet->getColumnDimension('B')->setVisible(false);
+
+    // Column widths
+    $sheet->getColumnDimension('A')->setWidth(5);
+    $sheet->getColumnDimension('C')->setWidth(35);
+    $sheet->getColumnDimension('D')->setWidth(20);
+    $sheet->getColumnDimension('E')->setWidth(15);
+
+    $row = 2;
+    foreach ($siswa_nilai as $index => $s) {
+        $sheet->setCellValue('A' . $row, $index + 1);
+        $sheet->setCellValue('B' . $row, $s['id_penempatan']);
+        $sheet->setCellValue('C' . $row, $s['nama']);
+        $sheet->setCellValue('D' . $row, $s['nisn']);
+        $sheet->setCellValue('E' . $row, $s['nilai'] ?? '');
+        // Set nilai column as numeric
+        $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode('0.00');
+        $row++;
+    }
+
+    $filename = "Template_Nilai_Formatif_" . date('YmdHis') . ".xlsx";
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    if (ob_get_length()) ob_clean();
+    flush();
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
+function input_nilai_import($pdo)
+{
+    if (!can_do($pdo, 'input_nilai', 'create') && !can_do($pdo, 'input_nilai', 'update')) {
+        $_SESSION['pesan_error'] = "Akses ditolak. Anda tidak memiliki izin untuk mengimpor nilai.";
+        redirect('index.php?mod=input_nilai');
+        return;
+    }
+
+    $id_kelas = $_POST['id_kelas'];
+    $id_guru_mapel = $_POST['id_guru_mapel'];
+    $id_cp = $_POST['id_cp'];
+    $id_tp = $_POST['id_tp'];
+    $redirect_url = "index.php?mod=input_nilai&id_kelas={$id_kelas}&id_guru_mapel={$id_guru_mapel}&id_cp={$id_cp}&id_tp={$id_tp}";
+
+    if (!isset($_FILES['file_excel']) || $_FILES['file_excel']['error'] !== UPLOAD_ERR_OK) {
+        $_SESSION['pesan_error'] = 'File tidak valid atau tidak diunggah.';
+        redirect($redirect_url);
+        return;
+    }
+
+    try {
+        $spreadsheet = IOFactory::load($_FILES['file_excel']['tmp_name']);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        $nilai_data = [];
+        foreach ($rows as $index => $row) {
+            if ($index === 0) continue; // Skip header
+
+            $id_penempatan = $row[1];
+            $nilai = $row[4];
+
+            if ($id_penempatan && $nilai !== null && $nilai !== '') {
+                $nilai_data[$id_penempatan] = ['nilai' => $nilai];
+            }
+        }
+
+        if (!empty($nilai_data)) {
+            $data_to_save = [
+                'id_kelas'     => $id_kelas,
+                'id_guru_mapel' => $id_guru_mapel,
+                'id_tp'        => $id_tp,
+                'nilai'        => $nilai_data
+            ];
+            NilaiModel::save($pdo, $data_to_save);
+            $_SESSION['pesan_sukses'] = "Berhasil mengimpor " . count($nilai_data) . " nilai dari Excel.";
+        } else {
+            $_SESSION['pesan_error'] = "Tidak ada data nilai yang ditemukan dalam file.";
+        }
+
+    } catch (Exception $e) {
+        $_SESSION['pesan_error'] = "Gagal mengimpor nilai: " . $e->getMessage();
+    }
+
+    redirect($redirect_url);
 }

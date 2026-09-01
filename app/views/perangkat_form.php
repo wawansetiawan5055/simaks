@@ -14,12 +14,12 @@ $page_title = $is_edit ? "Edit Dokumen" : "Buat Dokumen Baru";
                     <i class="fas fa-edit"></i> <?= $page_title ?> - <?= $jenis ?>
                 </h3>
                 <div class="card-tools">
-                    <a href="index.php?mod=perangkat&act=index&type=<?= $type ?>" class="btn btn-secondary btn-sm">
+                    <a href="<?= BASE_URL ?>perangkat/index?type=<?= $type ?>" class="btn btn-secondary btn-sm">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                 </div>
             </div>
-            <form action="index.php?mod=perangkat&act=save" method="post" id="formPerangkat">
+            <form action="<?= BASE_URL ?>perangkat/save" method="post" id="formPerangkat">
                 <input type="hidden" name="id_perangkat" value="<?= $dokumen['id_perangkat'] ?? '' ?>">
                 <input type="hidden" name="type" value="<?= $type ?>">
                 <input type="hidden" name="jenis" value="<?= $jenis ?>">
@@ -80,7 +80,7 @@ $page_title = $is_edit ? "Edit Dokumen" : "Buat Dokumen Baru";
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> Simpan
                     </button>
-                    <a href="index.php?mod=perangkat&act=index&type=<?= $type ?>" class="btn btn-secondary">
+                    <a href="<?= BASE_URL ?>perangkat/index?type=<?= $type ?>" class="btn btn-secondary">
                         Batal
                     </a>
                 </div>
@@ -89,6 +89,7 @@ $page_title = $is_edit ? "Edit Dokumen" : "Buat Dokumen Baru";
     </div>
 </div>
 
+<style>.tox-notifications-container { display: none !important; }</style>
 <!-- TinyMCE CDN -->
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
@@ -118,7 +119,7 @@ $(document).ready(function() {
         const id_template = $(this).val();
         if (!id_template) return;
 
-        $.getJSON('index.php?mod=perangkat&act=get_template&id_template=' + id_template, function(response) {
+        $.getJSON('<?= BASE_URL ?>perangkat/get_template?id_template=' + id_template, function(response) {
             if (response.status === 'success') {
                 tinymce.get('editor').setContent(response.konten);
             } else {

@@ -46,7 +46,7 @@ include __DIR__ . '/partials/header.php';
                 <h1>Kewirausahaan: <strong><?= htmlspecialchars($kewirausahaan['nama_kegiatan']) ?></strong></h1>
             </div>
             <div class="col-sm-6 text-end">
-                <a href="index.php?mod=kewirausahaan" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left"></i> Kembali</a>
+                <a href="<?= BASE_URL ?>kewirausahaan" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left"></i> Kembali</a>
             </div>
         </div>
     </div>
@@ -58,37 +58,37 @@ include __DIR__ . '/partials/header.php';
             <div class="card-header p-0 pt-1 border-bottom-0">
                 <ul class="nav nav-tabs" id="kewirausahaanTabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'program') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=program">
+                        <a class="nav-link <?= ($tab == 'program') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/program">
                             <i class="fas fa-file-signature"></i> Program Kerja
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'kegiatan' || $tab == 'anggota') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=anggota">
+                        <a class="nav-link <?= ($tab == 'kegiatan' || $tab == 'anggota') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/anggota">
                             <i class="fas fa-users"></i> Anggota
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'tahapan') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=tahapan">
+                        <a class="nav-link <?= ($tab == 'tahapan') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/tahapan">
                             <i class="fas fa-tasks"></i> Tahapan
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'produk') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=produk">
+                        <a class="nav-link <?= ($tab == 'produk') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/produk">
                             <i class="fas fa-box"></i> Produk
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'keuangan') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=keuangan">
+                        <a class="nav-link <?= ($tab == 'keuangan') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/keuangan">
                             <i class="fas fa-money-bill-wave"></i> Keuangan
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=jurnal">
+                        <a class="nav-link <?= ($tab == 'jurnal') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/jurnal">
                             <i class="fas fa-book-reader"></i> Jurnal & Absensi
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= ($tab == 'galeri') ? 'active' : '' ?>" href="index.php?mod=kewirausahaan&act=index&id=<?= $id ?>&tab=galeri">
+                        <a class="nav-link <?= ($tab == 'galeri') ? 'active' : '' ?>" href="<?= BASE_URL ?>kewirausahaan/index/<?= $id ?>/galeri">
                             <i class="fas fa-images"></i> Galeri
                         </a>
                     </li>
@@ -153,7 +153,7 @@ include __DIR__ . '/partials/header.php';
                                                                             </button>
                                                                         <?php endif; ?>
                                                                         <button class="btn btn-xs btn-warning p-1" onclick='editAgenda(<?= json_encode($ag) ?>)' title="Edit" style="line-height: 1;"><i class="fas fa-edit fa-xs"></i></button>
-                                                                        <a href="index.php?mod=kewirausahaan&act=agenda_delete&id_kewirausahaan=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
+                                                                        <a href="<?= BASE_URL ?>kewirausahaan/agenda_delete?id_kewirausahaan=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -198,7 +198,7 @@ include __DIR__ . '/partials/header.php';
                                                                         <button class="btn btn-xs btn-info p-1" onclick="previewFile('<?= $pr['file_path'] ?>', 'pdf', '<?= htmlspecialchars($pr['nama_kegiatan']) ?>')" title="Lihat File" style="line-height: 1;">
                                                                             <i class="fas fa-eye fa-xs"></i>
                                                                         </button>
-                                                                        <a href="index.php?mod=kewirausahaan&act=agenda_delete&id_kewirausahaan=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
+                                                                        <a href="<?= BASE_URL ?>kewirausahaan/agenda_delete?id_kewirausahaan=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
                                                                             <i class="fas fa-trash fa-xs"></i>
                                                                         </a>
                                                                     </div>
@@ -315,11 +315,11 @@ include __DIR__ . '/partials/header.php';
                                         <td><span class="badge badge-<?= $t['status'] == 'Selesai' ? 'success' : ($t['status'] == 'Proses' ? 'warning' : 'secondary') ?>"><?= $t['status'] ?></span></td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="index.php?mod=kewirausahaan&act=jurnal_form&id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" class="btn btn-info btn-xs mr-1" title="Isi Jurnal & Absensi">
+                                                <a href="<?= BASE_URL ?>kewirausahaan/jurnal_form?id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" class="btn btn-info btn-xs mr-1" title="Isi Jurnal & Absensi">
                                                     <i class="fas fa-book-reader"></i>
                                                 </a>
                                                 <button type="button" class="btn btn-warning btn-xs mr-1" onclick='editTahapan(<?= json_encode($t) ?>)'><i class="fas fa-edit"></i></button>
-                                                <a href="index.php?mod=kewirausahaan&act=tahapan_delete&id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" class="btn btn-danger btn-xs" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
+                                                <a href="<?= BASE_URL ?>kewirausahaan/tahapan_delete?id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" class="btn btn-danger btn-xs" onclick="return confirmDelete(event)"><i class="fas fa-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>
@@ -364,7 +364,7 @@ include __DIR__ . '/partials/header.php';
                                             </div>
                                         </div>
                                         <div class="card-footer bg-white border-top-0">
-                                            <a href="index.php?mod=kewirausahaan&act=produk_delete&id_kewirausahaan=<?= $id ?>&id_produk=<?= $p['id_produk'] ?>" class="btn btn-danger btn-block btn-sm" onclick="return confirmDelete(event)">Hapus</a>
+                                            <a href="<?= BASE_URL ?>kewirausahaan/produk_delete?id_kewirausahaan=<?= $id ?>&id_produk=<?= $p['id_produk'] ?>" class="btn btn-danger btn-block btn-sm" onclick="return confirmDelete(event)">Hapus</a>
                                         </div>
                                     </div>
                                 </div>
@@ -385,7 +385,7 @@ include __DIR__ . '/partials/header.php';
                     <?php if ($tab == 'jurnal'): ?>
                     <div class="tab-pane fade show active">
                         <div class="mb-3">
-                            <a href="index.php?mod=kewirausahaan&act=jurnal_form&id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>" class="btn btn-primary">
+                            <a href="<?= BASE_URL ?>kewirausahaan/jurnal_form?id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Isi Jurnal & Absensi
                             </a>
                         </div>
@@ -417,8 +417,8 @@ include __DIR__ . '/partials/header.php';
                                     <td><?= htmlspecialchars($j['materi']) ?></td>
                                     <td><?= $hadir_count ?> Siswa</td>
                                     <td>
-                                        <a href="index.php?mod=kewirausahaan&act=jurnal_form&id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                                        <a href="index.php?mod=kewirausahaan&act=jurnal_delete&id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-danger btn-delete-confirm"><i class="fas fa-trash"></i></a>
+                                        <a href="<?= BASE_URL ?>kewirausahaan/jurnal_form?id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                        <a href="<?= BASE_URL ?>kewirausahaan/jurnal_delete?id_kewirausahaan=<?= $kewirausahaan['id_kewirausahaan'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-danger btn-delete-confirm"><i class="fas fa-trash"></i></a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -461,7 +461,7 @@ include __DIR__ . '/partials/header.php';
                                                     <button class="btn btn-info btn-xs" onclick="previewFile('<?= $g['file_path'] ?>', 'image', '<?= htmlspecialchars($g['judul'] ?? 'Galeri') ?>')">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <a href="index.php?mod=kewirausahaan&act=galeri_delete&id_kewirausahaan=<?= $id ?>&id_galeri=<?= $g['id_galeri'] ?>" 
+                                                    <a href="<?= BASE_URL ?>kewirausahaan/galeri_delete?id_kewirausahaan=<?= $id ?>&id_galeri=<?= $g['id_galeri'] ?>" 
                                                        class="btn btn-danger btn-xs btn-delete-confirm">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
@@ -505,7 +505,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalTahapan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=tahapan_save" method="post">
+            <form action="<?= BASE_URL ?>kewirausahaan/tahapan_save" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Tahapan</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -560,7 +560,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalProduk" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=produk_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kewirausahaan/produk_save" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Produk</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -607,28 +607,82 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalGaleri" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=galeri_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kewirausahaan/galeri_save" method="post" enctype="multipart/form-data" id="formGaleriKew">
                 <div class="modal-header">
-                    <h5 class="modal-title">Upload Foto Galeri</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title font-weight-bold"><i class="fas fa-camera text-primary mr-1"></i> Dokumentasi Foto Kegiatan</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="stopKewCamera()">&times;</button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="id_kewirausahaan" value="<?= $id ?>">
                     
                     <div class="form-group">
-                        <label>Judul Foto <small class="text-muted">(Opsional)</small></label>
-                        <input type="text" name="judul" class="form-control">
+                        <label class="small font-weight-bold">Judul / Keterangan Foto <small class="text-muted">(Opsional)</small></label>
+                        <input type="text" name="judul" class="form-control" placeholder="Contoh: Pembuatan Produk Kewirausahaan">
                     </div>
                     
-                    <div class="form-group">
-                        <label>File Gambar</label>
-                        <input type="file" name="file_upload" class="form-control" accept="image/*" required>
-                        <small class="text-muted">Format: JPG, PNG, GIF</small>
+                    <div class="form-group mb-2">
+                        <label class="small font-weight-bold">Foto Dokumentasi</label>
+                        <ul class="nav nav-pills mb-2" role="tablist" style="display: flex; gap: 4px;">
+                            <li class="nav-item" style="flex: 1;">
+                                <a class="nav-link active text-center font-weight-bold" id="tab-kew-upload-link" data-toggle="pill" href="#tab-kew-upload" role="tab" onclick="stopKewCamera()" style="font-size: 0.78rem; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px;">
+                                    <i class="fas fa-folder-open mr-1"></i> Unggah
+                                </a>
+                            </li>
+                            <li class="nav-item" style="flex: 1;">
+                                <a class="nav-link text-center font-weight-bold" id="tab-kew-camera-link" data-toggle="pill" href="#tab-kew-camera" role="tab" onclick="startKewCamera()" style="font-size: 0.78rem; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px;">
+                                    <i class="fas fa-camera mr-1"></i> Kamera
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border rounded p-2 bg-light" style="border-radius: 10px;">
+                            <!-- Tab Upload -->
+                            <div class="tab-pane fade show active" id="tab-kew-upload" role="tabpanel">
+                                <div class="custom-file">
+                                    <input type="file" name="file_upload" class="custom-file-input" id="kewFileUpload" accept="image/*" onchange="previewKewFile(this)">
+                                    <label class="custom-file-label" for="kewFileUpload" style="font-size:0.8rem;">Pilih file gambar...</label>
+                                </div>
+                                <img id="previewKewImg" class="img-fluid rounded mt-2 shadow-sm" style="display:none; max-height:160px; width:100%; object-fit:cover;">
+                            </div>
+
+                            <!-- Tab Camera -->
+                            <div class="tab-pane fade" id="tab-kew-camera" role="tabpanel">
+                                <div style="background:#0f172a; border-radius:8px; overflow:hidden; position:relative; text-align:center;">
+                                    <video id="kewVideo" autoplay playsinline muted style="width:100%; max-height:180px; object-fit:cover; display:none; background:#000;"></video>
+                                    <canvas id="kewCanvas" style="display:none;"></canvas>
+
+                                    <div id="kewControls" class="p-2 d-flex justify-content-center align-items-center flex-wrap" style="gap: 6px; background: rgba(15, 23, 42, 0.9); display: none !important;">
+                                        <button type="button" class="btn btn-xs btn-primary rounded-pill px-3 font-weight-bold" id="btnSnapKew" onclick="takeKewSnapshot()">
+                                            <i class="fas fa-camera mr-1"></i> Jepret
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-light rounded-pill px-2.5 font-weight-bold" onclick="switchKewFacing()">
+                                            <i class="fas fa-sync-alt mr-1"></i> Balik
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-warning rounded-pill px-2.5 font-weight-bold" id="btnRetakeKew" onclick="retakeKewSnapshot()" style="display:none;">
+                                            <i class="fas fa-redo mr-1"></i> Ulangi
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-1.5 text-center">
+                                    <input type="file" id="nativeKewInput" accept="image/*" capture="environment" style="display:none;" onchange="previewNativeKew(this)">
+                                    <button type="button" class="btn btn-xs btn-outline-info rounded-pill px-3 font-weight-bold btn-block" onclick="document.getElementById('nativeKewInput').click()">
+                                        <i class="fas fa-camera-retro mr-1"></i> Buka Aplikasi Kamera
+                                    </button>
+                                </div>
+
+                                <div id="kewCapturedBox" class="mt-2 text-center" style="display:none;">
+                                    <small class="text-success font-weight-bold d-block mb-1"><i class="fas fa-check-circle mr-1"></i> Foto Siap Disimpan:</small>
+                                    <img id="kewCapturedPreview" class="img-fluid rounded shadow-sm" style="max-height:140px; width:100%; object-fit:cover;" src="">
+                                </div>
+                                <input type="hidden" name="foto_cam_data" id="fotoKewCamData" value="">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="stopKewCamera()">Batal</button>
+                    <button type="submit" class="btn btn-primary font-weight-bold">Simpan Foto</button>
                 </div>
             </form>
         </div>
@@ -639,7 +693,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalUploadProker" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=program_upload" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kewirausahaan/program_upload" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Program Kerja</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -672,7 +726,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalAgenda" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=program_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kewirausahaan/program_save" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Agenda Kegiatan</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -725,7 +779,7 @@ $(document).ready(function() {
             const studentId = ui.item.data('id');
             let action = (targetList === 'list-right') ? 'add' : 'remove';
             
-            $.post('index.php?mod=kewirausahaan&act=update_anggota', {
+            $.post('<?= BASE_URL ?>kewirausahaan/update_anggota', {
                 action: action, id_kew: id_kew, student_ids: [studentId]
             }, function(res) {
                  if(res.status === 'success') {
@@ -744,7 +798,7 @@ $(document).ready(function() {
     function loadStudents() {
         var q = $('#search-left').val();
         var k = $('#filter-kelas').val();
-        $.getJSON('index.php?mod=kewirausahaan&act=search_students', {id_kewirausahaan: id_kew, q: q, id_kelas: k}, function(res){
+        $.getJSON('<?= BASE_URL ?>kewirausahaan/search_students', {id_kewirausahaan: id_kew, q: q, id_kelas: k}, function(res){
             if(res.status === 'success'){
                 $('#list-left').empty();
                 res.data.forEach(s => {
@@ -812,5 +866,137 @@ $('#modalTahapan').on('hidden.bs.modal', function () {
     $(this).find('form')[0].reset();
     $(this).find('.modal-title').text('Tambah Tahapan');
     $(this).find('input[name="id_tahapan"]').remove();
+});
+
+// ============================================================
+// 📸 LIVE CAMERA HANDLER UNTUK MODAL GALERI KEWIRAUSAHAAN
+// ============================================================
+let kewStream = null;
+let kewFacing = "environment";
+
+function previewKewFile(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = e => {
+            $('#previewKewImg').attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function startKewCamera() {
+    stopKewCamera();
+    const video = document.getElementById('kewVideo');
+    const controls = document.getElementById('kewControls');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('nativeKewInput').click();
+        return;
+    }
+
+    video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+
+    try {
+        kewStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: kewFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        });
+    } catch (e) {
+        try {
+            kewStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        } catch (err) {
+            console.warn("Camera stream failed", err);
+            document.getElementById('nativeKewInput').click();
+            return;
+        }
+    }
+
+    if (kewStream) {
+        video.srcObject = kewStream;
+        video.onloadedmetadata = () => {
+            video.play();
+            video.style.display = 'block';
+            controls.style.setProperty('display', 'flex', 'important');
+        };
+    }
+}
+
+function stopKewCamera() {
+    if (kewStream) {
+        kewStream.getTracks().forEach(t => t.stop());
+        kewStream = null;
+    }
+    const video = document.getElementById('kewVideo');
+    if (video) {
+        video.srcObject = null;
+        video.style.display = 'none';
+    }
+    const controls = document.getElementById('kewControls');
+    if (controls) controls.style.setProperty('display', 'none', 'important');
+}
+
+function switchKewFacing() {
+    kewFacing = (kewFacing === "environment") ? "user" : "environment";
+    startKewCamera();
+}
+
+function takeKewSnapshot() {
+    const video = document.getElementById('kewVideo');
+    const canvas = document.getElementById('kewCanvas');
+    const preview = document.getElementById('kewCapturedPreview');
+    const previewBox = document.getElementById('kewCapturedBox');
+    const hiddenInput = document.getElementById('fotoKewCamData');
+    const btnSnap = document.getElementById('btnSnapKew');
+    const btnRetake = document.getElementById('btnRetakeKew');
+
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 480;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+
+    const base64 = canvas.toDataURL('image/jpeg', 0.88);
+    hiddenInput.value = base64;
+    preview.src = base64;
+    previewBox.style.display = 'block';
+
+    video.pause();
+    btnSnap.style.display = 'none';
+    btnRetake.style.display = 'inline-block';
+}
+
+function retakeKewSnapshot() {
+    const video = document.getElementById('kewVideo');
+    const previewBox = document.getElementById('kewCapturedBox');
+    const hiddenInput = document.getElementById('fotoKewCamData');
+    const btnSnap = document.getElementById('btnSnapKew');
+    const btnRetake = document.getElementById('btnRetakeKew');
+
+    hiddenInput.value = '';
+    previewBox.style.display = 'none';
+    btnSnap.style.display = 'inline-block';
+    btnRetake.style.display = 'none';
+    video.play();
+}
+
+function previewNativeKew(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = e => {
+            let base64 = e.target.result;
+            document.getElementById('fotoKewCamData').value = base64;
+            document.getElementById('kewCapturedPreview').src = base64;
+            document.getElementById('kewCapturedBox').style.display = 'block';
+            stopKewCamera();
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$('#modalGaleri').on('hidden.bs.modal', function () {
+    stopKewCamera();
 });
 </script>

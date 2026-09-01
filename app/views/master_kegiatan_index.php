@@ -52,7 +52,12 @@
                                             ?>
                                         </td>
                                         <td class="text-center align-middle">
-                                            <a href="index.php?mod=master_kegiatan&act=delete&id=<?= $k['id_kegiatan'] ?>" 
+                                            <button type="button" class="btn btn-xs btn-outline-primary border-0 p-1 mr-1" 
+                                               style="background: #eff6ff; width: 26px; height: 26px; border-radius: 8px; color: #3b82f6;" 
+                                               title="Edit" onclick="editKegiatan(<?= htmlspecialchars(json_encode($k), ENT_QUOTES, 'UTF-8') ?>, 'modal-akademik')">
+                                                <i class="fas fa-pencil-alt" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                            <a href="<?= BASE_URL ?>master_kegiatan/delete?id=<?= $k['id_kegiatan'] ?>" 
                                                class="btn btn-xs btn-outline-danger border-0 p-1" 
                                                style="background: #fef2f2; width: 26px; height: 26px; border-radius: 8px; color: #dc2626;" 
                                                title="Hapus" onclick="return confirmDelete(event)">
@@ -95,7 +100,12 @@
                                             ?>
                                         </td>
                                         <td class="text-center align-middle">
-                                            <a href="index.php?mod=master_kegiatan&act=delete&id=<?= $k['id_kegiatan'] ?>" 
+                                            <button type="button" class="btn btn-xs btn-outline-primary border-0 p-1 mr-1" 
+                                               style="background: #eff6ff; width: 26px; height: 26px; border-radius: 8px; color: #3b82f6;" 
+                                               title="Edit" onclick="editKegiatan(<?= htmlspecialchars(json_encode($k), ENT_QUOTES, 'UTF-8') ?>, 'modal-non-akademik')">
+                                                <i class="fas fa-pencil-alt" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                            <a href="<?= BASE_URL ?>master_kegiatan/delete?id=<?= $k['id_kegiatan'] ?>" 
                                                class="btn btn-xs btn-outline-danger border-0 p-1" 
                                                style="background: #fef2f2; width: 26px; height: 26px; border-radius: 8px; color: #dc2626;" 
                                                title="Hapus" onclick="return confirmDelete(event)">
@@ -123,7 +133,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="index.php?mod=master_kegiatan&act=save" method="POST">
+            <form action="<?= BASE_URL ?>master_kegiatan/save" method="POST">
                 <input type="hidden" name="kategori" value="Akademik">
                 <div class="modal-body p-4">
                     <div class="form-group mb-3">
@@ -174,7 +184,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="index.php?mod=master_kegiatan&act=save" method="POST">
+            <form action="<?= BASE_URL ?>master_kegiatan/save" method="POST">
                 <input type="hidden" name="kategori" value="Non-Akademik">
                 <div class="modal-body p-4">
                     <div class="form-group mb-3">
@@ -214,6 +224,67 @@
             </form>
         </div>
     </div>
-</div>
+</div><script>
+function editKegiatan(kegiatan, modalId) {
+    const modal = document.getElementById(modalId);
+    
+    // Set title
+    const title = modal.querySelector('.modal-title');
+    title.innerHTML = title.innerHTML.replace(/Tambah/, 'Edit');
+    
+    // Set values
+    const form = modal.querySelector('form');
+    
+    // Add id_kegiatan if not exists
+    let idInput = form.querySelector('input[name="id_kegiatan"]');
+    if (!idInput) {
+        idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id_kegiatan';
+        form.appendChild(idInput);
+    }
+    idInput.value = kegiatan.id_kegiatan;
+    
+    form.querySelector('input[name="nama_kegiatan"]').value = kegiatan.nama_kegiatan;
+    form.querySelector('select[name="jenis_kegiatan"]').value = kegiatan.jenis_kegiatan;
+    form.querySelector('input[name="durasi_menit"]').value = kegiatan.durasi_menit;
+    
+    // Reset checkboxes
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    
+    // Set checkboxes based on hari_pelaksanaan
+    if (kegiatan.hari_pelaksanaan) {
+        const hariArr = kegiatan.hari_pelaksanaan.split(',').map(s => s.trim());
+        checkboxes.forEach(cb => {
+            if (hariArr.includes(cb.value)) {
+                cb.checked = true;
+            }
+        });
+    }
+    
+    $(modal).modal('show');
+}
+
+// Ensure resetting of modal on hidden/close so Tambah works normally next time
+$('.modal').on('hidden.bs.modal', function() {
+    const form = this.querySelector('form');
+    if (form) {
+        form.reset();
+        
+        // remove id_kegiatan so it does not update accidentally
+        const idInput = form.querySelector('input[name="id_kegiatan"]');
+        if (idInput) {
+            idInput.remove();
+        }
+    }
+    
+    // reset title
+    const title = this.querySelector('.modal-title');
+    if (title) {
+        title.innerHTML = title.innerHTML.replace(/Edit/, 'Tambah');
+    }
+});
+</script>
 
 <?php include __DIR__.'/partials/footer.php'; ?>

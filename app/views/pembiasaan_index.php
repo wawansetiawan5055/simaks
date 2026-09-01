@@ -2,22 +2,27 @@
 require_once __DIR__ . '/../helpers/DateHelper.php';
 include __DIR__ . '/partials/header.php';
 ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-praying-hands mr-2"></i> Pembiasaan Akhlak Mulia</h1>
-            </div>
-            <div class="col-sm-6 text-end">
-                <div class="float-sm-right">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
-                        <i class="fas fa-plus"></i> Tambah Kegiatan
-                    </button>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-praying-hands"></i>
                 </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Kelola Pembiasaan Karakter &amp; Ibadah
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-primary btn-sm shadow-sm font-weight-bold rounded-pill px-3" data-toggle="modal" data-target="#modalTambah">
+                    <i class="fas fa-plus mr-1"></i> Tambah Kegiatan
+                </button>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -56,7 +61,7 @@ include __DIR__ . '/partials/header.php';
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="index.php?mod=pembiasaan&id=<?= $row['id_pembiasaan'] ?>"
+                                            <a href="<?= BASE_URL ?>pembiasaan/index/<?= $row['id_pembiasaan'] ?>/program"
                                                 class="btn btn-info" title="Kelola Program & Anggota">
                                                 <i class="fas fa-cog"></i>
                                             </a>
@@ -69,7 +74,7 @@ include __DIR__ . '/partials/header.php';
                                                 data-status="<?= $row['status'] ?>" title="Edit Data Kegiatan">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="index.php?mod=pembiasaan&act=delete&id=<?= $row['id_pembiasaan'] ?>"
+                                            <a href="<?= BASE_URL ?>pembiasaan/delete?id=<?= $row['id_pembiasaan'] ?>"
                                                 class="btn btn-danger btn-delete-confirm" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </a>
@@ -89,7 +94,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=pembiasaan&act=save" method="post">
+            <form action="<?= BASE_URL ?>pembiasaan/save" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Kegiatan Pembiasaan</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -159,7 +164,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=pembiasaan&act=save" method="post">
+            <form action="<?= BASE_URL ?>pembiasaan/save" method="post">
                 <input type="hidden" name="id_pembiasaan" id="edit_id">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Kegiatan Pembiasaan</h5>

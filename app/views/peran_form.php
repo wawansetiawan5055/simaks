@@ -1,7 +1,7 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
 <?php
 $is_edit = isset($peran) && $peran !== null;
-$action_url = 'index.php?mod=peran&act=save_action';
+$action_url = BASE_URL . 'peran/save_action';
 ?>
 <div class="content-header p-0 pt-3">
     <div class="container-fluid">
@@ -13,7 +13,7 @@ $action_url = 'index.php?mod=peran&act=save_action';
                     <?= $is_edit ? 'Perbarui informasi peran pengguna yang sudah ada.' : 'Definisikan peran baru untuk kategori pengguna sistem.' ?>
                 </p>
             </div>
-            <a href="index.php?mod=peran" class="btn btn-light btn-sm px-3 border" style="border-radius: 8px;">
+            <a href="<?= BASE_URL ?>peran" class="btn btn-light btn-sm px-3 border" style="border-radius: 8px;">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
             </a>
         </div>
@@ -22,6 +22,22 @@ $action_url = 'index.php?mod=peran&act=save_action';
 
 <section class="content">
     <div class="container-fluid">
+        <?php if (isset($_SESSION['pesan_error'])): ?>
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <div class="alert alert-danger alert-dismissible shadow-sm py-2 px-3 mb-3" style="border-radius: 8px;">
+                        <div class="font-weight-bold my-1" style="font-size: 0.9rem;">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> <?= $_SESSION['pesan_error'] ?>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <?php unset($_SESSION['pesan_error']); ?>
+        <?php endif; ?>
+
         <div class="row justify-content-center">
             <div class="col-md-5">
                 <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
@@ -43,7 +59,7 @@ $action_url = 'index.php?mod=peran&act=save_action';
                                     </div>
                                     <input type="text" class="form-control" id="nama_peran" name="nama_peran"
                                         style="border-radius: 0 8px 8px 0;" placeholder="Masukkan Nama Peran"
-                                        value="<?= $is_edit ? htmlspecialchars($peran['nama_peran']) : '' ?>" required>
+                                        value="<?= $is_edit ? htmlspecialchars($peran['nama_peran']) : '' ?>" required autofocus>
                                 </div>
                                 <small class="form-text text-muted mt-2">Contoh: Kepala Sekolah, Bendahara, Pembina
                                     OSIS.</small>
@@ -54,7 +70,7 @@ $action_url = 'index.php?mod=peran&act=save_action';
                                 style="border-radius: 8px;">
                                 <i class="fas fa-save mr-1"></i> Simpan Perubahan
                             </button>
-                            <a href="index.php?mod=peran" class="btn btn-link btn-sm text-muted float-right">Batal</a>
+                            <a href="<?= BASE_URL ?>peran" class="btn btn-link btn-sm text-muted float-right">Batal</a>
                         </div>
                     </form>
                 </div>

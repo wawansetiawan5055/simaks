@@ -155,8 +155,42 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            // TODO: Implementation for saving if controller supports it
-            alert('Fitur tambah/edit rekening akan segera hadir.');
+            const formData = new FormData(this);
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            
+            fetch('<?= BASE_URL ?>keuangan_master/save_rekening', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Berhasil', data.message, 'success').then(() => location.reload());
+                    } else {
+                        alert(data.message);
+                        location.reload();
+                    }
+                } else {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Error', data.message || 'Gagal menyimpan', 'error');
+                    } else {
+                        alert('Error: ' + (data.message || 'Gagal menyimpan'));
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof Swal !== 'undefined') Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                else alert('Terjadi kesalahan sistem');
+            })
+            .finally(() => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalText;
+            });
         });
     }
 });

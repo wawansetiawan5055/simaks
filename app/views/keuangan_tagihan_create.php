@@ -163,7 +163,7 @@
             <nav class="d-none d-md-block">
                 <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
                     <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                    <li class="breadcrumb-item"><a href="index.php?mod=keuangan_tagihan&act=index">Tagihan Siswa</a>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>keuangan_tagihan/index">Tagihan Siswa</a>
                     </li>
                     <li class="breadcrumb-item active">Generate</li>
                 </ol>
@@ -196,7 +196,7 @@
                                 </div>
                             </div>
 
-                            <form id="formGenerate" action="index.php?mod=keuangan_tagihan&act=store" method="POST">
+                            <form id="formGenerate" action="<?= BASE_URL ?>keuangan_tagihan/store" method="POST">
                                 <input type="hidden" name="tahun_ajaran"
                                     value="<?= $taAktif ? $taAktif['id_ta'] : '' ?>">
 
@@ -299,7 +299,7 @@
 
                                 <!-- ACTIONS -->
                                 <div class="text-right mt-3 border-top pt-3">
-                                    <a href="index.php?mod=keuangan_tagihan&act=index"
+                                    <a href="<?= BASE_URL ?>keuangan_tagihan/index"
                                         class="btn btn-link text-muted font-weight-bold py-2 px-4 mr-3">Batal</a>
                                     <button type="submit" class="btn btn-generate" id="btnSubmit">
                                         <i class="fas fa-magic mr-2"></i> Jalankan Engine Penagihan
@@ -358,7 +358,7 @@
     `;
 
         // AJAX Call
-        fetch('../api/api.php?mod=keuangan&act=students_by_class&id_kelas=' + idKelas)
+        fetch('<?= BASE_URL ?>api?type=keuangan&act=students_by_class&id_kelas=' + idKelas)
             .then(response => response.json())
             .then(data => {
                 list.innerHTML = '';
@@ -401,7 +401,7 @@
         select.disabled = true;
         select.innerHTML = '<option value="">-- Sedang Memuat Kategori... --</option>';
 
-        fetch('../api/api.php?mod=keuangan&act=active_kinds_by_class&id_kelas=' + idKelas)
+        fetch('<?= BASE_URL ?>api?type=keuangan&act=active_kinds_by_class&id_kelas=' + idKelas)
             .then(response => response.json())
             .then(data => {
                 select.disabled = false;
@@ -477,7 +477,7 @@
                             text: data.message,
                             confirmButtonColor: '#6366f1'
                         }).then(() => {
-                            window.location.href = 'index.php?mod=keuangan_tagihan&act=index';
+                            window.location.href = '<?= BASE_URL ?>keuangan_tagihan/index';
                         });
                     } else {
                         Swal.fire('Gagal', data.message, 'error');

@@ -6,7 +6,7 @@
             <div class="card-header bg-gradient-success">
                 <h3 class="card-title"><i class="fas fa-user-graduate"></i> Data Lulusan & Study Tracer (5 Tahun Terakhir)</h3>
                 <div class="card-tools">
-                    <a href="index.php?mod=tracer_study" class="btn btn-sm btn-light">
+                    <a href="<?= BASE_URL ?>tracer_study" class="btn btn-sm btn-light">
                         <i class="fas fa-cog"></i> Kelola
                     </a>
                 </div>

@@ -24,6 +24,12 @@ class MapelModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function findByName($pdo, $name) {
+        $stmt = $pdo->prepare("SELECT id_mapel, nama_mapel FROM mapel WHERE nama_mapel=?");
+        $stmt->execute([$name]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     /**
      * REVISI:
      * 1. Menambahkan kode_mapel dan urutan ke query UPDATE dan INSERT.

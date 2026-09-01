@@ -2,16 +2,24 @@
 require_once __DIR__ . '/../helpers/DateHelper.php';
 include __DIR__.'/partials/header.php'; 
 ?>
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
   <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-        <div>
-            <h2 class="m-0 font-weight-bold text-dark"><i class="fas fa-calendar-alt text-primary mr-2"></i> Data Tahun Ajaran</h2>
-            <p class="text-muted small mb-0">Kelola periode kalender akademik dan tahun ajaran aktif sistem.</p>
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-calendar-alt"></i>
         </div>
-        <a href="index.php?mod=ta&act=form" class="btn btn-warning btn-sm px-3 shadow-none font-weight-bold text-white" style="border-radius: 8px;">
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Data Tahun Ajaran &amp; Semester
+          </h4>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <a href="<?= BASE_URL ?>ta/form" class="btn btn-warning btn-sm px-3 shadow-sm font-weight-bold text-white rounded-pill">
             <i class="fas fa-plus mr-1"></i> Tambah Tahun Ajaran
         </a>
+      </div>
     </div>
   </div>
 </div>
@@ -71,18 +79,18 @@ include __DIR__.'/partials/header.php';
                     <td class="text-center align-middle">
                         <div class="btn-group">
                             <?php if (strtolower($row['status']) !== 'aktif'): ?>
-                              <a href="index.php?mod=ta&act=set_aktif&id=<?= $row['id_ta'] ?>" 
+                              <a href="<?= BASE_URL ?>ta/set_aktif?id=<?= $row['id_ta'] ?>" 
                                  class="btn btn-xs btn-outline-success border-0 p-1 mr-1" 
                                  style="background: #f0fdf4; width: 28px; height: 28px; border-radius: 8px; color: #16a34a;" 
                                  title="Set Aktif" onclick="return confirm('Aktifkan Tahun Ajaran ini?')">
                                   <i class="fas fa-check-double" style="font-size: 0.8rem;"></i>
                               </a>
                             <?php endif; ?>
-                            <a href="index.php?mod=ta&act=form&id=<?= $row['id_ta'] ?>" 
+                            <a href="<?= BASE_URL ?>ta/form?id=<?= $row['id_ta'] ?>" 
                                class="btn btn-xs btn-outline-warning border-0 p-1 mr-1" 
                                style="background: #fffbeb; width: 28px; height: 28px; border-radius: 8px; color: #d97706;" 
                                title="Edit"><i class="fas fa-pencil-alt" style="font-size: 0.8rem;"></i></a>
-                            <a href="index.php?mod=ta&act=delete&id=<?= $row['id_ta'] ?>" 
+                            <a href="<?= BASE_URL ?>ta/delete?id=<?= $row['id_ta'] ?>" 
                                class="btn btn-xs btn-outline-danger border-0 p-1" 
                                style="background: #fef2f2; width: 28px; height: 28px; border-radius: 8px; color: #dc2626;" 
                                title="Hapus" onclick="return confirmDelete(event)">

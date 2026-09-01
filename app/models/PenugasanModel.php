@@ -78,22 +78,84 @@ class PenugasanModel
 
     public static function guru_mapel_list($pdo, $id_ta)
     {
+        // Menggunakan SEPARATOR ' | ' agar mapel yang mengandung koma (seperti PJOK) tidak terpecah
         $stmt = $pdo->prepare(
-            "SELECT gm.id_guru_mapel, g.nama AS nama_guru, m.nama_mapel
-                FROM guru_mapel gm
-                JOIN guru g ON gm.id_guru = g.id_guru
-                JOIN mapel m ON gm.id_mapel = m.id_mapel
-                WHERE gm.id_ta = ?
-                ORDER BY g.nama, m.nama_mapel ASC"
+            "SELECT 
+                gm.id_guru, 
+                g.nama AS nama_guru, 
+                GROUP_CONCAT(DISTINCT m.nama_mapel ORDER BY m.nama_mapel SEPARATOR ' | ') AS daftar_mapel,
+                GROUP_CONCAT(DISTINCT k.nama_kelas ORDER BY k.tingkat, k.nama_kelas SEPARATOR ', ') AS daftar_kelas,
+                GROUP_CONCAT(DISTINCT gm.id_mapel SEPARATOR ',') AS mapel_ids,
+                GROUP_CONCAT(DISTINCT gm.id_kelas SEPARATOR ',') AS kelas_ids,
+                GROUP_CONCAT(gm.id_guru_mapel SEPARATOR ',') AS ids_guru_mapel
+            FROM guru_mapel gm
+            JOIN guru g ON gm.id_guru = g.id_guru
+            JOIN mapel m ON gm.id_mapel = m.id_mapel
+            LEFT JOIN kelas k ON gm.id_kelas = k.id_kelas
+            WHERE gm.id_ta = ?
+            GROUP BY gm.id_guru
+            ORDER BY g.nama ASC"
         );
         $stmt->execute([$id_ta]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function guru_mapel_save($pdo, $id_guru, $id_mapel, $id_ta)
+    public static function guru_mapel_save($pdo, $id_guru, $id_mapel, $id_kelas, $id_ta)
     {
-        $stmt = $pdo->prepare("INSERT INTO guru_mapel (id_guru, id_mapel, id_ta) VALUES (?,?,?)");
-        $stmt->execute([$id_guru, $id_mapel, $id_ta]);
+        $stmt = $pdo->prepare("INSERT INTO guru_mapel (id_guru, id_mapel, id_kelas, id_ta) VALUES (?,?,?,?)");
+        $stmt->execute([$id_guru, $id_mapel, $id_kelas, $id_ta]);
+    }
+
+    /**
+     * [FUNGSI BARU]
+     * Memperbarui penugasan guru mapel dengan sinkronisasi kombinasi (id_mapel, id_kelas)
+     */
+    public static function guru_mapel_update($pdo, $id_guru, array $id_mapel_list, array $id_kelas_list, $id_ta)
+    {
+        $pdo->beginTransaction();
+        try {
+            $stmt_old = $pdo->prepare("SELECT id_guru_mapel, id_mapel, id_kelas FROM guru_mapel WHERE id_guru = ? AND id_ta = ?");
+            $stmt_old->execute([$id_guru, $id_ta]);
+            $existing = $stmt_old->fetchAll(PDO::FETCH_ASSOC);
+
+            $existing_combos = [];
+            foreach ($existing as $ex) {
+                $key = $ex['id_mapel'] . '_' . ($ex['id_kelas'] ?? 0);
+                $existing_combos[$key] = $ex['id_guru_mapel'];
+            }
+
+            $new_combos = [];
+            foreach ($id_mapel_list as $m) {
+                foreach ($id_kelas_list as $k) {
+                    $key = $m . '_' . $k;
+                    $new_combos[$key] = ['id_mapel' => $m, 'id_kelas' => $k];
+                }
+            }
+
+            // 1. Hapus yang tidak dipilih lagi
+            foreach ($existing_combos as $key => $id_gm) {
+                if (!isset($new_combos[$key])) {
+                    // Hapus slot jadwal mengajar lama yang terkait agar tidak menjadi data yatim/rusak
+                    $pdo->prepare("DELETE FROM jadwal_mengajar WHERE id_guru_mapel = ?")->execute([$id_gm]);
+                    $stmt_del = $pdo->prepare("DELETE FROM guru_mapel WHERE id_guru_mapel = ?");
+                    $stmt_del->execute([$id_gm]);
+                }
+            }
+
+            // 2. Tambah kombinasi baru yang belum ada
+            foreach ($new_combos as $key => $combo) {
+                if (!isset($existing_combos[$key])) {
+                    $stmt_ins = $pdo->prepare("INSERT INTO guru_mapel (id_guru, id_mapel, id_kelas, id_ta) VALUES (?, ?, ?, ?)");
+                    $stmt_ins->execute([$id_guru, $combo['id_mapel'], $combo['id_kelas'], $id_ta]);
+                }
+            }
+
+            $pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -109,7 +171,7 @@ class PenugasanModel
     // Helper: Ambil mapel yg diajar oleh guru tertentu (untuk filter CP/TP dll)
     public static function getMapelDiajarGuru($pdo, $id_guru, $id_ta)
     {
-        $sql = "SELECT m.* 
+        $sql = "SELECT DISTINCT m.* 
                 FROM guru_mapel gm
                 JOIN mapel m ON gm.id_mapel = m.id_mapel
                 WHERE gm.id_guru = ? AND gm.id_ta = ?
@@ -125,11 +187,16 @@ class PenugasanModel
     public static function jabatan_list($pdo, $id_ta)
     {
         $stmt = $pdo->prepare(
-            "SELECT pj.id_penugasan_jabatan, g.nama AS nama_guru, pj.jenis_jabatan
-                FROM penugasan_jabatan pj
-                JOIN guru g ON pj.id_guru = g.id_guru
-                WHERE pj.id_ta = ?
-                ORDER BY pj.jenis_jabatan ASC"
+            "SELECT 
+                pj.id_guru, 
+                g.nama AS nama_guru, 
+                GROUP_CONCAT(pj.jenis_jabatan ORDER BY pj.jenis_jabatan SEPARATOR ' | ') AS daftar_jabatan,
+                GROUP_CONCAT(pj.id_penugasan_jabatan SEPARATOR ',') AS ids_penugasan_jabatan
+            FROM penugasan_jabatan pj
+            JOIN guru g ON pj.id_guru = g.id_guru
+            WHERE pj.id_ta = ?
+            GROUP BY pj.id_guru
+            ORDER BY g.nama ASC"
         );
         $stmt->execute([$id_ta]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -223,6 +290,13 @@ class PenugasanModel
     {
         $stmt = $pdo->prepare("SELECT * FROM keuangan_master_jabatan WHERE kategori = ? ORDER BY nama_jabatan ASC");
         $stmt->execute([$kategori]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function all_kelas($pdo, $id_ta)
+    {
+        $stmt = $pdo->prepare("SELECT id_kelas, nama_kelas, tingkat FROM kelas WHERE id_ta = ? ORDER BY tingkat, nama_kelas ASC");
+        $stmt->execute([$id_ta]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

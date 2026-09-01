@@ -10,7 +10,7 @@ include __DIR__ . '/partials/header.php';
                     <i class="fas fa-file-alt me-2"></i> <?= htmlspecialchars($title) ?>
                 </h3>
                 <div class="card-tools">
-                    <a href="index.php?mod=perangkat&act=form&type=<?= $type ?>" class="btn btn-primary btn-sm">
+                    <a href="<?= BASE_URL ?>perangkat/form?type=<?= $type ?>" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus"></i> Tambah Dokumen
                     </a>
                 </div>
@@ -20,7 +20,7 @@ include __DIR__ . '/partials/header.php';
                     <div class="text-center py-5 text-muted">
                         <i class="fas fa-folder-open fa-3x mb-3"></i>
                         <p>Belum ada dokumen <?= htmlspecialchars($jenis) ?>.</p>
-                        <a href="index.php?mod=perangkat&act=form&type=<?= $type ?>" class="btn btn-outline-primary">
+                        <a href="<?= BASE_URL ?>perangkat/form?type=<?= $type ?>" class="btn btn-outline-primary">
                             <i class="fas fa-plus"></i> Buat Dokumen Pertama
                         </a>
                     </div>
@@ -46,15 +46,15 @@ include __DIR__ . '/partials/header.php';
                                     <td><?= date('d/m/Y H:i', strtotime($dok['updated_at'])) ?></td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="index.php?mod=perangkat&act=print&id=<?= $dok['id_perangkat'] ?>" 
+                                            <a href="<?= BASE_URL ?>perangkat/print?id=<?= $dok['id_perangkat'] ?>" 
                                                class="btn btn-info" title="Lihat/Print" target="_blank">
                                                 <i class="fas fa-print"></i>
                                             </a>
-                                            <a href="index.php?mod=perangkat&act=form&type=<?= $type ?>&id=<?= $dok['id_perangkat'] ?>" 
+                                            <a href="<?= BASE_URL ?>perangkat/form?type=<?= $type ?>&id=<?= $dok['id_perangkat'] ?>" 
                                                class="btn btn-warning" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="index.php?mod=perangkat&act=delete&type=<?= $type ?>&id=<?= $dok['id_perangkat'] ?>" 
+                                            <a href="<?= BASE_URL ?>perangkat/delete?type=<?= $type ?>&id=<?= $dok['id_perangkat'] ?>" 
                                                class="btn btn-danger" onclick="return confirmDelete(event)" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </a>

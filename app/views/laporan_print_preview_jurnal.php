@@ -379,13 +379,14 @@
         <table class="main-table">
             <thead>
                 <tr>
-                    <th width="5%">NO</th>
-                    <th width="12%">HARI, TANGGAL</th>
-                    <th width="10%">JAM / WAKTU</th>
-                    <th width="15%">NAMA GURU & MAPEL</th>
-                    <th width="28%">CAPAIAN & TUJUAN PEMBELAJARAN</th>
-                    <th width="10%">TAGIHAN/TUGAS</th>
-                    <th width="22%">REKAP ABSENSI</th>
+                    <th width="4%">NO</th>
+                    <th width="11%">HARI, TANGGAL</th>
+                    <th width="9%">JAM / WAKTU</th>
+                    <th width="14%">NAMA GURU & MAPEL</th>
+                    <th width="23%">CAPAIAN & TUJUAN PEMBELAJARAN</th>
+                    <th width="9%">TAGIHAN/TUGAS</th>
+                    <th width="18%">REKAP ABSENSI</th>
+                    <th width="12%">DOKUMENTASI</th>
                 </tr>
             </thead>
             <tbody>
@@ -399,7 +400,7 @@
 
                 <?php if (empty($rows)): ?>
                     <tr>
-                        <td colspan="7" class="col-center">Tidak ada data jurnal.</td>
+                        <td colspan="8" class="col-center">Tidak ada data jurnal.</td>
                     </tr>
                 <?php endif; ?>
 
@@ -423,6 +424,15 @@
                         <td><?= htmlspecialchars($row['tujuan']) ?></td>
                         <td><?= htmlspecialchars($row['tagihan']) ?></td>
                         <td><?= htmlspecialchars($row['absensi']) ?></td>
+                        <td class="col-center" style="vertical-align: middle;">
+                            <?php if (!empty($row['foto_kegiatan'])): ?>
+                                <img src="<?= BASE_URL ?>uploads/jurnal/<?= htmlspecialchars($row['foto_kegiatan']) ?>" 
+                                     alt="Foto KBM" 
+                                     style="max-width: 80px; max-height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; display: block; margin: 0 auto;">
+                            <?php else: ?>
+                                <span style="font-size: 8pt; color: #888;">-</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

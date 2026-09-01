@@ -56,4 +56,13 @@ return [
         'meta_description' => 'Sistem Informasi Manajemen Akademik Sekolah yang modern dan terintegrasi',
         'meta_keywords' => 'sekolah, akademik, manajemen, ppdb, pendaftaran',
     ],
+
+    // =======================================================
+    // CBT INTEGRATION (OPTIONAL)
+    // =======================================================
+    // Configuration hanya dibaca apabila modul diaktifkan melalui .env
+    'cbt' => [
+        'enabled' => getenv('ENABLE_CBT') === 'true',
+        'base_url' => getenv('CBT_BASE_URL') ?: '/simaks/cbt',
+    ],
 ];

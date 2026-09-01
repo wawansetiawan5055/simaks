@@ -2,15 +2,28 @@
 // views/utilitas_db_index.php - IMPROVED LAYOUT VERSION
 include __DIR__.'/partials/header.php'; 
 ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-database"></i> Utilitas Database</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Utilitas &amp; Manajemen Database
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+                    <li class="breadcrumb-item active text-primary font-weight-bold">Utilitas DB</li>
+                </ol>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -63,13 +76,13 @@ include __DIR__.'/partials/header.php';
                     <div class="card-body">
                         <p class="text-muted small">Download database sql file.</p>
                         <div class="btn-group-vertical d-block">
-                            <a href="index.php?mod=utilitas_db&act=backup&type=full" class="btn btn-primary mb-2 btn-block text-left shadow-sm">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=full" class="btn btn-primary mb-2 btn-block text-left shadow-sm">
                                 <i class="fas fa-database mr-2"></i> Backup Full (Struktur + Data)
                             </a>
-                            <a href="index.php?mod=utilitas_db&act=backup&type=structure" class="btn btn-info mb-2 btn-block text-left shadow-sm text-white">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=structure" class="btn btn-info mb-2 btn-block text-left shadow-sm text-white">
                                 <i class="fas fa-project-diagram mr-2"></i> Backup Struktur Saja
                             </a>
-                            <a href="index.php?mod=utilitas_db&act=backup&type=data" class="btn btn-secondary btn-block text-left shadow-sm">
+                            <a href="<?= BASE_URL ?>utilitas_db/backup?type=data" class="btn btn-secondary btn-block text-left shadow-sm">
                                 <i class="fas fa-file-alt mr-2"></i> Backup Data Saja
                             </a>
                         </div>
@@ -84,7 +97,7 @@ include __DIR__.'/partials/header.php';
                         <h3 class="card-title"><i class="fas fa-terminal"></i> Insert Data (SQL Dump)</h3>
                     </div>
                     <div class="card-body">
-                        <form action="index.php?mod=utilitas_db&act=run_sql" method="POST">
+                        <form action="<?= BASE_URL ?>utilitas_db/run_sql" method="POST">
                             <div class="form-group pb-0 mb-2">
                                 <textarea class="form-control form-control-sm" name="sql_query" rows="5" placeholder="Paste SQL Insert/Dump here..." style="font-family: monospace; font-size: 12px;"><?= $_SESSION['last_query'] ?? '' ?></textarea>
                                 <?php unset($_SESSION['last_query']); ?>
@@ -104,7 +117,7 @@ include __DIR__.'/partials/header.php';
                         <h3 class="card-title"><i class="fas fa-upload"></i> Restore Data</h3>
                     </div>
                     <div class="card-body">
-                        <form action="index.php?mod=utilitas_db&act=restore" method="POST" enctype="multipart/form-data" onsubmit="return confirm('APAKAH ANDA YAKIN? Ini akan menimpa seluruh database Anda saat ini.')">
+                        <form action="<?= BASE_URL ?>utilitas_db/restore" method="POST" enctype="multipart/form-data" onsubmit="return confirm('APAKAH ANDA YAKIN? Ini akan menimpa seluruh database Anda saat ini.')">
                             <p class="text-muted small">Upload file .sql untuk restore.</p>
                             <div class="form-group">
                                 <div class="custom-file mb-3">
@@ -119,6 +132,97 @@ include __DIR__.'/partials/header.php';
                     </div>
                 </div>
              </div>
+        </div>
+
+        <!-- ROW PATCH RUNNER: DATABASE MIGRATION & PATCHES -->
+        <div class="row mb-3" id="patch-section">
+            <div class="col-12">
+                <div class="card card-indigo card-outline shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title font-weight-bold text-indigo">
+                            <i class="fas fa-magic mr-2"></i> Patch &amp; Migrasi Database (Database Patch Runner)
+                        </h3>
+                        <div class="card-tools ml-auto">
+                            <span class="badge badge-light border px-2 py-1">
+                                <i class="fas fa-folder-open text-primary mr-1"></i> <?= count($available_patches ?? []) ?> File Patch Tersedia
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-3 bg-light border-bottom">
+                            <small class="text-muted d-block">
+                                <i class="fas fa-info-circle text-info mr-1"></i>
+                                Menu ini digunakan untuk mengeksekusi berkas migrasi/patch database SQL baru yang disimpan di folder <code>sql/</code> atau <code>patch/</code> secara terisolasi tanpa membebani alur runtime aplikasi.
+                            </small>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0 text-nowrap table-sm">
+                                <thead class="bg-indigo text-white">
+                                    <tr>
+                                        <th style="width: 40px;" class="text-center">#</th>
+                                        <th>Nama Berkas Patch</th>
+                                        <th>Folder</th>
+                                        <th>Ukuran</th>
+                                        <th>Status Eksekusi</th>
+                                        <th>Terakhir Dijalankan</th>
+                                        <th style="width: 140px;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($available_patches)): ?>
+                                        <?php $no = 1; foreach ($available_patches as $patch): 
+                                            $is_applied = isset($applied_patches[$patch['filename']]);
+                                            $applied_info = $applied_patches[$patch['filename']] ?? null;
+                                        ?>
+                                        <tr>
+                                            <td class="text-center align-middle"><?= $no++ ?></td>
+                                            <td class="align-middle font-weight-bold">
+                                                <i class="fas fa-file-code text-indigo mr-1"></i>
+                                                <?= htmlspecialchars($patch['filename']) ?>
+                                            </td>
+                                            <td class="align-middle">
+                                                <span class="badge badge-secondary"><?= htmlspecialchars($patch['folder']) ?>/</span>
+                                            </td>
+                                            <td class="align-middle text-muted"><?= number_format($patch['size'] / 1024, 2) ?> KB</td>
+                                            <td class="align-middle">
+                                                <?php if ($is_applied): ?>
+                                                    <span class="badge badge-success px-2 py-1 shadow-sm">
+                                                        <i class="fas fa-check-circle mr-1"></i> Sudah Diterapkan
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="badge badge-warning px-2 py-1 shadow-sm">
+                                                        <i class="fas fa-clock mr-1"></i> Belum Diterapkan
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="align-middle text-muted small">
+                                                <?= $is_applied ? ($applied_info['executed_at'] . ' (' . ($applied_info['executed_by'] ?? 'Admin') . ')') : '-' ?>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <form action="<?= BASE_URL ?>utilitas_db/run_patch" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menjalankan file patch \'<?= htmlspecialchars($patch['filename']) ?>\'?');">
+                                                    <input type="hidden" name="patch_filename" value="<?= htmlspecialchars($patch['filename']) ?>">
+                                                    <button type="submit" class="btn <?= $is_applied ? 'btn-outline-secondary' : 'btn-indigo' ?> btn-xs shadow-sm font-weight-bold px-2 py-1">
+                                                        <i class="fas <?= $is_applied ? 'fa-redo' : 'fa-play' ?> mr-1"></i>
+                                                        <?= $is_applied ? 'Jalankan Ulang' : 'Jalankan Patch' ?>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                <i class="fas fa-folder-open fa-2x mb-2 d-block text-gray"></i>
+                                                Tidak ada berkas <code>.sql</code> ditemukan di folder <code>sql/</code> atau <code>patch/</code>.
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ROW 1: Master & Setup (Balanced) -->
@@ -146,7 +250,7 @@ include __DIR__.'/partials/header.php';
                     <h3 class="card-title"><?= $cat ?></h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="max-height: 400px;">
-                    <form action="index.php?mod=utilitas_db" method="POST">
+                    <form action="<?= BASE_URL ?>utilitas_db" method="POST">
                         <table class="table table-hover table-sm table-head-fixed text-nowrap">
                             <thead class="">
                                 <tr>
@@ -173,12 +277,12 @@ include __DIR__.'/partials/header.php';
                         <div class="card-footer p-2 bg-white border-top-0">
                              <div class="row no-gutters">
                                 <div class="col-6 pr-1">
-                                    <button type="submit" name="backup_selected" value="1" onclick="this.form.action='index.php?mod=utilitas_db&act=backup'" class="btn btn-primary btn-sm btn-block shadow-sm">
+                                    <button type="submit" name="backup_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/backup'" class="btn btn-primary btn-sm btn-block shadow-sm">
                                         <i class="fas fa-download mr-1"></i> Backup
                                     </button>
                                 </div>
                                 <div class="col-6 pl-1">
-                                    <button type="submit" name="truncate_selected" value="1" onclick="this.form.action='index.php?mod=utilitas_db&act=truncate_selected'; return confirm('Yakin ingin kosongkan/hapus data terpilih?');" class="btn btn-danger btn-sm btn-block shadow-sm">
+                                    <button type="submit" name="truncate_selected" value="1" onclick="this.form.action='<?= BASE_URL ?>utilitas_db/truncate_selected'; return confirm('Yakin ingin kosongkan/hapus data terpilih?');" class="btn btn-danger btn-sm btn-block shadow-sm">
                                         <i class="fas fa-trash mr-1"></i> Kosongkan
                                     </button>
                                 </div>
@@ -225,7 +329,7 @@ include __DIR__.'/partials/header.php';
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Reset Aplikasi TOTAL (TRUNCATE)</h3>
                     </div>
-                    <form action="index.php?mod=utilitas_db&act=reset_aplikasi" method="POST" onsubmit="return confirm('ANDA SANGAT YAKIN INGIN MELAKUKAN RESET APLIKASI TOTAL? SEMUA DATA AKAN HILANG PERMANEN!')">
+                    <form action="<?= BASE_URL ?>utilitas_db/reset_aplikasi" method="POST" onsubmit="return confirm('ANDA SANGAT YAKIN INGIN MELAKUKAN RESET APLIKASI TOTAL? SEMUA DATA AKAN HILANG PERMANEN!')">
                         <div class="card-body">
                             <p class="text-danger"><strong>PERINGATAN PALING SERIUS:</strong> Aksi ini akan menghapus **SEMUA DATA** di database. Digunakan untuk mengembalikan aplikasi ke "Setelan Pabrik".</p>
                             

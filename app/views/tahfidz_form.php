@@ -10,7 +10,7 @@ include __DIR__ . '/partials/header.php';
                     <?= $tahfidz ? 'Edit' : 'Tambah' ?> Kelompok Tahfidz
                 </h3>
             </div>
-            <form action="index.php?mod=tahfidz&act=save" method="post">
+            <form action="<?= BASE_URL ?>tahfidz/save" method="post">
                 <?php if ($tahfidz): ?>
                     <input type="hidden" name="id_tahfidz" value="<?= $tahfidz['id_tahfidz'] ?>">
                 <?php endif; ?>
@@ -73,7 +73,7 @@ include __DIR__ . '/partials/header.php';
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="index.php?mod=tahfidz" class="btn btn-secondary">Batal</a>
+                    <a href="<?= BASE_URL ?>tahfidz" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>

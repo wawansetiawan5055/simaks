@@ -111,7 +111,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h4 class="m-0 font-weight-bold text-dark">
-                    <a href="index.php?mod=penempatan" class="text-dark hover-primary" style="text-decoration: none;">
+                    <a href="<?= BASE_URL ?>penempatan" class="text-dark hover-primary" style="text-decoration: none;">
                         <i class="fas fa-layer-group text-primary mr-2"></i> Penempatan Siswa
                     </a>
                 </h4>
@@ -119,7 +119,7 @@
                     Kelola anggota rombel dengan drag & drop (TA: <?= htmlspecialchars($_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'N/A') ?>)
                 </p>
             </div>
-            <a href="index.php?mod=penempatan" class="btn btn-outline-secondary shadow-sm" style="border-radius: 8px;">
+            <a href="<?= BASE_URL ?>penempatan" class="btn btn-outline-secondary shadow-sm" style="border-radius: 8px;">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
             </a>
         </div>
@@ -216,7 +216,7 @@
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="small text-muted font-weight-bold text-uppercase mb-0">Sumber Data Siswa</label>
                                         <?php if ($id_ta_sumber || $id_kelas_sumber): ?>
-                                            <a href="index.php?mod=penempatan&act=kelola&id_kelas=<?= $id_kelas_filter ?>"
+                                            <a href="<?= BASE_URL ?>penempatan/kelola?id_kelas=<?= $id_kelas_filter ?>"
                                                 class="btn btn-xs btn-danger shadow-none rounded-pill px-2" title="Reset Filter">
                                                 <i class="fas fa-times mr-1"></i> Reset
                                             </a>
@@ -248,7 +248,7 @@
                                 </form>
 
                                 <?php if ($id_ta_sumber && $id_kelas_sumber && !empty($source_students)): ?>
-                                    <form method="POST" action="index.php?mod=penempatan&act=copy_rombel" class="mt-2"
+                                    <form method="POST" action="<?= BASE_URL ?>penempatan/copy_rombel" class="mt-2"
                                         onsubmit="return confirm('Salin semua siswa ini ke kelas tujuan?');">
                                         <input type="hidden" name="target_kelas" value="<?= $id_kelas_filter ?>">
                                         <input type="hidden" name="source_ta" value="<?= $id_ta_sumber ?>">
@@ -340,7 +340,7 @@
                 if (targetListId === 'assigned-list') {
                     // Assign to Class
                     $.ajax({
-                        url: 'index.php?mod=penempatan&act=save',
+                        url: '<?= BASE_URL ?>penempatan/save',
                         type: 'POST',
                         data: {
                             id_siswa: idSiswa,
@@ -368,7 +368,7 @@
                 } else if (targetListId === 'unassigned-list') {
                     // Unassign
                     $.ajax({
-                        url: 'index.php?mod=penempatan&act=delete&id=' + idSiswa,
+                        url: '<?= BASE_URL ?>penempatan/delete?id=' + idSiswa,
                         type: 'GET',
                         dataType: 'json',
                         success: function (response) {

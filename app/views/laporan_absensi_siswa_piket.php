@@ -1,6 +1,26 @@
 <?php include __DIR__.'/partials/header.php'; ?>
-<div class="container-fluid">
-  <h2 class="mt-4 mb-3" style="font-size: 1.75rem; font-weight: 600;">Laporan Absensi Siswa (Piket)</h2>
+<div class="content-header pt-3 mb-2">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-clipboard-check"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Laporan Presensi Siswa (Piket)
+          </h4>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+          <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+          <li class="breadcrumb-item active text-primary font-weight-bold">Laporan Piket</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
   
   <form method="get" class="mb-3">
     <input type="hidden" name="mod" value="laporan">
@@ -97,9 +117,9 @@
     $queryParamsArray = array_diff_key($_GET, ['mod' => '', 'act' => '']);
     $query_params = http_build_query($queryParamsArray);
     ?>
-    <a href="index.php?mod=laporan&act=absensi_siswa_piket_export_excel&<?= $query_params ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
-    <a href="index.php?mod=laporan&act=absensi_siswa_piket_export_pdf&<?= $query_params ?>" class="btn btn-danger btn-sm"><i class="fas fa-file-pdf"></i> Export PDF</a>
-    <button type="button" onclick="showReportPreview('index.php?mod=laporan&act=absensi_siswa_piket_print&<?= $query_params ?>', 'Laporan Absensi Siswa (Piket)')" class="btn btn-info btn-sm"><i class="fas fa-print"></i> Cetak</button>
+    <a href="<?= BASE_URL ?>laporan/absensi_siswa_piket_export_excel?<?= $query_params ?>" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
+    <a href="<?= BASE_URL ?>laporan/absensi_siswa_piket_export_pdf?<?= $query_params ?>" class="btn btn-danger btn-sm"><i class="fas fa-file-pdf"></i> Export PDF</a>
+    <button type="button" onclick="showReportPreview('<?= BASE_URL ?>laporan/absensi_siswa_piket_print?<?= $query_params ?>', 'Laporan Absensi Siswa (Piket)')" class="btn btn-info btn-sm"><i class="fas fa-print"></i> Cetak</button>
   </div>
 
   <?php if (empty($data)): ?>
@@ -108,26 +128,28 @@
 
     <!-- A. HARIAN -->
     <?php if ($jenis_laporan == 'harian'): ?>
-      <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-          <th>No</th><th>Nama</th><th>NISN</th><th>NIPD</th><th>Tanggal</th><th>Status</th><th>Keterangan</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php $no=1; foreach ($data as $d): ?>
-        <tr>
-          <td><?= $no++ ?></td>
-          <td class="text-left"><?= $d['nama'] ?></td>
-          <td><?= $d['nisn'] ?></td>
-          <td><?= $d['nipd'] ?></td>
-          <td><?= $d['tanggal'] ?></td>
-          <td><?= $d['status'] ?></td>
-          <td><?= $d['keterangan'] ?></td>
-        </tr>
-        <?php endforeach; ?>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm">
+          <thead>
+          <tr>
+            <th>No</th><th>Nama</th><th class="d-none d-sm-table-cell">NISN</th><th class="d-none d-sm-table-cell">NIPD</th><th>Tanggal</th><th>Status</th><th>Keterangan</th>
+          </tr>
+          </thead>
+          <tbody>
+          <?php $no=1; foreach ($data as $d): ?>
+          <tr>
+            <td><?= $no++ ?></td>
+            <td class="text-left"><?= $d['nama'] ?></td>
+            <td class="d-none d-sm-table-cell"><?= $d['nisn'] ?></td>
+            <td class="d-none d-sm-table-cell"><?= $d['nipd'] ?></td>
+            <td><?= $d['tanggal'] ?></td>
+            <td><?= $d['status'] ?></td>
+            <td><?= $d['keterangan'] ?></td>
+          </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
 
     <!-- B. BULANAN -->
     <?php elseif ($jenis_laporan == 'bulanan'): ?>
@@ -136,8 +158,8 @@
             <thead>
               <tr>
                 <th rowspan="2" class="align-middle">No</th>
-                <th rowspan="2" class="align-middle">NIPD</th>
-                <th rowspan="2" class="align-middle">NISN</th>
+                <th rowspan="2" class="align-middle d-none d-sm-table-cell">NIPD</th>
+                <th rowspan="2" class="align-middle d-none d-sm-table-cell">NISN</th>
                 <th rowspan="2" class="align-middle text-left">Nama Siswa</th>
                 <th colspan="<?= count($data['dates']) ?>">Tanggal</th>
                 <th colspan="4">Rekap</th>
@@ -158,8 +180,8 @@
               foreach ($data['students'] as $s): ?>
                 <tr>
                   <td><?= $no++ ?></td>
-                  <td><?= $s['nipd'] ?></td>
-                  <td><?= $s['nisn'] ?></td>
+                  <td class="d-none d-sm-table-cell"><?= $s['nipd'] ?></td>
+                  <td class="d-none d-sm-table-cell"><?= $s['nisn'] ?></td>
                   <td class="text-left"><?= $s['nama'] ?></td>
 
                   <?php foreach ($data['dates'] as $dt):
@@ -197,8 +219,8 @@
             <thead>
               <tr>
                 <th rowspan="2" class="align-middle">No</th>
-                <th rowspan="2" class="align-middle">NIPD</th>
-                <th rowspan="2" class="align-middle">NISN</th>
+                <th rowspan="2" class="align-middle d-none d-sm-table-cell">NIPD</th>
+                <th rowspan="2" class="align-middle d-none d-sm-table-cell">NISN</th>
                 <th rowspan="2" class="align-middle text-left">Nama Siswa</th>
                 <?php foreach ($data['months'] as $m): ?>
                   <th colspan="4"><?= date('F Y', strtotime($m . "-01")) ?></th>
@@ -224,8 +246,8 @@
               foreach ($data['students'] as $s): ?>
                 <tr>
                   <td><?= $no++ ?></td>
-                  <td><?= $s['nipd'] ?></td>
-                  <td><?= $s['nisn'] ?></td>
+                  <td class="d-none d-sm-table-cell"><?= $s['nipd'] ?></td>
+                  <td class="d-none d-sm-table-cell"><?= $s['nisn'] ?></td>
                   <td class="text-left"><?= $s['nama'] ?></td>
 
                   <?php foreach ($data['months'] as $m):

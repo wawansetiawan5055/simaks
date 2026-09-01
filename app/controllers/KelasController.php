@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/KelasModel.php';
 require_once __DIR__ . '/../models/ProfilSekolahModel.php';
+require_once __DIR__ . '/../models/TahunAjaranModel.php';
 
 function kelas_index($pdo)
 {
@@ -9,15 +10,22 @@ function kelas_index($pdo)
 
     // Ambil id_ta dari session (prioritas: yang dipilih user > TA aktif sistem)
     $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? null;
+    $kelas_list = [];
+    $kelas_count = 0;
+    $previous_ta = null;
+    $can_import_previous = false;
 
     if (!$id_ta) {
-        // Set pesan peringatan tapi JANGAN redirect, biar menu tetap bisadiakses
+        // Set pesan peringatan tapi JANGAN redirect, biar menu tetap bisa diakses
         $_SESSION['pesan_warning'] = 'Info: Tahun ajaran tidak terdeteksi. Silakan atur tahun ajaran aktif di menu Data Master.';
-        $kelas_list = []; // List kosong
     } else {
         $kelas_list = KelasModel::all($pdo, $id_ta);
+        $kelas_count = count($kelas_list);
+        $previous_ta = TahunAjaranModel::findPrevious($pdo, $id_ta);
+        $can_import_previous = $previous_ta && $kelas_count === 0;
     }
 
+    extract(compact('kelas_list', 'kelas_count', 'previous_ta', 'can_import_previous'));
     include __DIR__ . '/../views/kelas_index.php';
 }
 
@@ -90,6 +98,49 @@ function kelas_save($pdo)
     redirect('index.php?mod=kelas');
 }
 
+function kelas_import_from_previous($pdo)
+{
+    if (!can_do($pdo, 'kelas', 'create')) {
+        $_SESSION['pesan_error'] = "Akses ditolak. Anda tidak memiliki izin untuk melakukan impor kelas.";
+        redirect('index.php?mod=kelas');
+        return;
+    }
+
+    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? null;
+    if (!$id_ta) {
+        $_SESSION['pesan_error'] = 'Gagal impor: Tahun ajaran tidak ditemukan. Silakan pilih tahun ajaran di header.';
+        redirect('index.php?mod=kelas');
+        return;
+    }
+
+    $kelas_count = KelasModel::countByTa($pdo, $id_ta);
+    if ($kelas_count > 0) {
+        $_SESSION['pesan_error'] = 'Gagal impor: TA saat ini sudah memiliki kelas. Hapus kelas terlebih dahulu atau gunakan TA kosong.';
+        redirect('index.php?mod=kelas');
+        return;
+    }
+
+    $previous_ta = TahunAjaranModel::findPrevious($pdo, $id_ta);
+    if (!$previous_ta) {
+        $_SESSION['pesan_error'] = 'Gagal impor: Tidak ditemukan Tahun Ajaran sebelumnya yang valid.';
+        redirect('index.php?mod=kelas');
+        return;
+    }
+
+    try {
+        $copied = KelasModel::copyFromTa($pdo, $previous_ta['id_ta'], $id_ta);
+        if ($copied > 0) {
+            $_SESSION['pesan_sukses'] = "Berhasil menarik $copied kelas dari TA {$previous_ta['nama_ta']} ke TA saat ini.";
+        } else {
+            $_SESSION['pesan_warning'] = 'Proses impor selesai, tetapi tidak ada kelas baru yang ditambahkan.';
+        }
+    } catch (Exception $e) {
+        $_SESSION['pesan_error'] = "Gagal impor kelas: " . $e->getMessage();
+    }
+
+    redirect('index.php?mod=kelas');
+}
+
 function kelas_delete($pdo, $id)
 {
     if (!can_do($pdo, 'kelas', 'delete')) {
@@ -110,6 +161,37 @@ function kelas_delete($pdo, $id)
         } catch (Exception $e) {
             $_SESSION['pesan_error'] = "Gagal menghapus: " . $e->getMessage();
         }
+    }
+    redirect('index.php?mod=kelas');
+}
+
+/**
+ * 1-Click Dynamic AJAX Toggle Jenis Program Kelas (Reguler, PJJ, Menginduk)
+ */
+function kelas_toggle_jenis($pdo)
+{
+    if (!can_do($pdo, 'kelas', 'update')) {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Akses ditolak. Anda tidak memiliki izin.']);
+            exit;
+        }
+        $_SESSION['pesan_error'] = "Akses ditolak.";
+        redirect('index.php?mod=kelas');
+        return;
+    }
+
+    $id_kelas = (int)($_POST['id_kelas'] ?? $_GET['id_kelas'] ?? 0);
+    $jenis = $_POST['jenis_kelas'] ?? $_GET['jenis_kelas'] ?? 'reguler';
+
+    if ($id_kelas > 0 && in_array($jenis, ['reguler', 'pjj', 'menginduk'])) {
+        KelasModel::updateJenisKelas($pdo, $id_kelas, $jenis);
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'jenis_kelas' => $jenis, 'id_kelas' => $id_kelas]);
+            exit;
+        }
+        $_SESSION['pesan_sukses'] = "Status program kelas berhasil diperbarui menjadi: " . strtoupper($jenis);
     }
     redirect('index.php?mod=kelas');
 }

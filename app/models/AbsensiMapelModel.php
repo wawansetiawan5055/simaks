@@ -12,6 +12,43 @@ class AbsensiMapelModel {
     }
 
     /**
+     * Mengambil data absensi mapel yang sudah tersimpan untuk kelas, guru_mapel & tanggal tertentu.
+     * Digunakan untuk menampilkan status existing saat form dibuka ulang (mode edit).
+     * Return: array berindeks id_siswa.
+     */
+    public static function getAbsensiByKelasAndTanggal($pdo, $id_kelas, $tanggal, $id_guru_mapel = null) {
+        if ($id_guru_mapel) {
+            $stmt = $pdo->prepare(
+                "SELECT id_siswa, status, keterangan, jam_ke FROM absensi_siswa_mapel
+                 WHERE id_kelas = ? AND tanggal = ? AND id_guru_mapel = ?"
+            );
+            $stmt->execute([$id_kelas, $tanggal, $id_guru_mapel]);
+        } else {
+            $stmt = $pdo->prepare(
+                "SELECT id_siswa, status, keterangan, jam_ke FROM absensi_siswa_mapel
+                 WHERE id_kelas = ? AND tanggal = ?"
+            );
+            $stmt->execute([$id_kelas, $tanggal]);
+        }
+        $result = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $result[$row['id_siswa']] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     * Cek apakah absensi mapel untuk kelas & tanggal sudah pernah diisi.
+     */
+    public static function sudahDiisi($pdo, $id_kelas, $tanggal) {
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM absensi_siswa_mapel WHERE id_kelas = ? AND tanggal = ?"
+        );
+        $stmt->execute([$id_kelas, $tanggal]);
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+    /**
      * [REVISI TOTAL LOGIKA SIMPAN - ANTI BUG V2]
      * Kita akan menggunakan 1 query INSERT ... ON DUPLICATE KEY UPDATE.
      * Ini adalah cara paling aman dan paling efisien untuk menyimpan data absensi.

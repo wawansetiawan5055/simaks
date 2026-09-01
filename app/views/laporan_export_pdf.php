@@ -171,7 +171,13 @@
                 <?php foreach($rows as $row): ?>
                     <tr>
                         <?php foreach($row as $cell): ?>
-                            <td><?= htmlspecialchars($cell) ?></td>
+                            <td style="vertical-align: middle; text-align: <?= (strpos($cell, '<img') !== false) ? 'center' : 'left' ?>;">
+                                <?php if (strpos($cell, '<img') !== false): ?>
+                                    <?= $cell ?>
+                                <?php else: ?>
+                                    <?= htmlspecialchars($cell) ?>
+                                <?php endif; ?>
+                            </td>
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>

@@ -66,22 +66,35 @@ class PerangkatModel
     // PERANGKAT (Teacher Documents)
     // ==========================================
 
-    public static function getAllDocuments($pdo, $id_guru, $id_ta, $jenis = null)
+    public static function getAllDocuments($pdo, $id_guru, $id_ta, $jenis = null, $mapel = null)
     {
-        $sql = "SELECT * FROM perangkat_pembelajaran WHERE id_ta = ?";
-        $params = [$id_ta];
+        $sql = "SELECT p.*, ta.nama_ta 
+                FROM perangkat_pembelajaran p 
+                LEFT JOIN tahun_ajaran ta ON p.id_ta = ta.id_ta
+                WHERE 1=1";
+        $params = [];
+
+        if ($id_ta) {
+            $sql .= " AND p.id_ta = ?";
+            $params[] = $id_ta;
+        }
 
         if ($id_guru) {
-            $sql .= " AND id_guru = ?";
+            $sql .= " AND p.id_guru = ?";
             $params[] = $id_guru;
         }
 
         if ($jenis) {
-            $sql .= " AND jenis = ?";
+            $sql .= " AND p.jenis = ?";
             $params[] = $jenis;
         }
 
-        $sql .= " ORDER BY updated_at DESC";
+        if ($mapel) {
+            $sql .= " AND p.mapel = ?";
+            $params[] = $mapel;
+        }
+
+        $sql .= " ORDER BY p.updated_at DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -131,8 +144,8 @@ class PerangkatModel
     }
     public static function saveUpload($pdo, $data)
     {
-        $sql = "INSERT INTO perangkat_pembelajaran (id_guru, id_ta, jenis, mapel, kelas, judul, file_path, file_name, tipe_file, ukuran_file) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO perangkat_pembelajaran (id_guru, id_ta, jenis, mapel, kelas, judul, file_path, file_name, tipe_file, ukuran_file, is_reused, source_perangkat_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([
             $data['id_guru'],
@@ -144,8 +157,49 @@ class PerangkatModel
             $data['file_path'],
             $data['file_name'],
             $data['tipe_file'],
-            $data['ukuran_file']
+            $data['ukuran_file'],
+            $data['is_reused'] ?? 0,
+            $data['source_perangkat_id'] ?? null
         ]);
+    }
+
+    public static function duplicateDocument($pdo, $id_perangkat, $target_id_ta)
+    {
+        $doc = self::findDocument($pdo, $id_perangkat);
+        if (!$doc) return false;
+
+        $doc['id_ta'] = $target_id_ta;
+        $doc['is_reused'] = 1;
+        $doc['source_perangkat_id'] = $id_perangkat;
+        
+        // Remove primary key to insert as new record
+        unset($doc['id_perangkat']);
+        unset($doc['created_at']);
+        unset($doc['updated_at']);
+
+        $columns = implode(", ", array_keys($doc));
+        $placeholders = implode(", ", array_fill(0, count($doc), "?"));
+        
+        $sql = "INSERT INTO perangkat_pembelajaran ($columns) VALUES ($placeholders)";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute(array_values($doc));
+    }
+
+    public static function getRelatedTA($pdo, $id_ta)
+    {
+        // Find TA in the same year (e.g. 2025/2026 Ganjil and 2025/2026 Genap)
+        $current = $pdo->prepare("SELECT nama_ta FROM tahun_ajaran WHERE id_ta = ?");
+        $current->execute([$id_ta]);
+        $name = $current->fetchColumn();
+        
+        if (!$name) return [];
+
+        // Extract year part (e.g. "2025/2026")
+        $year_part = substr($name, 0, 9);
+        
+        $stmt = $pdo->prepare("SELECT id_ta, nama_ta FROM tahun_ajaran WHERE nama_ta LIKE ? AND id_ta != ?");
+        $stmt->execute([$year_part . "%", $id_ta]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function updateUpload($pdo, $data)
@@ -171,10 +225,10 @@ class PerangkatModel
         return $stmt->execute($params);
     }
 
-    public static function getAllUploads($pdo, $id_guru, $id_ta, $jenis = null)
+    public static function getAllUploads($pdo, $id_guru, $id_ta, $jenis = null, $mapel = null)
     {
         // Reuse getAllDocumentslogic but specifically for uploads (where file_path is not null)
         // Or just return everything for now
-        return self::getAllDocuments($pdo, $id_guru, $id_ta, $jenis);
+        return self::getAllDocuments($pdo, $id_guru, $id_ta, $jenis, $mapel);
     }
 }

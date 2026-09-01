@@ -78,6 +78,33 @@ function jurnal_kbm_save($pdo)
     $jam_ke_string = implode(', ', $label_jam_array);
     // -------------------------------------------------------------
 
+    // --- [TAMBAHAN] PENANGANAN UPLOAD FOTO ---
+    $nama_file_foto = null;
+    if (isset($_FILES['foto_kegiatan']) && $_FILES['foto_kegiatan']['error'] === UPLOAD_ERR_OK) {
+        $fileTmp = $_FILES['foto_kegiatan']['tmp_name'];
+        $fileName = $_FILES['foto_kegiatan']['name'];
+        $fileSize = $_FILES['foto_kegiatan']['size'];
+        $fileType = mime_content_type($fileTmp);
+        
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        $maxSize = 2 * 1024 * 1024; // 2MB
+        
+        if (in_array($fileType, $allowedTypes) && $fileSize <= $maxSize) {
+            $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+            // Buat nama file unik
+            $nama_file_foto = 'jurnal_' . date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+            $uploadPath = __DIR__ . '/../../public/uploads/jurnal/' . $nama_file_foto;
+            
+            if (!move_uploaded_file($fileTmp, $uploadPath)) {
+                $nama_file_foto = null; // Gagal upload
+            }
+        } else {
+            $_SESSION['pesan_error'] = "Gagal menyimpan foto. Pastikan format gambar JPG/PNG dan maksimal 2MB.";
+            // Tetap lanjut simpan jurnal tanpa foto jika foto gagal divalidasi
+        }
+    }
+    // ------------------------------------------
+
     $data = [
         'id_guru' => $id_guru_login,
         'id_kelas' => $_POST['id_kelas'],
@@ -87,7 +114,8 @@ function jurnal_kbm_save($pdo)
         'tujuan_pembelajaran' => $_POST['tujuan_pembelajaran'],
         'tagihan' => $_POST['tagihan'],
         'catatan_absensi' => $_POST['catatan_absensi'],
-        'keterangan' => $_POST['keterangan'] ?? ''
+        'keterangan' => $_POST['keterangan'] ?? '',
+        'foto_kegiatan' => $nama_file_foto
     ];
 
     JurnalKbmModel::save($pdo, $data);

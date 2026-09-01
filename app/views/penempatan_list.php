@@ -1,23 +1,25 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
 
-<!-- Content Header -->
-<!-- Content Header -->
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-            <div>
-                <h2 class="m-0 font-weight-bold text-dark">
-                    <i class="fas fa-layer-group text-primary mr-2"></i> Daftar Rombel (Kelas)
-                </h2>
-                <p class="text-muted small mb-0">
-                    Kelola data rombongan belajar dan penempatan siswa TA: <?= htmlspecialchars($_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'N/A') ?>
-                </p>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Daftar Rombel &amp; Penempatan Siswa
+                    </h4>
+                </div>
             </div>
-            <?php if (can_do($pdo, 'penempatan', 'create')): ?>
-                <button type="button" class="btn btn-warning shadow-sm px-4 font-weight-bold text-white" style="border-radius: 8px;" data-toggle="modal" data-target="#modalTambahRombel">
-                    <i class="fas fa-plus mr-2"></i> Tambah Rombel
-                </button>
-            <?php endif; ?>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <?php if (can_do($pdo, 'penempatan', 'create')): ?>
+                    <button type="button" class="btn btn-warning btn-sm shadow-sm px-4 font-weight-bold text-white rounded-pill" data-toggle="modal" data-target="#modalTambahRombel">
+                        <i class="fas fa-plus mr-1"></i> Tambah Rombel
+                    </button>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>
@@ -90,7 +92,7 @@
                                     <tr>
                                         <td class="text-center align-middle font-weight-bold text-muted small"><?= $no++ ?></td>
                                         <td class="align-middle">
-                                            <a href="index.php?mod=penempatan&act=kelola&id_kelas=<?= $row['id_kelas'] ?>" class="font-weight-bold text-dark" style="font-size: 0.95rem; text-decoration: none;">
+                                            <a href="<?= BASE_URL ?>penempatan/kelola?id_kelas=<?= $row['id_kelas'] ?>" class="font-weight-bold text-dark" style="font-size: 0.95rem; text-decoration: none;">
                                                 <?= htmlspecialchars($row['nama_kelas']) ?>
                                             </a>
                                         </td>
@@ -113,13 +115,13 @@
                                         </td>
                                         <td class="text-center align-middle">
                                             <div class="btn-group">
-                                                <a href="index.php?mod=penempatan&act=kelola&id_kelas=<?= $row['id_kelas'] ?>"
+                                                <a href="<?= BASE_URL ?>penempatan/kelola?id_kelas=<?= $row['id_kelas'] ?>"
                                                     class="btn btn-sm btn-outline-primary border-0 px-2 mr-1" 
                                                     style="background: #eff6ff; color: #3b82f6; border-radius: 6px;" title="Kelola Anggota">
                                                     <i class="fas fa-users-cog"></i>
                                                 </a>
                                                 <?php if (can_do($pdo, 'penempatan', 'delete')): ?>
-                                                    <a href="index.php?mod=penempatan&act=hapus_rombel&id_kelas=<?= $row['id_kelas'] ?>"
+                                                    <a href="<?= BASE_URL ?>penempatan/hapus_rombel?id_kelas=<?= $row['id_kelas'] ?>"
                                                         class="btn btn-sm btn-outline-danger border-0 px-2"
                                                         style="background: #fef2f2; color: #ef4444; border-radius: 6px;"
                                                         onclick="return confirm('⚠️ Hapus rombel ini?\nSeluruh data penempatan siswa, jadwal, dan wali kelas di dalamnya akan dihapus. Lanjutkan?')"
@@ -161,7 +163,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="index.php?mod=penempatan&act=tambah_rombel" method="POST">
+            <form action="<?= BASE_URL ?>penempatan/tambah_rombel" method="POST">
                 <div class="modal-body p-4">
                     <div class="form-group mb-4">
                         <label class="font-weight-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">Tingkat / Kelas Master</label>

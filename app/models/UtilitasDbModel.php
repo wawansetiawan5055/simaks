@@ -333,5 +333,126 @@ class UtilitasDbModel {
         $pdo->exec($sql);
         return true;
     }
+
+    /**
+     * Memastikan tabel riwayat migrasi (app_migrations) tersedia
+     */
+    public static function ensureMigrationTable(PDO $pdo) {
+        try {
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS `app_migrations` (
+                    `id` INT AUTO_INCREMENT PRIMARY KEY,
+                    `patch_name` VARCHAR(255) NOT NULL UNIQUE,
+                    `executed_at` DATETIME NOT NULL,
+                    `executed_by` VARCHAR(100) DEFAULT 'Admin',
+                    `status` ENUM('Success', 'Failed') DEFAULT 'Success',
+                    `notes` TEXT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            ");
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to ensure app_migrations table: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Mengambil daftar file patch SQL yang tersedia di folder sql/ dan patch/
+     */
+    public static function getAvailablePatches() {
+        $patches = [];
+        $dirs = [
+            __DIR__ . '/../../sql',
+            __DIR__ . '/../../patch'
+        ];
+
+        foreach ($dirs as $dir) {
+            if (is_dir($dir)) {
+                $files = scandir($dir);
+                foreach ($files as $file) {
+                    if ($file === '.' || $file === '..') continue;
+                    if (pathinfo($file, PATHINFO_EXTENSION) === 'sql') {
+                        $fullPath = $dir . '/' . $file;
+                        $patches[$file] = [
+                            'filename' => $file,
+                            'folder' => basename($dir),
+                            'path' => $fullPath,
+                            'size' => filesize($fullPath),
+                            'modified' => date('Y-m-d H:i:s', filemtime($fullPath))
+                        ];
+                    }
+                }
+            }
+        }
+
+        ksort($patches);
+        return array_values($patches);
+    }
+
+    /**
+     * Mengambil daftar patch yang sudah pernah dieksekusi
+     */
+    public static function getAppliedPatches(PDO $pdo) {
+        self::ensureMigrationTable($pdo);
+        try {
+            $stmt = $pdo->query("SELECT patch_name, executed_at, executed_by, status FROM app_migrations");
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $applied = [];
+            foreach ($rows as $row) {
+                $applied[$row['patch_name']] = $row;
+            }
+            return $applied;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Menjalankan file patch SQL tertentu dan mencatat riwayatnya
+     */
+    public static function executePatch(PDO $pdo, string $filename, string $username = 'Admin') {
+        self::ensureMigrationTable($pdo);
+        
+        $dirs = [
+            __DIR__ . '/../../sql/' . $filename,
+            __DIR__ . '/../../patch/' . $filename
+        ];
+
+        $targetFile = null;
+        foreach ($dirs as $path) {
+            if (file_exists($path)) {
+                $targetFile = $path;
+                break;
+            }
+        }
+
+        if (!$targetFile) {
+            return ['success' => false, 'message' => "File patch '{$filename}' tidak ditemukan."];
+        }
+
+        $sqlContent = file_get_contents($targetFile);
+        if (empty(trim($sqlContent))) {
+            return ['success' => false, 'message' => "File patch kosong."];
+        }
+
+        try {
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+            $pdo->exec($sqlContent);
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+            // Catat ke app_migrations
+            $stmt = $pdo->prepare("
+                INSERT INTO app_migrations (patch_name, executed_at, executed_by, status)
+                VALUES (?, NOW(), ?, 'Success')
+                ON DUPLICATE KEY UPDATE executed_at = NOW(), executed_by = VALUES(executed_by), status = 'Success'
+            ");
+            $stmt->execute([$filename, $username]);
+
+            return ['success' => true, 'message' => "Patch '{$filename}' berhasil dijalankan."];
+        } catch (Exception $e) {
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+            return ['success' => false, 'message' => "Gagal menjalankan patch: " . $e->getMessage()];
+        }
+    }
 }
 ?>

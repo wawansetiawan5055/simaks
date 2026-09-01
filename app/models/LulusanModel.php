@@ -118,15 +118,16 @@ class LulusanModel
             // Disable FK Check
             $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
 
-            // 1. Pindahkan data
-            // Gunakan loop untuk memastikan aman atau pass array ke moveRow jika support
-            // Helper moveRow kita support array.
-            self::moveRow($pdo, $ids_siswa, 'siswa', 'siswa_alumni', true);
+            // 1. Copy data (TIDAK MENGHAPUS master agar history penempatan terjaga)
+            self::moveRow($pdo, $ids_siswa, 'siswa', 'siswa_alumni', false);
 
-            // 2. Update status di tabel alumni 
-            // Dan set tahun lulus (dari parameter atau current year)
+            // 2. Update status di tabel master siswa
             $placeholders = implode(',', array_fill(0, count($ids_siswa), '?'));
+            $sqlSiswa = "UPDATE siswa SET status_aktif = 'Lulus' WHERE id_siswa IN ($placeholders)";
+            $pdo->prepare($sqlSiswa)->execute($ids_siswa);
 
+            // 3. Update informasi di tabel alumni 
+            // Dan set tahun lulus (dari parameter atau current year)
             // LOGIKA TAHUN LULUS:
             // Jika custom_tahun_lulus ada, gunakan itu. Jika tidak, gunakan tahun saat ini.
             $tahun_lulus = $custom_tahun_lulus ? $custom_tahun_lulus : date('Y');

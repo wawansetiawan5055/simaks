@@ -29,11 +29,12 @@ class HakAksesModel {
                 WHERE (
                     am.link = ? 
                     OR am.link LIKE CONCAT('%mod=', ?, '%')
+                    OR am.link LIKE CONCAT(?, '/%')
                 )
                 AND ha.id_peran IN ({$in_placeholders})";
                 
-        // Parameter: [link_raw, link_raw, role_id_1, role_id_2...]
-        $params = array_merge([$module_link, $module_link], $user_role_ids);
+        // Parameter: [link_raw, link_raw, link_raw, role_id_1, role_id_2...]
+        $params = array_merge([$module_link, $module_link, $module_link], $user_role_ids);
         
         try {
             $stmt = $pdo->prepare($sql);

@@ -37,9 +37,11 @@ function master_jam_delete($pdo, $id) {
         redirect('index.php?mod=master_jam');
     }
     
+    $day = $_GET['day'] ?? null;
+    
     try {
-        MasterJamModel::delete($pdo, $id);
-        $_SESSION['pesan_sukses'] = "Data jam pelajaran berhasil dihapus.";
+        MasterJamModel::delete($pdo, $id, $day);
+        $_SESSION['pesan_sukses'] = $day ? "Slot jam berhasil dihapus dari hari $day." : "Data jam pelajaran berhasil dihapus permanen.";
     } catch (Exception $e) {
         $_SESSION['pesan_error'] = "Gagal menghapus: " . $e->getMessage();
     }
@@ -77,4 +79,28 @@ function master_jam_update_urutan($pdo) {
         exit;
     }
 }
-?>
+
+function master_jam_copy_day($pdo) {
+    if (!is_logged_in() || !check_access('master_jam')) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Akses ditolak.']);
+        exit;
+    }
+
+    $from = $_POST['from'] ?? '';
+    $to = $_POST['to'] ?? '';
+
+    if (!$from || !$to) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Parameter tidak lengkap.']);
+        exit;
+    }
+
+    try {
+        MasterJamModel::copyDay($pdo, $from, $to);
+        echo json_encode(['status' => 'success', 'message' => "Jadwal $to berhasil disamakan dengan hari $from."]);
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+    exit;
+}

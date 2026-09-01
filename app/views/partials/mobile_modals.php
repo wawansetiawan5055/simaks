@@ -11,7 +11,7 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        z-index: 1050;
+        z-index: 999999 !important;
     }
     .mobile-menu-dots li {
         background-color: #cbd5e1 !important;
@@ -30,43 +30,64 @@
         border-radius: 10px !important;
     }
 
-    /* Modal Height & Width Fixers */
-    .icon-grid-drawer .modal-content {
-        height: calc(100vh - 65px) !important;
-        max-height: calc(100vh - 65px) !important;
-        width: 100% !important;
-        border-radius: 25px 25px 0 0 !important;
-        overflow: hidden !important; /* Ensure children don't leak square corners */
-        border: none !important;
+    /* CUSTOM MOBILE DRAWER (Bypassing Bootstrap Modal) */
+    .mobile-drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1999999;
+        display: none;
+        backdrop-filter: blur(3px);
     }
-    
-    .icon-grid-drawer.modal {
-        background: transparent !important;
+
+    .mobile-drawer {
+        position: fixed;
+        bottom: -100%; /* Start hidden below */
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 65px);
+        background: #fff;
+        z-index: 2000000;
+        border-radius: 25px 25px 0 0;
+        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
     }
-    
-    @media (max-width: 576px) {
-        .icon-grid-drawer .modal-dialog {
-            margin: 0 !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-            align-items: flex-start !important;
-            background: transparent !important;
-        }
+
+    .mobile-drawer.active {
+        bottom: 0;
+    }
+
+    .mobile-drawer-header {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .drawer-handle {
+        width: 40px;
+        height: 5px;
+        background: #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 10px;
     }
 </style>
 
-<div class="modal fade icon-grid-drawer" id="mobileGridModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="margin: 0; align-items: flex-start;">
-        <div class="modal-content border-0" style="border-radius: 25px 25px 0 0; background: #fff !important; height: calc(100vh - 65px) !important; display: flex; flex-direction: column; width: 100%;">
-            <div class="modal-header border-0 pb-0 justify-content-center pt-2" style="background: #fff !important; border-radius: 25px 25px 0 0; flex-shrink: 0;">
-                <div style="width: 40px; height: 5px; background: #e2e8f0; border-radius: 10px; margin-bottom: 5px;"></div>
-            </div>
-            
-            <div class="px-3 pt-2 flex-shrink-0">
-                <h6 class="text-center font-weight-bold mb-3" style="color: #1e293b;">Menu Cepat SIMAKS</h6>
-            </div>
+<div class="mobile-drawer-overlay" onclick="toggleMobileMenu();"></div>
 
-            <div class="modal-body p-0" style="flex: 1; overflow-y: auto; overflow-x: hidden;">
+<div class="mobile-drawer" id="mobileGridDrawer">
+    <div class="mobile-drawer-header">
+        <div class="drawer-handle"></div>
+        <h6 class="text-center font-weight-bold mb-2" style="color: #1e293b;">Menu Cepat SIMAKS</h6>
+    </div>
+    
+    <div class="mobile-drawer-body" style="flex: 1; overflow-y: auto; padding-bottom: 80px;">
                 <?php 
                 $grid_items = [];
                 $icon_colors = [
@@ -124,6 +145,9 @@
                         return $default;
                     }
                 }
+                if (empty($grid_items)) {
+                    echo '<div class="text-center p-5 text-muted"><h5>Menu tidak tersedia.</h5><p>Silakan hubungi Admin untuk hak akses.</p></div>';
+                }
                 ?>
 
                 <div id="mobileMenuCarousel" class="carousel slide" data-interval="false" data-wrap="true" style="width: 100%; touch-action: pan-y;">
@@ -165,13 +189,12 @@
                         </ol>
                     <?php endif; ?>
                 </div>
-        </div>
     </div>
 </div>
 
 
 <!-- 2. SUBMENU MODAL -->
-<div class="modal fade" id="submenuModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1045;">
+<div class="modal" id="submenuModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 999999 !important;">
   <div class="modal-dialog modal-dialog-centered modal-sm" role="document" style="padding-bottom: 70px;">
     <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: #fff !important;">
       <div class="modal-header border-0 pb-0 justify-content-center" style="background: #fff !important; border-radius: 20px 20px 0 0;">
@@ -183,7 +206,7 @@
 </div>
 
 <!-- 3. JADWAL HARI INI MODAL -->
-<div class="modal fade" id="modal-jadwal-mengajar" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1045;">
+<div class="modal" id="modal-jadwal-mengajar" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 999999 !important;">
     <div class="modal-dialog modal-lg" role="document" style="padding-bottom: 70px;">
         <div class="modal-content">
             <div class="modal-header border-0 justify-content-center pt-3" style="background: #fff !important;">
@@ -228,16 +251,20 @@ function openSubmenuFromData(el) {
     renderSubmenuModal(title, children);
 }
 
-// TOGGLE FUNCTION FOR BOTTOM NAV MENU BUTTON
+// TOGGLE FUNCTION FOR CUSTOM DRAWER
 function toggleMobileMenu(e) {
     if(e) e.preventDefault();
-    const $modal = $('#mobileGridModal');
-    const isVisible = $modal.hasClass('show');
+    const $drawer = $('#mobileGridDrawer');
+    const $overlay = $('.mobile-drawer-overlay');
     
-    if (isVisible) {
-        $modal.modal('hide');
+    if ($drawer.hasClass('active')) {
+        $drawer.removeClass('active');
+        $overlay.fadeOut(300);
+        $('body').css('overflow', '');
     } else {
-        $modal.modal('show');
+        $drawer.addClass('active');
+        $overlay.fadeIn(300);
+        $('body').css('overflow', 'hidden');
     }
 }
 
@@ -330,8 +357,9 @@ function renderSubmenuModal(title, children) {
     html += '</div>';
     $('#submenuList').html(html);
     
-    // HIDE main grid modal first to avoid backdrop conflict
-    $('#mobileGridModal').modal('hide');
+    // HIDE custom drawer first
+    $('#mobileGridDrawer').removeClass('active');
+    $('.mobile-drawer-overlay').fadeOut(200);
     
     // SHOW submenu modal with a small delay for smooth transition
     setTimeout(() => {
@@ -416,6 +444,7 @@ function renderGlobalModalTable(data) {
 
 // Carousel Global Logic (Swipe & Sync)
 $(document).ready(function() {
+    console.log('Mobile Menu JS Initialized');
     const $carousel = $('#mobileMenuCarousel');
     const $dots = $('.mobile-menu-dots li');
     const totalSlides = $dots.length;

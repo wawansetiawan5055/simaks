@@ -3,15 +3,28 @@ class MutasiSiswaModel
 {
 
     // Mengambil siswa yang masih aktif di kelas tertentu
-    public static function getSiswaAktifByKelas($pdo, $id_kelas, $id_ta)
+    public static function getSiswaAktifByKelas($pdo, $id_kelas, $id_ta = null)
     {
+        if (!empty($id_ta)) {
+            $sql = "SELECT s.id_siswa, s.nama, s.nisn 
+                    FROM siswa s
+                    JOIN penempatan_siswa ps ON s.id_siswa = ps.id_siswa
+                    WHERE ps.id_kelas = ? AND ps.id_ta = ? AND s.status_aktif = 'Aktif'
+                    ORDER BY s.nama ASC";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$id_kelas, $id_ta]);
+            $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($res)) return $res;
+        }
+
+        // Fallback: id_kelas is unique per class, fetch active students
         $sql = "SELECT s.id_siswa, s.nama, s.nisn 
                 FROM siswa s
                 JOIN penempatan_siswa ps ON s.id_siswa = ps.id_siswa
-                WHERE ps.id_kelas = ? AND ps.id_ta = ? AND s.status_aktif = 'Aktif'
+                WHERE ps.id_kelas = ? AND (s.status_aktif = 'Aktif' OR s.status_aktif IS NULL)
                 ORDER BY s.nama ASC";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$id_kelas, $id_ta]);
+        $stmt->execute([$id_kelas]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -53,17 +66,21 @@ class MutasiSiswaModel
             // namun data history (nilai/absensi) tetap ada (menjadi orphan / yatim).
             $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
 
-            // 1. Copy data siswa ke tabel arsip 'siswa_mutasi' dengan dynamic helper
-            self::moveRow($pdo, [$data['id_siswa']], 'siswa', 'siswa_mutasi', true);
+            // 1. Copy data (TIDAK MENGHAPUS master agar history penempatan terjaga)
+            self::moveRow($pdo, [$data['id_siswa']], 'siswa', 'siswa_mutasi', false);
 
-            // 2. Update informasi mutasi di tabel arsip
+            // 2. Update status di tabel master siswa
+            $stmt_m = $pdo->prepare("UPDATE siswa SET status_aktif = 'Keluar' WHERE id_siswa = ?");
+            $stmt_m->execute([$data['id_siswa']]);
+
+            // 3. Update informasi mutasi di tabel arsip
             $stmt_update = $pdo->prepare("UPDATE siswa_mutasi SET 
                 tgl_mutasi = ?, 
                 alasan_mutasi = ?,
                 jenis_mutasi = ?,
                 id_ta_mutasi = ?,
                 id_kelas_asal = ?,
-                status_aktif = 'Mutasi'
+                status_aktif = 'Keluar'
                 WHERE id_siswa = ?");
             // Mapping data:
             $stmt_update->execute([
@@ -77,9 +94,6 @@ class MutasiSiswaModel
 
             // 3. [CATATAN] Kita TIDAK MENGHAPUS data dari penempatan_siswa agar histori tetap ada.
             // $pdo->prepare("DELETE FROM penempatan_siswa WHERE id_siswa = ?")->execute([$data['id_siswa']]);
-
-            // 4. Update status siswa (Keluar)
-            $pdo->prepare("UPDATE siswa_mutasi SET status_aktif = 'Keluar' WHERE id_siswa = ?")->execute([$data['id_siswa']]);
 
             // Hidupkan kembali cek Foreign Key
             $pdo->exec("SET FOREIGN_KEY_CHECKS=1");

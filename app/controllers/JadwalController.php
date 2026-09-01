@@ -14,16 +14,46 @@ function jadwal_index($pdo)
 
     // Ambil data untuk filter DAN form
     $guru_mapel_list = JadwalModel::all_guru_mapel($pdo, $id_ta_tampil);
+    $guru_list = JadwalModel::all_guru_unique($pdo, $id_ta_tampil);
     $kelas_list = JadwalModel::all_kelas($pdo, $id_ta_tampil);
     $jam_list = JadwalModel::getKbmJamSlots($pdo); // Mengambil slot KBM
 
-    $view_type = $_GET['view'] ?? 'sekolah';
-    $id_kelas_filter = $_GET['id_kelas'] ?? null;
-    $id_guru_mapel_filter = $_GET['id_guru_mapel'] ?? null;
+    $view_type = $_GET['view'] ?? 'kelas';
+    if ($view_type === 'sekolah') {
+        $view_type = 'kelas';
+    }
 
-    $result = JadwalModel::getJadwalLengkap($pdo, $id_ta_tampil, $view_type, $id_kelas_filter, $id_guru_mapel_filter);
+    $program = $_GET['program'] ?? '';
 
-    extract(compact('guru_mapel_list', 'kelas_list', 'jam_list', 'view_type', 'id_kelas_filter', 'id_guru_mapel_filter', 'result'));
+    // Filter kelas berdasarkan program jika ada
+    $filtered_kelas_list = $kelas_list;
+    if (!empty($program)) {
+        $filtered_kelas_list = array_filter($kelas_list, function($k) use ($program) {
+            $jk = $k['jenis_kelas'] ?? 'reguler';
+            return $jk === $program;
+        });
+        $filtered_kelas_list = array_values($filtered_kelas_list);
+    }
+
+    $id_kelas_filter = $_GET['id_kelas'] ?? ($view_type === 'kelas' && !empty($filtered_kelas_list) ? $filtered_kelas_list[0]['id_kelas'] : (!empty($kelas_list) ? $kelas_list[0]['id_kelas'] : null));
+    $id_guru_filter = $_GET['id_guru'] ?? ($view_type === 'guru' && !empty($guru_list) ? $guru_list[0]['id_guru'] : null);
+
+    // Auto sync program dengan jenis kelas yang sedang dipilih jika program kosong
+    if (empty($program) && $view_type === 'kelas' && $id_kelas_filter) {
+        foreach ($kelas_list as $k) {
+            if ($k['id_kelas'] == $id_kelas_filter) {
+                $program = $k['jenis_kelas'] ?? 'reguler';
+                break;
+            }
+        }
+    }
+    if (empty($program)) {
+        $program = 'reguler';
+    }
+
+    $result = JadwalModel::getJadwalLengkap($pdo, $id_ta_tampil, $view_type, $id_kelas_filter, $id_guru_filter);
+
+    extract(compact('guru_mapel_list', 'guru_list', 'kelas_list', 'filtered_kelas_list', 'jam_list', 'view_type', 'id_kelas_filter', 'id_guru_filter', 'program', 'result'));
     include __DIR__ . '/../views/jadwal_index.php';
 }
 
@@ -55,6 +85,7 @@ function jadwal_save($pdo)
         'id_guru_mapel' => $_POST['id_guru_mapel'],
         'id_kelas' => $_POST['id_kelas'],
         'hari_kbm' => $_POST['hari_kbm'],
+        'mode_kbm' => $_POST['mode_kbm'] ?? 'offline',
         'id_jam' => $_POST['jam'] ?? [], // can be single value or array
         'id_ta' => $id_ta_aktif
     ];

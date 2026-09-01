@@ -1,16 +1,24 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-            <div>
-                <h2 class="fw-bold m-0 text-dark"><i class="fas fa-file-export text-success mr-2"></i> Surat Keluar</h2>
-                <p class="text-muted small mb-0">Kelola dan cetak surat resmi sekolah.</p>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-file-export"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Arsip Surat Keluar
+                    </h4>
+                </div>
             </div>
-            <button type="button" class="btn btn-success shadow-sm" data-toggle="modal" data-target="#modalAddSurat">
-                <i class="fas fa-plus mr-1"></i> Buat Surat Baru
-            </button>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-success btn-sm shadow-sm font-weight-bold rounded-pill px-3" data-toggle="modal" data-target="#modalAddSurat">
+                    <i class="fas fa-plus mr-1"></i> Buat Surat Baru
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -56,7 +64,7 @@
                                     </td>
                                     <td class="text-center align-middle">
                                         <div class="btn-group">
-                                            <a href="index.php?mod=surat&act=print_keluar&id=<?= $s['id_surat_keluar'] ?>" target="_blank" class="btn btn-sm btn-info" title="Preview/Print"><i class="fas fa-print"></i></a>
+                                            <a href="<?= BASE_URL ?>surat/print_keluar?id=<?= $s['id_surat_keluar'] ?>" target="_blank" class="btn btn-sm btn-info" title="Preview/Print"><i class="fas fa-print"></i></a>
                                             <a href="#" class="btn btn-sm btn-warning" title="Edit"><i class="fas fa-edit"></i></a>
                                             <a href="#" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></a>
                                         </div>
@@ -75,9 +83,9 @@
 
 <!-- Modal Add Surat -->
 <div class="modal fade" id="modalAddSurat" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content" style="border-radius: 15px;">
-            <form id="formSuratKeluar" method="POST" action="index.php?mod=surat&act=save_keluar">
+            <form id="formSuratKeluar" method="POST" action="<?= BASE_URL ?>surat/save_keluar">
                 <div class="modal-header border-0 px-4 pt-4">
                     <h5 class="modal-title fw-bold"><i class="fas fa-pencil-alt text-success mr-2"></i> Buat Surat Keluar</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -129,7 +137,7 @@
 
                     <div class="mb-3">
                         <label class="small fw-bold">Isi Surat</label>
-                        <textarea name="isi_surat" id="isi_surat" class="form-control" rows="8" placeholder="Tuliskan isi surat di sini..."></textarea>
+                        <textarea name="isi_surat" id="isi_surat" class="form-control summernote" placeholder="Tuliskan isi surat di sini..."></textarea>
                         <div class="small text-muted mt-1">Gunakan editor ini untuk menyesuaikan isi surat sebelum dicetak.</div>
                     </div>
                 </div>
@@ -146,7 +154,7 @@
 function generateNomor() {
     const idKat = $('#id_kategori').val();
     if(idKat) {
-        $.get('index.php?mod=surat&act=get_nomor_otomatis&id_kategori=' + idKat, function(res) {
+        $.get('<?= BASE_URL ?>surat/get_nomor_otomatis?id_kategori=' + idKat, function(res) {
             $('#nomor_surat').val(res);
         });
     } else {
@@ -157,15 +165,23 @@ function generateNomor() {
 function loadTemplate() {
     const idTemplate = $('#id_template').val();
     if(idTemplate) {
-        $.getJSON('index.php?mod=surat&act=get_template_content&id=' + idTemplate, function(res) {
+        $.getJSON('<?= BASE_URL ?>surat/get_template_content?id=' + idTemplate, function(res) {
             if(res) {
                 $('#perihal').val(res.subjek_default);
-                $('#isi_surat').val(res.isi_template);
+                if ($('#isi_surat').next('.note-editor').length > 0) {
+                    $('#isi_surat').summernote('code', res.isi_template);
+                } else {
+                    $('#isi_surat').val(res.isi_template);
+                }
             }
         });
     } else {
         $('#perihal').val('');
-        $('#isi_surat').val('');
+        if ($('#isi_surat').next('.note-editor').length > 0) {
+            $('#isi_surat').summernote('code', '');
+        } else {
+            $('#isi_surat').val('');
+        }
     }
 }
 </script>

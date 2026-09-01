@@ -1,7 +1,7 @@
 {
   "name": "SIMAKS Mobile",
   "short_name": "SIMAKS",
-  "start_url": "index.php?mod=dashboard",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f172a",

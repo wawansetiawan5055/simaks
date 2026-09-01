@@ -115,7 +115,7 @@ if (file_exists($header_path)) {
                 <h1 class="m-0"><i class="fas fa-magic mr-2"></i> Custom Visual Aplikasi</h1>
             </div>
             <div class="col-sm-6 text-right">
-                <a href="index.php?mod=dashboard" class="btn btn-outline-secondary btn-sm"><i
+                <a href="<?= BASE_URL ?>dashboard" class="btn btn-outline-secondary btn-sm"><i
                         class="fas fa-times mr-1"></i> Tutup</a>
             </div>
         </div>
@@ -124,7 +124,7 @@ if (file_exists($header_path)) {
 
 <section class="content">
     <div class="container-fluid">
-        <form action="index.php?mod=app_config&act=save" method="POST">
+        <form action="<?= BASE_URL ?>app_config/save" method="POST" enctype="multipart/form-data">
             <div class="card card-primary card-outline card-tabs">
                 <div class="card-header p-0 pt-1">
                     <ul class="nav nav-tabs" id="theme-tab" role="tablist">
@@ -138,6 +138,18 @@ if (file_exists($header_path)) {
                             <a class="nav-link" id="theme-fonts-tab" data-toggle="pill" href="#theme-typography"
                                 role="tab" aria-controls="theme-typography" aria-selected="false">
                                 <i class="fas fa-font mr-2"></i>Tipografi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="ai-tab" data-toggle="pill" href="#tab-ai"
+                                role="tab" aria-controls="tab-ai" aria-selected="false">
+                                <i class="fas fa-robot mr-2"></i>Integrasi AI
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="login-tab" data-toggle="pill" href="#tab-login"
+                                role="tab" aria-controls="tab-login" aria-selected="false">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Halaman Login
                             </a>
                         </li>
                     </ul>
@@ -497,6 +509,117 @@ if (file_exists($header_path)) {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TAB 3: INTEGRASI AI -->
+                        <div class="tab-pane fade" id="tab-ai" role="tabpanel" aria-labelledby="ai-tab">
+                            <div class="row justify-content-center">
+                                <div class="col-md-7">
+                                    <div class="card shadow-none border">
+                                        <div class="card-body">
+                                            <h5 class="text-primary font-weight-bold mb-4">
+                                                <i class="fas fa-robot mr-2"></i> Google Gemini AI Assistant
+                                            </h5>
+                                            
+                                            <div class="alert alert-info shadow-sm mb-4">
+                                                <h5><i class="icon fas fa-info-circle"></i> Cara Mendapatkan API Key:</h5>
+                                                <ol class="mb-0">
+                                                    <li>Buka situs <strong><a href="https://aistudio.google.com/" target="_blank" class="text-white" style="text-decoration:underline;">Google AI Studio</a></strong>.</li>
+                                                    <li>Login dengan akun Google Anda.</li>
+                                                    <li>Klik tombol <strong>"Get API Key"</strong> di sidebar kiri.</li>
+                                                    <li>Klik <strong>"Create API key in new project"</strong>.</li>
+                                                    <li>Salin kodenya dan tempelkan pada kotak di bawah ini.</li>
+                                                </ol>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Gemini API Key</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                    </div>
+                                                    <input type="password" name="gemini_api_key" class="form-control" 
+                                                        placeholder="Masukkan API Key dari Google AI Studio"
+                                                        value="<?= htmlspecialchars($config['gemini_api_key'] ?? '') ?>">
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKey(this)">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted mt-2 d-block">
+                                                    <i class="fas fa-shield-alt mr-1"></i> API Key ini digunakan untuk fitur "Penulisan Perangkat AI". Pastikan kunci ini tetap rahasia.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: HALAMAN LOGIN -->
+                        <div class="tab-pane fade" id="tab-login" role="tabpanel" aria-labelledby="login-tab">
+                            <div class="row">
+                                <!-- Kolom Gambar -->
+                                <div class="col-md-7">
+                                    <h5 class="text-primary font-weight-bold mb-4 border-bottom pb-2">
+                                        <i class="fas fa-images mr-2"></i> Slider Gambar Login
+                                    </h5>
+                                    
+                                    <?php for($i=1; $i<=3; $i++): 
+                                        $key = "login_bg_image_$i";
+                                        $bg_img = $config[$key] ?? null;
+                                        // Support fallback for slide 1 to old key for backward compatibility
+                                        if ($i == 1 && !$bg_img && !empty($config['login_bg_image'])) {
+                                            $bg_img = $config['login_bg_image'];
+                                        }
+                                    ?>
+                                    <div class="card shadow-sm mb-4 border-0 bg-light">
+                                        <div class="card-body p-3">
+                                            <label class="font-weight-bold">Slide Gambar <?= $i ?></label>
+                                            <div class="row align-items-center">
+                                                <div class="col-md-8">
+                                                    <div class="custom-file mb-2">
+                                                        <input type="file" class="custom-file-input" id="<?= $key ?>" name="<?= $key ?>" accept=".jpg,.jpeg,.png,.webp">
+                                                        <label class="custom-file-label" for="<?= $key ?>">Ganti gambar <?= $i ?>...</label>
+                                                    </div>
+                                                    <small class="text-muted">Format: JPG/PNG/WEBP (Rekomendasi: 1920x1080px)</small>
+                                                </div>
+                                                <div class="col-md-4 text-center">
+                                                    <?php if($bg_img): ?>
+                                                        <img src="<?= BASE_URL ?>assets/img/<?= $bg_img ?>" alt="Slide <?= $i ?>" class="img-thumbnail" style="height: 70px; object-fit: cover; width: 100%;">
+                                                    <?php else: ?>
+                                                        <div class="border rounded d-flex align-items-center justify-content-center text-muted bg-white" style="height: 70px; width: 100%;">
+                                                            <small>Kosong</small>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endfor; ?>
+                                </div>
+
+                                <!-- Kolom Quote -->
+                                <div class="col-md-5 border-left pl-md-4">
+                                    <h5 class="text-primary font-weight-bold mb-4 border-bottom pb-2">
+                                        <i class="fas fa-quote-left mr-2"></i> Kutipan / Hadits
+                                    </h5>
+                                    
+                                    <div class="form-group mb-4">
+                                        <p class="small text-muted mb-3">Tuliskan kutipan yang akan tampil bersamaan dengan masing-masing slide gambar. Anda bisa menambahkan sumber di akhir kalimat (misal: — HR. Muslim).</p>
+                                        
+                                        <?php for($i=1; $i<=3; $i++): 
+                                            $q_key = "login_quote_$i";
+                                        ?>
+                                        <div class="mb-3">
+                                            <label class="font-weight-bold text-secondary">Kutipan Slide <?= $i ?></label>
+                                            <textarea name="<?= $q_key ?>" class="form-control" rows="3" placeholder="Masukkan kutipan..."><?= htmlspecialchars($config[$q_key] ?? '') ?></textarea>
+                                        </div>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer bg-white border-top-0 p-4 text-center">
@@ -570,9 +693,27 @@ if (file_exists($header_path)) {
 
     function resetTheme() {
         if (confirm('Apakah Bapak yakin ingin mengembalikan semua pengaturan tampilan ke standar awal? Semua kustomisasi warna dan ukuran font akan dihapus.')) {
-            window.location.href = 'index.php?mod=app_config&act=reset';
+            window.location.href = '<?= BASE_URL ?>app_config/reset';
         }
     }
+
+    function toggleApiKey(btn) {
+        var input = $(btn).closest('.input-group').find('input');
+        var icon = $(btn).find('i');
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            input.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    }
+
+    // Custom file input label update
+    $('.custom-file-input').on('change', function() {
+        let fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass("selected").html(fileName);
+    });
 </script>
 
 <?php

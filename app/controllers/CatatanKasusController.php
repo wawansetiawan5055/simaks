@@ -7,11 +7,21 @@ function catatan_kasus_index($pdo)
     if (!check_access('catatan_kasus'))
         redirect('index.php');
 
-    $id_ta = $_SESSION['id_ta_aktif'] ?? 0;
+    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
     if (!$id_ta)
         die("Error: Tahun Ajaran aktif tidak ditemukan.");
 
-    $kelas_list = KelasModel::all($pdo, $id_ta);
+    // Ambil hanya kelas yang memiliki siswa aktif pada TA aktif
+    $stmt_kelas = $pdo->prepare("
+        SELECT DISTINCT k.id_kelas, k.nama_kelas, k.tingkat
+        FROM kelas k
+        JOIN penempatan_siswa ps ON k.id_kelas = ps.id_kelas
+        JOIN siswa s ON ps.id_siswa = s.id_siswa
+        WHERE ps.id_ta = ? AND s.status_aktif = 'Aktif'
+        ORDER BY k.tingkat, k.nama_kelas
+    ");
+    $stmt_kelas->execute([$id_ta]);
+    $kelas_list = $stmt_kelas->fetchAll(PDO::FETCH_ASSOC);
 
     // Panggil model untuk mengambil data kasus dengan filter TA aktif
     $kasus_list = CatatanKasusModel::getAllKasus($pdo, $id_ta);
@@ -27,7 +37,7 @@ function catatan_kasus_save($pdo)
     if (!check_access('catatan_kasus', 'save'))
         redirect('index.php');
 
-    $id_ta_aktif = $_SESSION['id_ta_aktif'] ?? 0;
+    $id_ta_aktif = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
     $id_guru_piket = $_SESSION['id_guru_terkait'] ?? 0;
     if (has_role('Admin') && !$id_guru_piket) {
         $id_guru_piket = $pdo->query("SELECT id_guru FROM guru LIMIT 1")->fetchColumn();

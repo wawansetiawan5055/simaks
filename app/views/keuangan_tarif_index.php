@@ -33,7 +33,7 @@
                             <strong>Harga Default (COA)</strong>.
                         </p>
 
-                        <a href="index.php?mod=keuangan_tarif&act=create" class="btn btn-primary mb-3">
+                        <a href="<?= BASE_URL ?>keuangan_tarif/create" class="btn btn-primary mb-3">
                             <i class="bi bi-plus-circle"></i> Tambah Tarif Khusus
                         </a>
 
@@ -75,7 +75,7 @@
                                             </td>
                                             <td><?= htmlspecialchars($t['keterangan']) ?></td>
                                             <td>
-                                                <a href="index.php?mod=keuangan_tarif&act=delete&id=<?= $t['id_tarif'] ?>"
+                                                <a href="<?= BASE_URL ?>keuangan_tarif/delete?id=<?= $t['id_tarif'] ?>"
                                                     class="btn btn-sm btn-danger"
                                                     onclick="return confirm('Yakin ingin menghapus aturan tarif ini?')">
                                                     <i class="bi bi-trash"></i>

@@ -41,7 +41,7 @@
                         <button class="btn btn-warning btn-xs" onclick="editTahapan(<?= htmlspecialchars(json_encode($t)) ?>); return false;">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <a href="index.php?mod=kewirausahaan&act=tahapan_delete&id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" 
+                        <a href="<?= BASE_URL ?>kewirausahaan/tahapan_delete?id_kewirausahaan=<?= $id ?>&id_tahapan=<?= $t['id_tahapan'] ?>" 
                            class="btn btn-danger btn-xs" onclick="return confirmDelete(event)">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -82,7 +82,7 @@
                         <p class="text-sm mb-1"><?= htmlspecialchars($p['deskripsi']) ?></p>
                         <p class="mb-1"><strong>Rp <?= number_format($p['harga_jual'], 0, ',', '.') ?></strong></p>
                         <p class="text-muted text-sm mb-2">Stok: <?= $p['stok'] ?></p>
-                        <a href="index.php?mod=kewirausahaan&act=produk_delete&id_kewirausahaan=<?= $id ?>&id_produk=<?= $p['id_produk'] ?>" 
+                        <a href="<?= BASE_URL ?>kewirausahaan/produk_delete?id_kewirausahaan=<?= $id ?>&id_produk=<?= $p['id_produk'] ?>" 
                            class="btn btn-danger btn-xs btn-block" onclick="return confirmDelete(event)">
                             <i class="fas fa-trash"></i> Hapus
                         </a>
@@ -167,7 +167,7 @@
                     <td><?= htmlspecialchars($k['keterangan']) ?></td>
                     <td class="text-right">Rp <?= number_format($k['jumlah'], 0, ',', '.') ?></td>
                     <td>
-                        <a href="index.php?mod=kewirausahaan&act=keuangan_delete&id_kewirausahaan=<?= $id ?>&id_transaksi=<?= $k['id_transaksi'] ?>" 
+                        <a href="<?= BASE_URL ?>kewirausahaan/keuangan_delete?id_kewirausahaan=<?= $id ?>&id_transaksi=<?= $k['id_transaksi'] ?>" 
                            class="btn btn-danger btn-xs" onclick="return confirmDelete(event)">
                             <i class="fas fa-trash"></i>
                         </a>
@@ -185,7 +185,7 @@
 <div class="modal" id="modalTahapan" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=tahapan_save" method="post">
+            <form action="<?= BASE_URL ?>kewirausahaan/tahapan_save" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah/Edit Tahapan</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -246,7 +246,7 @@
 <div class="modal" id="modalProduk" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=produk_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kewirausahaan/produk_save" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Produk</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -297,7 +297,7 @@
 <div class="modal" id="modalKeuangan" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kewirausahaan&act=keuangan_save" method="post">
+            <form action="<?= BASE_URL ?>kewirausahaan/keuangan_save" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Transaksi</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="120" height="150">
+  <defs>
+    <!-- Background Gradient (Rose/Violet) -->
+    <linearGradient id="femaleBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#831843" />
+    </linearGradient>
+    <!-- Skin Tone -->
+    <linearGradient id="femaleSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa" />
+      <stop offset="100%" stop-color="#fba471" />
+    </linearGradient>
+    <!-- Hijab Outer / Shawl -->
+    <linearGradient id="hijabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="50%" stop-color="#7e22ce" />
+      <stop offset="100%" stop-color="#581c87" />
+    </linearGradient>
+    <!-- Inner Hijab / Ciput -->
+    <linearGradient id="innerHijab" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+    <!-- Dress / Blouse -->
+    <linearGradient id="femaleDress" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#9333ea" />
+    </linearGradient>
+  </defs>
+
+  <!-- Full Background (Seamless in rectangle photo boxes and auto-rounded in circle frames) -->
+  <rect width="100%" height="100%" fill="url(#femaleBg)" />
+
+  <g transform="translate(0, 10)">
+    <!-- Shoulders / Blouse -->
+    <path d="M12 140 C12 106, 34 94, 60 94 C86 94, 108 106, 108 140 Z" fill="url(#femaleDress)" />
+
+    <!-- Hijab Outer Shape (Flowing over shoulders) -->
+    <path d="M29 36 C29 16, 91 16, 91 36 C91 66, 105 98, 102 140 C85 140, 35 140, 18 140 C15 98, 29 66, 29 36 Z" fill="url(#hijabGrad)" />
+
+    <!-- Inner Hijab / Ciput Band -->
+    <path d="M40 40 Q60 30 80 40 L83 44 Q60 33 37 44 Z" fill="url(#innerHijab)" />
+
+    <!-- Face Oval (Within Hijab opening) -->
+    <ellipse cx="60" cy="57" rx="22" ry="26" fill="url(#femaleSkin)" />
+
+    <!-- Hijab Frame / Opening (Overlap around face) -->
+    <path d="M37 42 Q60 31 83 42 Q86 64 78 78 Q60 88 42 78 Q34 64 37 42 Z" fill="none" stroke="url(#hijabGrad)" stroke-width="3" />
+
+    <!-- Hijab Chest Drape / Knot -->
+    <path d="M48 84 Q60 96 72 84 Q65 120 60 130 Q55 120 48 84 Z" fill="#6b21a8" opacity="0.65" />
+    <!-- Hijab Pin Accent -->
+    <circle cx="60" cy="92" r="3" fill="#fde047" stroke="#ca8a04" stroke-width="1" />
+
+    <!-- Eyes (Gentle, friendly curved eyes with lashes) -->
+    <path d="M49 56 Q54 60 58 56" stroke="#1e293b" stroke-width="2" stroke-linecap="round" fill="none" />
+    <path d="M62 56 Q66 60 71 56" stroke="#1e293b" stroke-width="2" stroke-linecap="round" fill="none" />
+    <path d="M58 56 L60 54" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round" />
+    <path d="M71 56 L73 54" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round" />
+
+    <!-- Cheeks (Blush) -->
+    <circle cx="48" cy="63" r="4" fill="#f43f5e" opacity="0.28" />
+    <circle cx="72" cy="63" r="4" fill="#f43f5e" opacity="0.28" />
+
+    <!-- Smile -->
+    <path d="M55 68 Q60 72 65 68" stroke="#e11d48" stroke-width="2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>

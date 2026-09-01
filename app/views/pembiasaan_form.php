@@ -8,7 +8,7 @@
 <section class="content">
     <div class="container-fluid">
         <div class="card card-success">
-            <form action="index.php?mod=pembiasaan&act=save" method="POST">
+            <form action="<?= BASE_URL ?>pembiasaan/save" method="POST">
                 <?php if ($pembiasaan): ?>
                     <input type="hidden" name="id_pembiasaan" value="<?= $pembiasaan['id_pembiasaan'] ?>">
                 <?php endif; ?>
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="card-footer">
-                    <a href="index.php?mod=pembiasaan" class="btn btn-secondary">Batal</a>
+                    <a href="<?= BASE_URL ?>pembiasaan" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>

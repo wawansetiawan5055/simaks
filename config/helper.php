@@ -52,8 +52,45 @@ function is_admin() {
 }
 
 function redirect($url) {
+    if (!preg_match('#^https?://#i', $url)) {
+        if (strpos($url, 'index.php?mod=') === 0 || strpos($url, 'index.php?') === 0 || strpos($url, '?mod=') === 0) {
+            $query_part = parse_url($url, PHP_URL_QUERY) ?? '';
+            parse_str($query_part, $queryParams);
+            $mod = $queryParams['mod'] ?? '';
+            $act = $queryParams['act'] ?? '';
+            unset($queryParams['mod'], $queryParams['act']);
+
+            if ($mod) {
+                $clean_path = $mod . ($act ? '/' . $act : '');
+                $query_str = !empty($queryParams) ? '?' . http_build_query($queryParams) : '';
+                $url = (defined('BASE_URL') ? BASE_URL : '/') . $clean_path . $query_str;
+            } else {
+                $url = (defined('BASE_URL') ? BASE_URL : '/') . ltrim($url, '/');
+            }
+        } elseif (defined('BASE_URL') && strpos($url, BASE_URL) !== 0) {
+            $url = BASE_URL . ltrim($url, '/');
+        }
+    }
     header("Location: $url"); 
     exit;
+}
+
+/**
+ * Cek apakah modul CBT diaktifkan melalui environment variable.
+ * Mengembalikan true jika ENABLE_CBT di-set ke "true" (case-insensitive).
+ */
+function is_cbt_enabled() {
+    $val = getenv('ENABLE_CBT');
+    return $val !== false && strtolower($val) === 'true';
+}
+
+/**
+ * Helper untuk mengambil base URL CBT jika disetel, atau default kosong.
+ */
+function cbt_base_url() {
+    // default path when environment variable is not provided.
+    // changed to match typical installation under /simaks/cbt
+    return getenv('CBT_BASE_URL') ?: '/simaks/cbt';
 }
 
 // =========================================================================
@@ -78,6 +115,81 @@ function has_role($roles) {
 // =========================================================================
 
 /**
+ * [BARU] Middleware: Require akses ke modul tertentu, redirect jika tidak punya izin
+ * Digunakan di awal controller untuk proteksi halaman.
+ * 
+ * @param string $mod_param Nama modul
+ * @param string $act_param Nama action (opsional)
+ * @param string $redirect_url URL redirect jika tidak punya akses (default: index.php)
+ */
+function require_access($mod_param, $act_param = 'index', $redirect_url = 'index.php') {
+    if (!check_access($mod_param, $act_param)) {
+        $_SESSION['error'] = "Anda tidak memiliki akses ke halaman ini.";
+        redirect($redirect_url);
+    }
+}
+
+/**
+ * [BARU] Middleware: Require role tertentu, redirect jika tidak punya
+ * 
+ * @param array|string $required_roles Role yang diperlukan (array atau string)
+ * @param string $redirect_url URL redirect jika tidak punya role
+ */
+function require_role($required_roles, $redirect_url = 'index.php') {
+    $user_roles = user_roles();
+    foreach ((array)$required_roles as $role) {
+        if (in_array($role, $user_roles)) return; // OK
+    }
+    $_SESSION['error'] = "Role tidak sesuai untuk mengakses halaman ini.";
+    redirect($redirect_url);
+}
+
+/**
+ * Helper internal untuk mencari ID Menu yang cocok dengan modul & aksi saat ini
+ * Mendukung Clean URL (e.g. 'siswa', 'lms/materi_list') dan Legacy Query String ('index.php?mod=siswa')
+ */
+function find_menu_id_smart($pdo, $mod_param, $act_param = 'index') {
+    $user_role_ids = $_SESSION['role_ids'] ?? [];
+    if (empty($user_role_ids)) return null;
+
+    $placeholders = implode(',', array_fill(0, count($user_role_ids), '?'));
+    $exact_mod = $mod_param;
+    $exact_mod_act = ($act_param && $act_param !== 'index') ? "{$mod_param}/{$act_param}" : $mod_param;
+    $mod_slash = "{$mod_param}/%";
+    $mod_query = "%mod={$mod_param}%";
+
+    $sql = "
+        SELECT am.id_menu,
+               (SELECT COUNT(*) FROM hak_akses ha WHERE ha.id_menu = am.id_menu AND ha.id_peran IN ({$placeholders}) AND ha.can_read = 1) as has_access
+        FROM app_menu am
+        WHERE am.status = 'Aktif' 
+          AND (
+             am.link = ?
+          OR am.link = ?
+          OR am.link LIKE ?
+          OR am.link LIKE ?
+          )
+        ORDER BY 
+            has_access DESC,
+            (am.link = ?) DESC,
+            (am.link = ?) DESC,
+            CHAR_LENGTH(am.link) ASC
+        LIMIT 1
+    ";
+
+    $params = array_merge(
+        $user_role_ids,
+        [$exact_mod, $exact_mod_act, $mod_slash, $mod_query],
+        [$exact_mod_act, $exact_mod]
+    );
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (int)$row['id_menu'] : null;
+}
+
+/**
  * [BARU] Cek apakah user memiliki izin akses ke modul tertentu (Dynamic RBAC)
  * Menggantikan has_role() yang hardcoded.
  * 
@@ -99,59 +211,13 @@ function check_access($mod_param = null, $act_param = null) {
     if ($mod_param === null) $mod_param = $_GET['mod'] ?? 'dashboard';
     if ($act_param === null) $act_param = $_GET['act'] ?? 'index';
 
-    // 2. Cari Menu ID berdasarkan Link
-    // [FIX] Gunakan query yang lebih smart: prioritaskan menu yang punya permission untuk role user
-    // Ini mengatasi masalah duplicate menu entries
-    
-    $placeholders = implode(',', array_fill(0, count($user_role_ids), '?'));
-    
-    // Jika ada act param yang spesifik selain index, coba cari match yang lebih spesifik dulu
-    if ($act_param !== 'index') {
-         // Cari menu dengan act parameter spesifik, prioritaskan yang punya permission
-         $sql_spec = "
-             SELECT am.id_menu 
-             FROM app_menu am
-             LEFT JOIN hak_akses ha ON am.id_menu = ha.id_menu AND ha.id_peran IN ($placeholders)
-             WHERE am.link LIKE ? AND am.status = 'Aktif'
-             ORDER BY 
-                 (ha.can_read IS NOT NULL AND ha.can_read = 1) DESC,
-                 CHAR_LENGTH(am.link) DESC
-             LIMIT 1
-         ";
-         $params_spec = array_merge($user_role_ids, ["%mod=$mod_param&act=$act_param%"]);
-         $stmt_spec = $pdo->prepare($sql_spec);
-         $stmt_spec->execute($params_spec);
-         $menu_id = $stmt_spec->fetchColumn();
-         
-         if ($menu_id) {
-             return _check_permission_by_id($pdo, $menu_id, $user_role_ids);
-         }
-    }
-    
-    // Fallback: cari berdasarkan mod saja
-    // [FIX] Prioritaskan menu yang memiliki permission untuk role user
-    // Ini mencegah matching ke menu duplicate yang tidak punya permission
-    $sql = "
-        SELECT am.id_menu 
-        FROM app_menu am
-        LEFT JOIN hak_akses ha ON am.id_menu = ha.id_menu AND ha.id_peran IN ($placeholders)
-        WHERE am.link LIKE ? AND am.status = 'Aktif'
-        ORDER BY 
-            (ha.can_read IS NOT NULL AND ha.can_read = 1) DESC,
-            CHAR_LENGTH(am.link) DESC
-        LIMIT 1
-    ";
-    
-    $params = array_merge($user_role_ids, ["%mod=$mod_param%"]);
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $menu_id = $stmt->fetchColumn();
+    // Dashboard & Portal Siswa default public untuk user logged-in
+    if ($mod_param == 'dashboard' || $mod_param == 'siswa_portal') return true;
+
+    // 2. Cari Menu ID berdasarkan Link (Smart Link Matching)
+    $menu_id = find_menu_id_smart($pdo, $mod_param, $act_param);
 
     if (!$menu_id) {
-        // Jika menu tidak terdaftar di database (misal dashboard), anggap PUBLIC atau Restricted default?
-        // Untuk aman, dashboard biasanya public untuk yang login.
-        if ($mod_param == 'dashboard') return true;
-
         return false; // Default deny
     }
 
@@ -199,25 +265,10 @@ function can_do($pdo, $mod_param, $action_type) {
     // [BYPASS UTAMA] Admin (ID 1) bypass semua izin per-aksi
     if (in_array(1, $user_role_ids)) return true;
 
+    if ($mod_param == 'dashboard' || $mod_param == 'siswa_portal') return true;
+
     // 3. Cari Menu ID
-    // [FIX] Gunakan query yang sama seperti check_access: prioritaskan menu dengan permission
-    $placeholders = implode(',', array_fill(0, count($user_role_ids), '?'));
-    
-    $sql = "
-        SELECT am.id_menu 
-        FROM app_menu am
-        LEFT JOIN hak_akses ha ON am.id_menu = ha.id_menu AND ha.id_peran IN ($placeholders)
-        WHERE am.link LIKE ? AND am.status = 'Aktif'
-        ORDER BY 
-            (ha.can_read IS NOT NULL AND ha.can_read = 1) DESC,
-            CHAR_LENGTH(am.link) DESC
-        LIMIT 1
-    ";
-    
-    $params = array_merge($user_role_ids, ["%mod=$mod_param%"]);
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $menu_id = $stmt->fetchColumn();
+    $menu_id = find_menu_id_smart($pdo, $mod_param, $_GET['act'] ?? 'index');
     
     if (!$menu_id) return false;
 
@@ -232,7 +283,6 @@ function can_do($pdo, $mod_param, $action_type) {
     
     foreach ($permissions as $p) {
         // Jika salah satu role mengizinkan, return true (Cumulative permission)
-        // FIX: Gunakan key yang benar (can_create, can_update)
         if (
             ($action_type == 'create' && !empty($p['can_create'])) ||
             ($action_type == 'update' && !empty($p['can_update'])) ||
@@ -280,34 +330,89 @@ function get_app_logo() {
 
 /**
  * [BARU] Mendapatkan URL Foto Profil Pengguna
+ * - Jika sudah ada foto kustom yang diupload -> kembalikan foto asli
+ * - Jika belum -> kembalikan Avatar Resmi sesuai Peran (Guru/Staf vs Siswa) dan Jenis Kelamin (L/P):
+ *   * Guru/Staf Perempuan: Avatar Batik PGRI Berhijab (assets/img/avatar-guru-female.jpg)
+ *   * Guru/Staf Laki-laki: Avatar Batik PGRI Berpeci (assets/img/avatar-guru-male.jpg)
+ *   * Siswa Perempuan: Avatar Seragam Siswi Berhijab (assets/img/avatar-female.jpg)
+ *   * Siswa Laki-laki: Avatar Seragam Siswa Berdasi (assets/img/avatar-male.jpg)
  */
-function get_user_photo($user_id = null) {
+function get_user_photo($user_id = null, $custom_name = null, $gender = null, $user_type = null) {
     global $pdo;
     if (!$user_id && isset($_SESSION['user_id'])) $user_id = $_SESSION['user_id'];
     
-    // Default photo
-    $default_photo = 'assets/img/user.jpg';
+    $jk = $gender ?? '';
+    $type = $user_type ?? '';
     
     if ($user_id) {
-        // Cek Session dulu biar cepat (jika update profil, session harus diupdate juga)
-        if (isset($_SESSION['user_photo']) && $_SESSION['user_id'] == $user_id) {
-             $photo_path = 'assets/img/profil/' . $_SESSION['user_photo'];
-             if (file_exists(__DIR__ . '/../public/' . $photo_path)) return $photo_path;
+        // Cek Session dulu jika user yang login
+        if (isset($_SESSION['user_photo']) && $_SESSION['user_id'] == $user_id && !empty($_SESSION['user_photo'])) {
+            $photo_path = 'assets/img/profil/' . $_SESSION['user_photo'];
+            if (file_exists(__DIR__ . '/../public/' . $photo_path)) {
+                return BASE_URL . $photo_path;
+            }
         }
 
-        // Kalau di session gak ada, cek DB
-        $stmt = $pdo->prepare("SELECT foto FROM pengguna WHERE id_pengguna = ?");
-        $stmt->execute([$user_id]);
-        $foto = $stmt->fetchColumn();
-        
-        if ($foto) {
-            $photo_path = 'assets/img/profil/' . $foto;
-            if (file_exists(__DIR__ . '/../public/' . $photo_path)) return $photo_path;
+        // Cek DB untuk user_id tersebut (ambil foto, jenis kelamin, & tipe guru/siswa)
+        if ($pdo) {
+            $stmt = $pdo->prepare("
+                SELECT p.foto, COALESCE(s.jk, g.jk, '') AS jk,
+                       (CASE WHEN g.id_guru IS NOT NULL THEN 'guru' 
+                             WHEN s.id_siswa IS NOT NULL THEN 'siswa' 
+                             ELSE 'staf' END) AS u_type
+                FROM pengguna p
+                LEFT JOIN siswa s ON p.id_pengguna = s.id_pengguna
+                LEFT JOIN guru g ON p.id_pengguna = g.id_pengguna
+                WHERE p.id_pengguna = ?
+            ");
+            $stmt->execute([$user_id]);
+            $u = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($u) {
+                if (!empty($u['foto'])) {
+                    $photo_path = 'assets/img/profil/' . $u['foto'];
+                    if (file_exists(__DIR__ . '/../public/' . $photo_path)) {
+                        return BASE_URL . $photo_path;
+                    }
+                }
+                if (empty($jk) && !empty($u['jk'])) {
+                    $jk = $u['jk'];
+                }
+                if (empty($type) && !empty($u['u_type'])) {
+                    $type = $u['u_type'];
+                }
+            }
         }
     }
-    
 
-    return $default_photo;
+    $is_female = !empty($jk) && strtoupper(substr(trim($jk), 0, 1)) === 'P';
+    $is_siswa = ($type === 'siswa');
+
+    if ($is_siswa) {
+        return BASE_URL . ($is_female ? 'assets/img/avatar-female.jpg' : 'assets/img/avatar-male.jpg');
+    } else {
+        return BASE_URL . ($is_female ? 'assets/img/avatar-guru-female.jpg' : 'assets/img/avatar-guru-male.jpg');
+    }
+}
+
+/**
+ * [BARU] Helper khusus untuk merender avatar / foto profil siswa & guru langsung dari nama file foto atau jenis kelamin
+ */
+function get_user_avatar($photo = null, $gender = null, $user_type = 'siswa') {
+    $base = defined('BASE_URL') ? BASE_URL : '/';
+    if (!empty($photo)) {
+        $photo_path = 'assets/img/profil/' . $photo;
+        if (file_exists(__DIR__ . '/../public/' . $photo_path)) {
+            return $base . $photo_path;
+        }
+    }
+    $is_female = !empty($gender) && strtoupper(substr(trim($gender), 0, 1)) === 'P';
+    $is_siswa = ($user_type === 'siswa');
+    if ($is_siswa) {
+        return $base . ($is_female ? 'assets/img/avatar-female.jpg' : 'assets/img/avatar-male.jpg');
+    } else {
+        return $base . ($is_female ? 'assets/img/avatar-guru-female.jpg' : 'assets/img/avatar-guru-male.jpg');
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -359,4 +464,68 @@ function format_nama_gelar($nama, $gelar_depan = '', $gelar_belakang = '') {
     }
     
     return $hasil;
+}
+
+/**
+ * [BARU] Helper untuk Clean URLs
+ * Mengubah index.php?mod=X&act=Y menjadi /X/Y
+ */
+function url($mod, $act = '', $params = []) {
+    $url = '/' . ltrim($mod, '/');
+    if ($act && $act !== 'index') {
+        $url .= '/' . ltrim($act, '/');
+    }
+    if (!empty($params)) {
+        $url .= '?' . http_build_query($params);
+    }
+    return $url;
+}
+
+if (!function_exists('format_cbt_math_output')) {
+    function format_cbt_math_output($text) {
+        if ($text === null || $text === '') return '';
+
+        $tokens = [];
+        $token_idx = 0;
+
+        $wrap_token = function($str) use (&$tokens, &$token_idx) {
+            $key = '___MATH_TK_' . ($token_idx++) . '___';
+            $tokens[$key] = '$' . trim($str, '$') . '$';
+            return $key;
+        };
+
+        // 1. Amankan yang sudah memiliki $...$ atau $$...$$
+        $text = preg_replace_callback('/(\$\$[^\$]+\$\$|\$[^\$]+\$)/', function($m) use ($wrap_token) {
+            return $wrap_token($m[0]);
+        }, $text);
+
+        // 2. Wrap complete LaTeX commands with braces
+        $text = preg_replace_callback('/\\\\(?:frac|sqrt|left|right|sum|int|lim|prod|binom|over|underline|overline|mathbf|text)\s*(?:\[[^\]]*\])?(?:\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})+/', function($m) use ($wrap_token) {
+            return $wrap_token($m[0]);
+        }, $text);
+
+        // 3. Wrap caret parentheses exponents
+        $text = preg_replace_callback('/([a-zA-Z0-9\)\.]+|\w+)\^\(([^)]+)\)/', function($m) use ($wrap_token) {
+            return $wrap_token($m[1] . '^{' . $m[2] . '}');
+        }, $text);
+
+        // 4. Wrap simple single-token exponents
+        $text = preg_replace_callback('/(?<![a-zA-Z0-9\$\_\@])([a-zA-Z0-9]+)\^([0-9a-zA-Z]+)(?![a-zA-Z0-9\$\_\@])/', function($m) use ($wrap_token) {
+            return $wrap_token($m[1] . '^{' . $m[2] . '}');
+        }, $text);
+
+        // 5. Wrap single LaTeX words
+        $text = preg_replace_callback('/\\\\(?:alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|cdot|times|div|pm|mp|le|ge|ne|neq|approx|infty|forall|exists|in|notin|subset|subseteq|cup|cap|to|leftarrow|rightarrow|Rightarrow|leftrightarrow)\b/', function($m) use ($wrap_token) {
+            return $wrap_token($m[0]);
+        }, $text);
+
+        if (!empty($tokens)) {
+            $text = strtr($text, $tokens);
+        }
+
+        $text = preg_replace('/\$\s*\$/', ' ', $text);
+        $text = preg_replace('/\$\s*([\=\+\-\*\/])\s*\$/', ' $1 ', $text);
+
+        return $text;
+    }
 }

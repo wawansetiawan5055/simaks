@@ -10,21 +10,76 @@
     .btn-aksi-grup .btn { margin-left: 13px;}
 </style>
 
-<div class="content-header p-0 pt-3">
+<div class="content-header pt-3 mb-2">
   <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3 px-4">
-      <div>
-        <h2 class="m-0 font-weight-bold text-dark">Struktur Kurikulum (Alokasi JJM)</h2>
-        <p class="text-muted small mb-0">Definisi jam mata pelajaran per minggu untuk setiap tingkat kelas.</p>
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-sitemap"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Struktur Kurikulum (Alokasi JJM)
+          </h4>
+        </div>
       </div>
-      <div class="text-right">
-        <button type="button" class="btn btn-warning shadow-sm px-3 font-weight-bold text-white" style="border-radius: 8px;" onclick="resetForm(); $('#modal-jjm').modal('show');">
-            <i class="fas fa-plus-circle mr-1"></i> Tambah Alokasi JJM
-        </button>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <div class="d-inline-flex flex-wrap justify-content-end" style="gap: 8px;">
+          <button type="button" class="btn btn-warning shadow-sm px-3 font-weight-bold text-white rounded-pill btn-sm" onclick="resetForm(); $('#modal-jjm').modal('show');">
+              <i class="fas fa-plus-circle mr-1"></i> Tambah Alokasi JJM
+          </button>
+          <?php if (!empty($previous_ta)): ?>
+              <?php if ($can_import_previous): ?>
+                  <a href="<?= BASE_URL ?>struktur_kurikulum/import_previous"
+                      class="btn btn-info shadow-sm px-3 font-weight-bold text-white rounded-pill btn-sm"
+                      onclick="return confirm('Tarik struktur kurikulum dari <?= htmlspecialchars(addslashes($previous_ta['nama_ta'])) ?> ke TA saat ini?');">
+                      <i class="fas fa-download mr-1"></i> Tarik dari <?= htmlspecialchars($previous_ta['nama_ta']) ?>
+                  </a>
+              <?php endif; ?>
+          <?php endif; ?>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<?php if (!empty($_SESSION['pesan_sukses']) || !empty($_SESSION['pesan_error']) || !empty($_SESSION['pesan_warning']) || !empty($_SESSION['pesan_info'])): ?>
+<div class="container-fluid mb-3">
+    <?php if (!empty($_SESSION['pesan_sukses'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle mr-2"></i> <?= htmlspecialchars($_SESSION['pesan_sukses']) ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <?php unset($_SESSION['pesan_sukses']); ?>
+    <?php elseif (!empty($_SESSION['pesan_error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle mr-2"></i> <?= htmlspecialchars($_SESSION['pesan_error']) ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <?php unset($_SESSION['pesan_error']); ?>
+    <?php elseif (!empty($_SESSION['pesan_warning'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle mr-2"></i> <?= htmlspecialchars($_SESSION['pesan_warning']) ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <?php unset($_SESSION['pesan_warning']); ?>
+    <?php elseif (!empty($_SESSION['pesan_info'])): ?>
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle mr-2"></i> <?= htmlspecialchars($_SESSION['pesan_info']) ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <?php unset($_SESSION['pesan_info']); ?>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <section class="content">
 <div class="container-fluid">
@@ -39,7 +94,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="index.php?mod=struktur_kurikulum&act=save" method="POST" id="form-struktur">
+                <form action="<?= BASE_URL ?>struktur_kurikulum/save" method="POST" id="form-struktur">
                     <div class="modal-body">
                         <div class="row">
                             <div class="form-group col-md-6">
@@ -159,7 +214,7 @@
                                                     data-jp="<?= $mapel['alokasi_jp_minggu'] ?>">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <a href="index.php?mod=struktur_kurikulum&act=delete&id=<?= $mapel['id_struktur'] ?>" 
+                                                <a href="<?= BASE_URL ?>struktur_kurikulum/delete?id=<?= $mapel['id_struktur'] ?>" 
                                                     class="btn btn-xs btn-outline-danger border-0 ml-1" 
                                                     style="background: #fef2f2; color: #ef4444;"
                                                     title="Hapus" 
@@ -193,7 +248,7 @@
 
 <script>
 // URL dasar untuk form (mode Tambah)
-const formActionBase = 'index.php?mod=struktur_kurikulum&act=save';
+const formActionBase = '<?= BASE_URL ?>struktur_kurikulum/save';
 
 function resetForm() {
     $('#form-title').text('Tambah Alokasi JJM');

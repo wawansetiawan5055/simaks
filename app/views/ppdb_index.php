@@ -53,22 +53,28 @@
     }
 </style>
 
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
   <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1><i class="fas fa-user-graduate mr-2"></i> Dashboard PPDB</h1>
-        <p class="text-muted mb-0">Manajemen Penerimaan Peserta Didik Baru</p>
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Dashboard &amp; Manajemen PPDB
+          </h4>
+        </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
         <ol class="breadcrumb float-sm-right bg-transparent p-0 m-0">
-            <li class="breadcrumb-item"><a href="index.php?mod=dashboard">Home</a></li>
-            <li class="breadcrumb-item active">PPDB</li>
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+            <li class="breadcrumb-item active text-primary font-weight-bold">PPDB</li>
         </ol>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <section class="content">
 <div class="container-fluid">
@@ -136,13 +142,19 @@
                     <button type="button" class="btn btn-success shadow-sm mr-2" data-toggle="modal" data-target="#modalImport">
                         <i class="fas fa-file-excel mr-1"></i> Import Excel
                     </button>
-                    <a href="index.php?mod=ppdb&act=form" class="btn btn-primary shadow-sm mr-2">
+                    <a href="<?= BASE_URL ?>ppdb/form" class="btn btn-primary shadow-sm mr-2">
                         <i class="fas fa-plus-circle mr-1"></i> Tambah Manual
                     </a>
-                    <a href="index.php?mod=ppdb&act=promote_massal" 
-                       class="btn btn-warning shadow-sm text-white" 
+                    <a href="<?= BASE_URL ?>ppdb/promote_massal" 
+                       class="btn btn-warning shadow-sm text-white mr-2" 
                        onclick="return confirm('PERINGATAN: Aksi ini akan mengunci NIPD dan memindahkan siswa DITERIMA ke Data Master Siswa. Lanjutkan?')">
                         <i class="fas fa-rocket mr-1"></i> Generate NIPD Massal
+                    </a>
+                    <a href="<?= BASE_URL ?>ppdb/regenerate_nipd" 
+                       class="btn btn-outline-indigo shadow-sm"
+                       style="border-color:#4f46e5;color:#4f46e5;"
+                       title="Re-generate NIPD untuk siswa yang sudah terdaftar di Data Master Siswa (pilih TA tertentu)">
+                        <i class="fas fa-sync-alt mr-1"></i> Re-Generate NIPD
                     </a>
                 </div>
             </div>
@@ -177,7 +189,7 @@
                         <div class="col-md-4">
                             <div class="d-flex">
                                 <button type="submit" class="btn btn-primary flex-fill mr-2"><i class="fas fa-filter"></i> Filter</button>
-                                <a href="index.php?mod=ppdb&act=index" class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></a>
+                                <a href="<?= BASE_URL ?>ppdb" class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></a>
                             </div>
                         </div>
                     </form>
@@ -249,12 +261,12 @@
                                                 data-nisn="<?= htmlspecialchars($data['nisn']) ?>"
                                                 data-sekolah="<?= htmlspecialchars($data['asal_sekolah']) ?>"
                                                 data-status="<?= $status ?>"
-                                                data-link-detail="index.php?mod=ppdb&act=detail&id=<?= $data['id']; ?>">
+                                                data-link-detail="<?= BASE_URL ?>ppdb/detail?id=<?= $data['id']; ?>">
                                                 <i class="fas fa-check-circle mr-1"></i> Verifikasi
                                             </button>
                                             
                                             <?php if (empty($data['id_siswa']) || $data['id_siswa'] == 0): ?>
-                                                <a href="index.php?mod=ppdb&act=delete&id=<?= $data['id'] ?>" 
+                                                <a href="<?= BASE_URL ?>ppdb/delete?id=<?= $data['id'] ?>" 
                                                    class="btn btn-sm btn-outline-danger btn-delete-confirm">
                                                     <i class="fas fa-trash mr-1"></i> Hapus
                                                 </a>
@@ -377,7 +389,7 @@
 <!-- MODAL IMPORT (BARU) -->
 <div class="modal fade" id="modalImport" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <form action="index.php?mod=ppdb&act=import" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
+        <form action="<?= BASE_URL ?>ppdb/import" method="POST" enctype="multipart/form-data" class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title"><i class="fas fa-file-excel mr-2"></i> Import Data PPDB</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -396,7 +408,7 @@
                 
                 <div class="form-group mb-4">
                     <label class="font-weight-bold"><i class="fas fa-download mr-1"></i> 1. Download Template</label>
-                    <a href="index.php?mod=ppdb&act=get_template" class="btn btn-outline-success btn-block">
+                    <a href="<?= BASE_URL ?>ppdb/get_template" class="btn btn-outline-success btn-block">
                         <i class="fas fa-file-download mr-2"></i> Unduh Template Excel
                     </a>
                 </div>
@@ -461,7 +473,7 @@
             $('#btn-lihat-detail').attr('href', detailSrc);
 
             // 3. Construct URLs & Logic
-            var baseUrl = 'index.php?mod=ppdb&act=update_status&id=' + id;
+            var baseUrl = '<?= BASE_URL ?>ppdb/update_status?id=' + id;
             $('#btn-terima').attr('href', baseUrl + '&status=diterima');
             $('#btn-tolak').attr('href', baseUrl + '&status=ditolak');
             $('#btn-reset').attr('href', baseUrl + '&status=pending');

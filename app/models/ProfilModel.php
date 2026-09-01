@@ -18,26 +18,48 @@ class ProfilModel {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
 
-        // 2. Handle File Upload (Foto)
-        if ($file && $file['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../public/assets/img/profil/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+        // 2. Handle File Upload (Foto) atau Live Camera Base64
+        $filename = null;
+        $uploadDir = __DIR__ . '/../../public/assets/img/profil/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
+        // A. Cek apakah ada foto dari Live Camera
+        if (!empty($data['foto_cam_data']) && preg_match('/^data:image\/(\w+);base64,/', $data['foto_cam_data'], $cam_match)) {
+            $raw_base64 = substr($data['foto_cam_data'], strpos($data['foto_cam_data'], ',') + 1);
+            $decoded = base64_decode($raw_base64);
+            $cam_type = strtolower($cam_match[1]);
+            $ext = ($cam_type === 'png') ? 'png' : 'jpg';
+            if ($decoded) {
+                $filename = 'user_' . $id . '_' . time() . '.' . $ext;
+                file_put_contents($uploadDir . $filename, $decoded);
+            }
+        } 
+        // B. Cek file upload biasa
+        elseif ($file && $file['error'] === UPLOAD_ERR_OK) {
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             
             if (in_array($ext, $allowed)) {
                 $filename = 'user_' . $id . '_' . time() . '.' . $ext;
                 $destination = $uploadDir . $filename;
+                move_uploaded_file($file['tmp_name'], $destination);
+            }
+        }
 
-                if (move_uploaded_file($file['tmp_name'], $destination)) {
-                    // Update field foto di DB
-                    $stmt = $pdo->prepare("UPDATE pengguna SET foto = ? WHERE id_pengguna = ?");
-                    $stmt->execute([$filename, $id]);
-                    
-                    // Update Session juga biar langsung berubah di header
-                    $_SESSION['user_photo'] = $filename;
-                }
+        // C. Simpan ke database jika foto baru berhasil disimpan
+        if ($filename) {
+            $stmt = $pdo->prepare("UPDATE pengguna SET foto = ? WHERE id_pengguna = ?");
+            $stmt->execute([$filename, $id]);
+            
+            // Update Session foto pengguna
+            $_SESSION['user_photo'] = $filename;
+
+            // Sinkronkan ke tabel guru / siswa jika terkait
+            try {
+                $pdo->prepare("UPDATE guru SET foto = ? WHERE id_pengguna = ?")->execute([$filename, $id]);
+                $pdo->prepare("UPDATE siswa SET foto = ? WHERE id_pengguna = ?")->execute([$filename, $id]);
+            } catch (Exception $e) {
+                // Ignore jika kolom/tabel belum ada
             }
         }
     }

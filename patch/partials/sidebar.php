@@ -323,6 +323,15 @@ if (!function_exists('is_menu_active_dynamic')) {
 
                 <?php endforeach; ?>
 
+                <?php if (function_exists('is_cbt_enabled') && is_cbt_enabled()): ?>
+                    <li class="nav-item">
+                        <a href="<?= htmlspecialchars(cbt_base_url()) ?>" class="nav-link" target="_blank">
+                            <i class="nav-icon fas fa-laptop-code"></i>
+                            <p>CBT</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
                 <li class="nav-header">KONFIGURASI</li>
                 <li class="nav-item">
                     <a href="index.php?mod=tema" class="nav-link <?= ($mod == 'tema') ? 'active' : '' ?>">

@@ -86,7 +86,7 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                <li class="breadcrumb-item"><a href="index.php?mod=keuangan_tarif&act=index">Tarif Khusus</a></li>
+                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>keuangan_tarif/index">Tarif Khusus</a></li>
                 <li class="breadcrumb-item active">Matrix Kelas</li>
             </ol>
         </nav>
@@ -120,7 +120,7 @@
         </div>
 
         <?php if ($id_kelas && !empty($students)): ?>
-        <form action="index.php?mod=keuangan_tarif&act=save_matrix" method="POST" id="formMatrix" onsubmit="return prepareSubmit()">
+        <form action="<?= BASE_URL ?>keuangan_tarif/save_matrix" method="POST" id="formMatrix" onsubmit="return prepareSubmit()">
             <input type="hidden" name="id_kelas" value="<?= $id_kelas ?>">
             <input type="hidden" name="action_type" id="action_type" value="save_rule">
             <input type="hidden" name="matrix_data" id="matrix_data">

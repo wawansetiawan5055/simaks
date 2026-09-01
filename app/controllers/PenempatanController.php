@@ -205,35 +205,69 @@ function penempatan_kelola($pdo)
  */
 function penempatan_copy_rombel($pdo)
 {
-    if (!check_access('penempatan', 'create')) { // Asumsi butuh create access
+    $is_ajax = isset($_POST['ajax']) && $_POST['ajax'] == 1;
+
+    // Cek akses - Admin dan Kurikulum selalu boleh
+    if (!can_do($pdo, 'penempatan', 'create') && !in_array('Admin', user_roles()) && !in_array('Kurikulum', user_roles())) {
+        if ($is_ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Akses ditolak.']);
+            exit;
+        }
         $_SESSION['pesan_error'] = "Akses ditolak.";
-        redirect('index.php?mod=penempatan');
+        redirect('penempatan');
         return;
     }
 
-    $id_ta_target = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
-    $id_kelas_target = $_POST['target_kelas'] ?? 0;
-    $id_ta_sumber = $_POST['source_ta'] ?? 0;
-    $id_kelas_sumber = $_POST['source_kelas'] ?? 0;
+    $id_ta_target = (int)($_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0);
+    if (!$id_ta_target) {
+        $ta_row = $pdo->query("SELECT id_ta FROM tahun_ajaran WHERE status='Aktif' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        $id_ta_target = (int)($ta_row['id_ta'] ?? 0);
+    }
+    $id_kelas_target = (int)($_POST['target_kelas'] ?? 0);
+    $id_ta_sumber = (int)($_POST['source_ta'] ?? 0);
+    $id_kelas_sumber = (int)($_POST['source_kelas'] ?? 0);
 
     if (!$id_ta_target || !$id_kelas_target || !$id_ta_sumber || !$id_kelas_sumber) {
-        $_SESSION['pesan_error'] = "Data tidak lengkap. Pastikan Tahun Ajaran dan Kelas Sumber & Target dipilih.";
-        redirect("index.php?mod=penempatan&id_kelas=$id_kelas_target&source_ta=$id_ta_sumber&source_kelas=$id_kelas_sumber");
+        if ($is_ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Data tidak lengkap. Pastikan Tahun Ajaran dan Kelas Sumber & Target dipilih.']);
+            exit;
+        }
+        $_SESSION['pesan_error'] = "Data tidak lengkap.";
+        redirect("penempatan/kelola?id_kelas=$id_kelas_target&source_ta=$id_ta_sumber&source_kelas=$id_kelas_sumber");
         return;
     }
 
     try {
         $count = PenempatanModel::copyRombel($pdo, $id_kelas_sumber, $id_ta_sumber, $id_kelas_target, $id_ta_target);
+        if ($is_ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            while (ob_get_level() > 0) ob_end_clean();
+            if ($count > 0) {
+                echo json_encode(['status' => 'success', 'message' => "Berhasil menyalin $count siswa ke kelas ini."]);
+            } else {
+                echo json_encode(['status' => 'warning', 'message' => 'Tidak ada siswa yang disalin (kelas sumber kosong atau sudah disalin sebelumnya).']);
+            }
+            exit;
+        }
         if ($count > 0) {
             $_SESSION['pesan_sukses'] = "Berhasil menyalin $count siswa ke kelas ini.";
         } else {
             $_SESSION['pesan_warning'] = "Tidak ada siswa yang disalin (Mungkin kelas sumber kosong).";
         }
     } catch (Exception $e) {
+        if ($is_ajax) {
+            header('Content-Type: application/json; charset=utf-8');
+            while (ob_get_level() > 0) ob_end_clean();
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Gagal menyalin: ' . $e->getMessage()]);
+            exit;
+        }
         $_SESSION['pesan_error'] = "Gagal menyalin: " . $e->getMessage();
     }
 
-    redirect("index.php?mod=penempatan&id_kelas=$id_kelas_target&source_ta=$id_ta_sumber&source_kelas=$id_kelas_sumber");
+    redirect("penempatan/kelola?id_kelas=$id_kelas_target&source_ta=$id_ta_sumber&source_kelas=$id_kelas_sumber");
 }
 
 /**
@@ -241,15 +275,24 @@ function penempatan_copy_rombel($pdo)
  */
 function penempatan_save($pdo)
 {
-    if (!can_do($pdo, 'penempatan', 'update')) {
+    header('Content-Type: application/json; charset=utf-8');
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    if (!can_do($pdo, 'penempatan', 'update') && !in_array('Admin', user_roles()) && !in_array('Kurikulum', user_roles())) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'Akses ditolak (Butuh Izin Update).']);
         exit;
     }
 
-    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
-    $id_siswa = $_POST['id_siswa'] ?? 0;
-    $id_kelas_baru = $_POST['id_kelas'] ?? 0;
+    $id_ta = (int)($_POST['id_ta'] ?? $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0);
+    if (!$id_ta) {
+        $ta_row = $pdo->query("SELECT id_ta FROM tahun_ajaran WHERE status='Aktif' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        $id_ta = (int)($ta_row['id_ta'] ?? 7);
+    }
+    $id_siswa = (int)($_POST['id_siswa'] ?? 0);
+    $id_kelas_baru = (int)($_POST['id_kelas'] ?? 0);
 
     if (!$id_ta || !$id_siswa || !$id_kelas_baru) {
         http_response_code(400);
@@ -272,13 +315,23 @@ function penempatan_save($pdo)
  */
 function penempatan_delete($pdo, $id_siswa)
 {
-    if (!can_do($pdo, 'penempatan', 'delete')) {
+    header('Content-Type: application/json; charset=utf-8');
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    if (!can_do($pdo, 'penempatan', 'delete') && !in_array('Admin', user_roles()) && !in_array('Kurikulum', user_roles())) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'Akses ditolak (Butuh Izin Delete).']);
         exit;
     }
 
-    $id_ta = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
+    $id_ta = (int)($_GET['id_ta'] ?? $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0);
+    if (!$id_ta) {
+        $ta_row = $pdo->query("SELECT id_ta FROM tahun_ajaran WHERE status='Aktif' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        $id_ta = (int)($ta_row['id_ta'] ?? 7);
+    }
+    $id_siswa = (int)($id_siswa ?: ($_GET['id'] ?? 0));
 
     if (!$id_ta || !$id_siswa) {
         http_response_code(400);

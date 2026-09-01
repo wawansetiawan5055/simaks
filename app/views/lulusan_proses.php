@@ -1,9 +1,26 @@
 <?php include __DIR__.'/partials/header.php'; ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <h1>Proses Kelulusan Siswa (Kelas XII)</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Proses Kelulusan Siswa (Tingkat Akhir)
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+                    <li class="breadcrumb-item active text-primary font-weight-bold">Kelulusan</li>
+                </ol>
+            </div>
+        </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -15,7 +32,7 @@
                 <h3 class="card-title"><i class="fas fa-user-graduate"></i> Daftar Calon Lulusan (Aktif & Kelas XII)</h3>
             </div>
             
-            <form action="index.php?mod=lulusan&act=save" method="POST" onsubmit="return confirm('Yakin ingin meluluskan siswa yang dipilih? Status mereka akan berubah menjadi LULUS.');">
+            <form action="<?= BASE_URL ?>lulusan/save" method="POST" onsubmit="return confirm('Yakin ingin meluluskan siswa yang dipilih? Status mereka akan berubah menjadi LULUS.');">
                 <div class="card-body table-responsive p-0">
                     <table class="table table-hover table-striped">
                         <thead>

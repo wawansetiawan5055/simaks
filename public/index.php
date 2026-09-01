@@ -11,17 +11,9 @@ date_default_timezone_set('Asia/Jakarta');
 // DEVELOPMENT: Keep as false for debugging
 $is_production = false; // Change to true for production
 
-if ($is_production) {
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 1);
-    ini_set('error_log', __DIR__ . '/../logs/php_error.log');
-    error_reporting(E_ALL);
-} else {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // =========================================================
 // SECURE SESSION COOKIE CONFIGURATION
@@ -38,6 +30,11 @@ session_set_cookie_params([
 
 // Mulai sesi
 session_start();
+
+// GLOBAL DEBUG LOGGING (Disabled for performance)
+// $logFile = __DIR__ . '/../lms_debug.log';
+// $logMsg = date('[Y-m-d H:i:s]') . " REQUEST: " . $_SERVER['REQUEST_METHOD'] . " mod=" . ($_GET['mod'] ?? 'NONE') . " act=" . ($_GET['act'] ?? 'NONE') . " IP=" . $_SERVER['REMOTE_ADDR'] . "\n";
+// file_put_contents($logFile, $logMsg, FILE_APPEND);
 
 // =========================================================
 // SECURITY HEADERS - Load after session_start
@@ -86,6 +83,21 @@ require_once '../app/models/PenggunaModel.php';
 // INJEKSI GLOBAL (Ambil data user dan menu)
 // =========================================================
 $pdo = connect_db();
+if (!$pdo) {
+    die("<h1>Koneksi Database Gagal</h1><p>Sistem tidak dapat terhubung ke database. Cek file config/db.php.</p>");
+}
+
+// [CBT] jika modul terpisah diaktifkan, sambungkan juga ke database CBT
+if (function_exists('is_cbt_enabled') && is_cbt_enabled()) {
+    if (function_exists('cbt_connect_db')) {
+        try {
+            $pdo_cbt = cbt_connect_db();
+            $GLOBALS['pdo_cbt'] = $pdo_cbt;
+        } catch (Exception $e) {
+            error_log("CBT DB gagal: " . $e->getMessage());
+        }
+    }
+}
 
 require_once '../app/models/ProfilSekolahModel.php'; // Load Model Profil Sekolah
 
@@ -115,29 +127,139 @@ if (empty($_SESSION['id_ta_aktif'])) {
 }
 
 // =========================================================
-// SMART ROUTING - LANDING PAGE INTEGRATION
+// SMART ROUTING - LANDING PAGE INTEGRATION & CLEAN URLS
 // =========================================================
-// Ambil variabel mod dan act dari URL
+
+// [BARU] Parse REQUEST_URI for Clean URLs (e.g. /mod/act/param)
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Remove base url prefix if any
+if (BASE_URL !== '/' && strpos($request_uri, BASE_URL) === 0) {
+    $request_uri = substr($request_uri, strlen(BASE_URL));
+}
+$request_uri = trim($request_uri, '/');
+
+if (!empty($request_uri) && $request_uri !== 'index.php') {
+    $segments = explode('/', $request_uri);
+
+    // Segment 1: mod
+    if (!isset($_GET['mod']) && !empty($segments[0]) && $segments[0] !== 'index.php') {
+        $_GET['mod'] = $segments[0];
+    }
+    // Segment 2: act
+    if (!isset($_GET['act']) && isset($segments[1]) && !empty($segments[1]) && $segments[1] !== 'index.php') {
+        $_GET['act'] = $segments[1];
+    }
+    // Segment 3: smart extra parameter mapping
+    // Detects the right GET key based on which module is being accessed.
+    // This allows clean URLs like /tugas_tambahan/index/kurikulum
+    // or /profil_guru/detail/5 without changing any controller code.
+    if (isset($segments[2]) && !empty($segments[2])) {
+        $mod_seg = $segments[0] ?? '';
+        $extra   = $segments[2];
+
+        // Map of module => GET param name for segment 3
+        $segment3_map = [
+            // Administrasi Jabatan
+            'tugas_tambahan'     => 'jenis',
+            // Program Kesiswaan (segment 3 = ID item)
+            'ekskul'             => 'id',
+            'kokulikuler'        => 'id',
+            'pembiasaan'         => 'id',
+            'kewirausahaan'      => 'id',
+            'tahfidz'            => 'id',
+            // Akademik
+            'rekap_nilai'        => 'tab',
+            'cetak_rapor'        => 'tab',
+            'cp_tp'              => 'tab',
+            'jadwal'             => 'tab',
+            'input_nilai'        => 'tab',
+            'absensi_mapel'      => 'tab',
+            'lms'                => 'tab',
+            'siswa_portal'       => 'tab',
+            'portal_siswa'       => 'tab',
+            // Profil Detail
+            'profil_guru'        => 'id',
+            'profil_siswa'       => 'id',
+            'siswa'              => 'id',
+            'guru'               => 'id',
+            'kelas'              => 'id',
+            // Keuangan
+            'keuangan_dashboard' => 'tab',
+            // Layanan UKS
+            'uks'                => 'tab',
+            'manajemen_uks'      => 'tab',
+        ];
+
+        $param_key = $segment3_map[$mod_seg] ?? 'param';
+        if (!isset($_GET[$param_key])) {
+            $_GET[$param_key] = $extra;
+        }
+
+        // Segment 4: if segment 3 was an 'id', then segment 4 is 'tab'.
+        // This allows URLs like /ekskul/index/5/program
+        if (isset($segments[3]) && !empty($segments[3])) {
+            if ($param_key === 'id' && !isset($_GET['tab'])) {
+                $_GET['tab'] = $segments[3];
+            } elseif ($param_key !== 'id' && !isset($_GET['id'])) {
+                $_GET['id'] = $segments[3];
+            }
+        }
+    }
+}
+
+// Ambil variabel mod dan act dari URL (bisa dari GET atau dari Clean URL di atas)
 // Default: landing page jika enabled dan belum login, dashboard jika sudah login
 if (!isset($_GET['mod'])) {
     if ($app_config['landing_page']['enabled'] && !is_logged_in()) {
-        $mod = 'landing';
+        $mod = 'landing'; // Default to landing page
+    } else if (is_logged_in()) {
+        // Logged-in users at root URL: redirect to proper dashboard URL
+        if (in_array('Siswa', $_SESSION['roles'] ?? []) && !in_array('Admin', $_SESSION['roles'] ?? []) && !in_array('Guru', $_SESSION['roles'] ?? [])) {
+            redirect(BASE_URL . 'siswa_portal/dashboard');
+        } else {
+            redirect(BASE_URL . 'dashboard');
+        }
+        exit;
     } else {
-        $mod = 'dashboard';
+        $mod = 'auth';
+        $_GET['act'] = 'login';
     }
 } else {
     $mod = $_GET['mod'];
 }
-
 $act = $_GET['act'] ?? 'index';
+// die("MOD: " . $mod . " | ACT: " . $act);
+
+// Jika modul CBT diaktifkan dan permintaan menuju CBT (mod=cbt)
+if (function_exists('is_cbt_enabled') && is_cbt_enabled() && $mod === 'cbt') {
+    // redirect ke subâ€‘aplikasi CBT, meneruskan query string kecuali mod
+    $query = $_SERVER['QUERY_STRING'];
+    $params = [];
+    parse_str($query, $params);
+    unset($params['mod']);
+    $qs = http_build_query($params);
+    $url = cbt_base_url();
+    if ($qs !== '') {
+        $url .= '?' . $qs;
+    }
+    header('Location: ' . $url);
+    exit;
+}
 
 // Cek login untuk semua halaman kecuali halaman otentikasi dan landing page
-if ($mod !== 'auth' && $mod !== 'landing' && !is_logged_in()) {
+if ($mod !== 'auth' && $mod !== 'landing' && $mod !== 'landing_sma' && !is_logged_in()) {
+    // Jika request API (AJAX), kembalikan JSON 401 bukan redirect HTML ke landing page
+    if ($mod === 'api') {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'msg' => 'Sesi telah berakhir. Silakan login kembali.', 'redirect' => BASE_URL . 'index.php?mod=auth&act=login']);
+        exit;
+    }
     // Jika landing page enabled, redirect ke landing, jika tidak langsung ke login
     if ($app_config['landing_page']['enabled']) {
-        redirect('index.php?mod=landing');
+        redirect(BASE_URL . 'landing');
     } else {
-        redirect('index.php?mod=auth&act=login');
+        redirect(BASE_URL . 'index.php?mod=auth&act=login');
     }
 }
 
@@ -152,6 +274,9 @@ if (is_logged_in()) {
 
     // 2. Panggil Model untuk mendapatkan data menu
     $user_menu = AppMenuModel::getUserMenu($pdo, $my_roles);
+
+    // [PRESENCE] Update last activity
+    $pdo->prepare("UPDATE pengguna SET last_activity = NOW() WHERE id_pengguna = ?")->execute([$_SESSION['user_id']]);
 }
 // ============================================================
 
@@ -162,7 +287,7 @@ if (is_logged_in()) {
 // JIKA ANDA INGIN CONTROLLER DI-REQUIRE HANYA KETIKA DIPERLUKAN (LAZY LOADING), 
 // PINDAHKAN REQUIRE KE DALAM BLOK CASE MASING-MASING.
 // =========================================================
-require_once '../app/controllers/LandingController.php'; // Landing Page Public
+// LandingController removed // Landing Page Public
 require_once '../app/controllers/AuthController.php';
 require_once '../app/controllers/DashboardController.php';
 require_once '../app/controllers/SessionFilterController.php';
@@ -194,6 +319,7 @@ require_once '../app/controllers/PenempatanController.php';
 require_once '../app/controllers/PenugasanGuruController.php';
 require_once '../app/controllers/JadwalController.php';
 require_once '../app/controllers/CpTpController.php';
+require_once '../app/controllers/TugasTambahanController.php';
 require_once '../app/controllers/EkskulController.php';
 require_once '../app/controllers/KokulikulerController.php';
 require_once '../app/controllers/PembiasaanController.php';
@@ -202,6 +328,12 @@ require_once '../app/controllers/TahfidzController.php';
 require_once '../app/controllers/PerangkatController.php';
 require_once '../app/controllers/PerangkatUploadController.php'; // NEW: File Upload Controller
 require_once '../app/controllers/TemplateDokumenController.php';
+require_once '../app/controllers/LabController.php';
+require_once '../app/controllers/PerpusController.php';
+require_once '../app/controllers/SarprasController.php';
+require_once '../app/controllers/UksController.php';
+require_once '../app/controllers/RekapNilaiController.php';
+require_once '../app/controllers/CetakRaporController.php';
 
 // --- Kegiatan KBM ---
 require_once '../app/controllers/JurnalKbmController.php';
@@ -209,6 +341,7 @@ require_once '../app/controllers/AbsensiMapelController.php';
 require_once '../app/controllers/InputNilaiController.php';
 require_once '../app/controllers/PenilaianSumatifController.php';
 require_once '../app/controllers/AbsensiPiketController.php';
+require_once '../app/controllers/JadwalPiketController.php';
 require_once '../app/controllers/AbsensiGuruController.php';
 require_once '../app/controllers/CatatanKasusController.php';
 require_once '../app/controllers/CatatanKelasController.php';
@@ -218,6 +351,9 @@ require_once '../app/controllers/MutasiSiswaController.php';
 require_once '../app/controllers/LulusanController.php';
 require_once '../app/controllers/AppConfigController.php'; // NEW: Theme & Font Config
 require_once '../app/controllers/SuratController.php'; // NEW: Correspondence Module
+require_once '../app/controllers/ChatController.php'; // NEW: Internal Chat Module
+require_once '../app/controllers/SiswaPortalController.php'; // NEW: Siswa Portal Module
+require_once '../app/controllers/CbtController.php'; // CBT Terintegrasi
 
 // --- Laporan ---
 require_once '../app/controllers/LaporanController.php';
@@ -238,6 +374,15 @@ try {
         case 'api':
             header('Content-Type: application/json');
             $type = $_GET['type'] ?? ''; // API type: dashboard, guru, siswa, dll
+            if (empty($type)) {
+                if (in_array($act, ['summary', 'rekap_siswa', 'absensi_guru', 'absensi_siswa', 'absensi_siswa_detail', 'list_ta', 'list_kelas', 'list_guru_aktif', 'jadwal_guru_html'])) {
+                    $type = 'dashboard';
+                } elseif (in_array($act, ['get_daily'])) {
+                    $type = 'jadwal';
+                } elseif (in_array($act, ['history', 'send', 'search', 'recent', 'unread_count', 'delete', 'clear'])) {
+                    $type = 'chat';
+                }
+            }
 
             try {
                 // Pastikan path dan file config
@@ -306,6 +451,15 @@ try {
                         require_once $apiControllerPath . '/CpTpApiController.php';
                         CpTpApiController::handle($pdo, $act);
                         break;
+                    case 'chat': // NEW: Chat API
+                        if ($act == 'history') api_chat_get_history($pdo);
+                        elseif ($act == 'send') api_chat_send($pdo);
+                        elseif ($act == 'search') api_chat_search_users($pdo);
+                        elseif ($act == 'recent') api_chat_recent($pdo);
+                        elseif ($act == 'unread_count') api_chat_unread_count($pdo);
+                        elseif ($act == 'delete') api_chat_delete($pdo);
+                        elseif ($act == 'clear') api_chat_clear($pdo);
+                        break;
                     default:
                         http_response_code(400);
                         echo json_encode(['status' => 'error', 'msg' => 'Invalid API type: ' . $type]);
@@ -341,6 +495,8 @@ try {
                 keuangan_master_jenis($pdo);
             elseif ($act == 'save_jenis')
                 keuangan_jenis_save($pdo); // New routing for save
+            elseif ($act == 'save_rekening')
+                keuangan_rekening_save($pdo);
             elseif ($act == 'rekening')
                 keuangan_master_rekening($pdo);
             else
@@ -477,26 +633,52 @@ try {
         // =========================================================
         // LANDING PAGE PUBLIC (No Login Required)
         // =========================================================
+        // =========================================================
+        // LANDING PAGE PUBLIC - SMA PLUS AL-MANSHURIYAH (Bootstrap 5)
+        // =========================================================
         case 'landing':
-            if ($act == 'index')
-                landing_index($pdo);
+        case 'landing_sma':
+            require_once dirname(__DIR__) . '/app/controllers/LandingControllerSMA.php';
+            if ($act == 'guru_list')
+                guru_list($pdo);
+            elseif ($act == 'siswa_list')
+                siswa_list($pdo);
+            elseif ($act == 'ekstrakurikuler_list' || $act == 'program_list')
+                ekstrakurikuler_list($pdo);
+            elseif ($act == 'ekstrakurikuler_detail')
+                ekstrakurikuler_detail($pdo);
+            elseif ($act == 'video_list')
+                video_list($pdo);
+            elseif ($act == 'gallery')
+                gallery_list($pdo);
+            elseif ($act == 'informasi_list' || $act == 'berita_list')
+                informasi_list($pdo);
+            elseif ($act == 'informasi_detail' || $act == 'berita_detail')
+                informasi_detail($pdo);
+            elseif ($act == 'program_detail')
+                program_detail($pdo);
+            elseif ($act == 'profil_sekolah')
+                profil_sekolah($pdo);
             elseif ($act == 'ppdb_form')
                 ppdb_public_form($pdo);
             elseif ($act == 'ppdb_save')
                 ppdb_public_save($pdo);
-            elseif ($act == 'ppdb_success')
-                ppdb_success_page($pdo);
             elseif ($act == 'ppdb_status')
                 ppdb_check_status($pdo);
+            elseif ($act == 'ppdb_success')
+                ppdb_success_page($pdo);
             else
-                landing_index($pdo);
+                landing_sma_index($pdo);
             break;
+
 
         case 'auth':
             if ($act == 'login')
                 login_form();
             elseif ($act == 'login_action')
                 login_action($pdo);
+            elseif ($act == 'login_qr')
+                login_qr_action($pdo);
             elseif ($act == 'logout')
                 logout_action();
             else
@@ -509,7 +691,200 @@ try {
             break;
 
         case 'dashboard':
-            dashboard_index($pdo);
+            if (in_array('Siswa', $_SESSION['roles'] ?? []) && !in_array('Admin', $_SESSION['roles'] ?? []) && !in_array('Guru', $_SESSION['roles'] ?? [])) {
+                siswa_portal_dashboard();
+            } else {
+                dashboard_index($pdo);
+            }
+            break;
+
+        case 'dashboard_guru':
+            require_once '../app/controllers/DashboardGuruController.php';
+            dashboard_guru();
+            break;
+
+
+        case 'lms':
+            require_once '../app/controllers/LmsController.php';
+            if ($act == 'dashboard' || $act == '')
+                lms_dashboard();
+            elseif ($act == 'materi_list')
+                lms_materi_list();
+            elseif ($act == 'materi_upload')
+                lms_materi_upload();
+            elseif ($act == 'materi_edit')
+                lms_materi_edit();
+            elseif ($act == 'materi_detail')
+                lms_materi_detail();
+            elseif ($act == 'materi_delete')
+                lms_materi_delete();
+            elseif ($act == 'materi_quiz_submit')
+                lms_materi_quiz_submit();
+            elseif ($act == 'materi_quiz_template')
+                lms_materi_quiz_template();
+            elseif ($act == 'tugas_create')
+                lms_tugas_create();
+            elseif ($act == 'tugas_submit')
+                lms_tugas_submit();
+            elseif ($act == 'tugas_list')
+                lms_tugas_list();
+            elseif ($act == 'tugas_detail')
+                lms_tugas_detail();
+            elseif ($act == 'tugas_edit')
+                lms_tugas_edit();
+            elseif ($act == 'tugas_delete')
+                lms_tugas_delete();
+            elseif ($act == 'koreksi_list')
+                lms_koreksi_list();
+            elseif ($act == 'koreksi_detail')
+                lms_koreksi_detail();
+            elseif ($act == 'tugas_student_detail')
+                lms_tugas_student_detail();
+            elseif ($act == 'get_cp_ajax')
+                lms_get_cp_ajax();
+            elseif ($act == 'get_tp_ajax')
+                lms_get_tp_ajax();
+            elseif ($act == 'lp_mark_stage')
+                lms_lp_mark_stage();
+            elseif ($act == 'lp_submit_text')
+                lms_lp_submit_text();
+            elseif ($act == 'lp_submit_formatif')
+                lms_lp_submit_formatif();
+            elseif ($act == 'lp_submit_refleksi')
+                lms_lp_submit_refleksi();
+            elseif ($act == 'lp_submit_essay')
+                lms_lp_submit_essay();
+            elseif ($act == 'ai_generate_materi')
+                lms_ai_generate_materi();
+            elseif ($act == 'ai_generate_soal')
+                lms_ai_generate_soal();
+            elseif ($act == 'bab_save')
+                lms_bab_save();
+            elseif ($act == 'bab_delete')
+                lms_bab_delete();
+            elseif ($act == 'sub_bab_save')
+                lms_sub_bab_save();
+            elseif ($act == 'sub_bab_delete')
+                lms_sub_bab_delete();
+            elseif ($act == 'get_bab_ajax')
+                lms_get_bab_ajax();
+            elseif ($act == 'get_sub_bab_ajax')
+                lms_get_sub_bab_ajax();
+            elseif ($act == 'diskusi_post')
+                lms_diskusi_post();
+            elseif ($act == 'diskusi_verify')
+                lms_diskusi_verify();
+            elseif ($act == 'diskusi_delete')
+                lms_diskusi_delete();
+            elseif ($act == 'get_nilai_formatif_ajax')
+                lms_get_nilai_formatif_ajax();
+            else
+                lms_dashboard();
+            break;
+
+        case 'tugas_tambahan':
+            $known_actions = ['upload', 'delete', 'save_agenda', 'delete_agenda', 'save_inventaris', 'delete_inventaris', 'save_jurnal_bk', 'delete_jurnal_bk', 'save_galeri', 'delete_galeri'];
+            if (in_array($act, $known_actions)) {
+                if ($act === 'upload') {
+                    TugasTambahanController::upload($pdo);
+                } elseif ($act === 'delete') {
+                    TugasTambahanController::delete($pdo);
+                } elseif ($act === 'save_agenda') {
+                    TugasTambahanController::save_agenda($pdo);
+                } elseif ($act === 'delete_agenda') {
+                    TugasTambahanController::delete_agenda($pdo);
+                } elseif ($act === 'save_inventaris') {
+                    TugasTambahanController::save_inventaris($pdo);
+                } elseif ($act === 'delete_inventaris') {
+                    TugasTambahanController::delete_inventaris($pdo);
+                } elseif ($act === 'save_jurnal_bk') {
+                    TugasTambahanController::save_jurnal_bk($pdo);
+                } elseif ($act === 'delete_jurnal_bk') {
+                    TugasTambahanController::delete_jurnal_bk($pdo);
+                } elseif ($act === 'save_galeri') {
+                    TugasTambahanController::save_galeri($pdo);
+                } elseif ($act === 'delete_galeri') {
+                    TugasTambahanController::delete_galeri($pdo);
+                }
+            } else {
+                if ($act !== 'index' && !empty($act) && empty($_GET['jenis'])) {
+                    $_GET['jenis'] = $act;
+                }
+                TugasTambahanController::index($pdo);
+            }
+            break;
+
+        case 'sarpras':
+            $controller = new SarprasController($pdo);
+            $controller->dashboard();
+            break;
+
+        case 'sarpras_gedung':
+            $controller = new SarprasController($pdo);
+            if ($act == 'save') $controller->gedung_save();
+            elseif ($act == 'delete') $controller->gedung_delete();
+            else $controller->gedung_index();
+            break;
+
+        case 'sarpras_ruang':
+            $controller = new SarprasController($pdo);
+            if ($act == 'save') $controller->ruang_save();
+            elseif ($act == 'delete') $controller->ruang_delete();
+            else $controller->ruang_index();
+            break;
+
+        case 'sarpras_barang':
+            $controller = new SarprasController($pdo);
+            if ($act == 'save') $controller->barang_save();
+            elseif ($act == 'delete') $controller->barang_delete();
+            else $controller->barang_index();
+            break;
+
+        case 'manajemen_lab':
+            if ($act === 'save_inventaris') {
+                LabController::save_inventaris($pdo);
+            } elseif ($act === 'delete_inventaris') {
+                LabController::delete_inventaris($pdo);
+            } elseif ($act === 'upload_foto') {
+                LabController::upload_foto($pdo);
+            } else {
+                LabController::index($pdo);
+            }
+            break;
+
+        case 'manajemen_perpus':
+            if ($act === 'save_buku') {
+                PerpusController::save_buku($pdo);
+            } elseif ($act === 'save_peminjaman') {
+                PerpusController::save_peminjaman($pdo);
+            } elseif ($act === 'kembalikan') {
+                PerpusController::kembalikan($pdo);
+            } elseif ($act === 'get_siswa_by_kelas') {
+                PerpusController::get_siswa_by_kelas($pdo);
+            } else {
+                PerpusController::index($pdo);
+            }
+            break;
+
+        case 'uks':
+        case 'manajemen_uks':
+            if ($act === 'save_kunjungan') {
+                UksController::save_kunjungan($pdo);
+            } elseif ($act === 'delete_kunjungan') {
+                UksController::delete_kunjungan($pdo);
+            } elseif ($act === 'save_obat') {
+                UksController::save_obat($pdo);
+            } elseif ($act === 'delete_obat') {
+                UksController::delete_obat($pdo);
+            } elseif ($act === 'save_agenda') {
+                UksController::save_agenda($pdo);
+            } elseif ($act === 'delete_agenda') {
+                UksController::delete_agenda($pdo);
+            } elseif ($act === 'cetak_surat_izin') {
+                UksController::cetak_surat_izin($pdo);
+            } else {
+                UksController::index($pdo);
+            }
             break;
 
         case 'profil_sekolah':
@@ -550,10 +925,76 @@ try {
                 profil_siswa_save($pdo);
             elseif ($act == 'upload')
                 profil_siswa_upload($pdo);
+            elseif ($act == 'ajukan')
+                profil_siswa_ajukan($pdo);
+            elseif ($act == 'riwayat')
+                profil_siswa_riwayat($pdo);
             elseif ($act == 'print')
                 profil_siswa_print($pdo);
             else
                 profil_siswa_index($pdo);
+            break;
+
+        case 'portal_siswa':
+        case 'siswa_portal':
+            if ($act == 'jadwal')
+                siswa_portal_jadwal();
+            elseif ($act == 'nilai')
+                siswa_portal_nilai();
+            elseif ($act == 'absensi')
+                siswa_portal_absensi();
+            elseif ($act == 'tagihan')
+                siswa_portal_tagihan();
+            elseif ($act == 'progress')
+                siswa_portal_progress();
+            elseif ($act == 'pembiasaan')
+                siswa_portal_pembiasaan();
+            elseif ($act == 'tahfidz')
+                siswa_portal_tahfidz();
+            elseif ($act == 'ekskul')
+                siswa_portal_ekskul();
+            elseif ($act == 'kokulikuler')
+                siswa_portal_kokulikuler();
+            elseif ($act == 'kewirausahaan')
+                siswa_portal_kewirausahaan();
+            elseif ($act == 'kalender')
+                siswa_portal_kalender();
+            elseif ($act == 'materi')
+                siswa_portal_materi();
+            elseif ($act == 'tugas')
+                siswa_portal_tugas();
+            elseif ($act == 'materi_detail')
+                siswa_portal_materi_detail();
+            elseif ($act == 'tugas_submit')
+                siswa_portal_tugas_submit();
+            elseif ($act == 'permohonan')
+                siswa_portal_permohonan();
+            elseif ($act == 'permohonan_simpan')
+                siswa_portal_permohonan_simpan();
+            elseif ($act == 'cbt')
+                siswa_portal_cbt();
+            elseif ($act == 'cbt_konfirmasi')
+                siswa_portal_cbt_konfirmasi();
+            elseif ($act == 'cbt_kerjakan' || $act == 'cbt_room')
+                siswa_portal_cbt_room();
+            elseif ($act == 'cbt_save_jawaban')
+                siswa_portal_cbt_save_jawaban();
+            elseif ($act == 'cbt_selesai')
+                siswa_portal_cbt_selesai();
+            elseif ($act == 'dashboard')
+                siswa_portal_dashboard();
+            else
+                siswa_portal_dashboard(); // default redirect to student portal dashboard
+            break;
+
+        case 'permohonan_absensi':
+            require_once __DIR__ . '/../app/controllers/PermohonanAbsensiController.php';
+            if ($act == 'index')
+                permohonan_absensi_index($pdo);
+            elseif ($act == 'proses')
+                permohonan_absensi_proses($pdo);
+            else
+                permohonan_absensi_index($pdo);
             break;
 
         case 'manajemen_pengguna':
@@ -569,6 +1010,8 @@ try {
                 pengguna_generate($pdo);
             elseif ($act == 'cleanup')
                 pengguna_cleanup($pdo);
+            elseif ($act == 'print_kartu')
+                pengguna_print_kartu($pdo);
             else
                 pengguna_index($pdo);
             break;
@@ -631,6 +1074,14 @@ try {
                 landing_admin_settings($pdo);
             elseif ($act == 'save_settings')
                 landing_admin_settings_save($pdo);
+            elseif ($act == 'quotes')
+                landing_admin_quotes_index($pdo);
+            elseif ($act == 'quote_form')
+                landing_admin_quote_form($pdo);
+            elseif ($act == 'quote_save')
+                landing_admin_quote_save($pdo);
+            elseif ($act == 'quote_delete')
+                landing_admin_quote_delete($pdo);
             elseif ($act == 'news')
                 landing_admin_news_index($pdo);
             elseif ($act == 'news_form')
@@ -647,6 +1098,62 @@ try {
                 landing_admin_gallery_save($pdo);
             elseif ($act == 'gallery_delete')
                 landing_admin_gallery_delete($pdo);
+            elseif ($act == 'sambutan')
+                landing_admin_sambutan($pdo);
+            elseif ($act == 'sambutan_form')
+                landing_admin_sambutan_form($pdo);
+            elseif ($act == 'sambutan_save')
+                landing_admin_sambutan_save($pdo);
+            elseif ($act == 'sambutan_delete')
+                landing_admin_sambutan_delete($pdo);
+            elseif ($act == 'program')
+                landing_admin_program($pdo);
+            elseif ($act == 'program_form')
+                landing_admin_program_form($pdo);
+            elseif ($act == 'program_save')
+                landing_admin_program_save($pdo);
+            elseif ($act == 'program_delete')
+                landing_admin_program_delete($pdo);
+            elseif ($act == 'facilities')
+                landing_admin_facilities($pdo);
+            elseif ($act == 'facilities_form')
+                landing_admin_facilities_form($pdo);
+            elseif ($act == 'facilities_save')
+                landing_admin_facilities_save($pdo);
+            elseif ($act == 'facilities_delete')
+                landing_admin_facilities_delete($pdo);
+            elseif ($act == 'testimonials')
+                landing_admin_testimonials($pdo);
+            elseif ($act == 'testimonials_form')
+                landing_admin_testimonials_form($pdo);
+            elseif ($act == 'testimonials_save')
+                landing_admin_testimonials_save($pdo);
+            elseif ($act == 'testimonials_delete')
+                landing_admin_testimonials_delete($pdo);
+            elseif ($act == 'faq')
+                landing_admin_faqs($pdo);
+            elseif ($act == 'faq_form')
+                landing_admin_faqs_form($pdo);
+            elseif ($act == 'faq_save')
+                landing_admin_faqs_save($pdo);
+            elseif ($act == 'faq_delete')
+                landing_admin_faqs_delete($pdo);
+            elseif ($act == 'ekskul')
+                landing_admin_ekskul($pdo);
+            elseif ($act == 'ekskul_form')
+                landing_admin_ekskul_form($pdo);
+            elseif ($act == 'ekskul_save')
+                landing_admin_ekskul_save($pdo);
+            elseif ($act == 'ekskul_delete')
+                landing_admin_ekskul_delete($pdo);
+            elseif ($act == 'video')
+                landing_admin_video($pdo);
+            elseif ($act == 'video_form')
+                landing_admin_video_form($pdo);
+            elseif ($act == 'video_save')
+                landing_admin_video_save($pdo);
+            elseif ($act == 'video_delete')
+                landing_admin_video_delete($pdo);
             else
                 landing_admin_settings($pdo);
             break;
@@ -668,6 +1175,10 @@ try {
                 utilitas_db_truncate_selected($pdo);
             elseif ($act == 'reset_aplikasi')
                 utilitas_db_reset_aplikasi($pdo);
+            elseif ($act == 'run_patch')
+                utilitas_db_run_patch($pdo);
+            else
+                utilitas_db_index($pdo);
             break;
 
         case 'app_config':
@@ -712,6 +1223,10 @@ try {
                 siswa_export($pdo);
             elseif ($act == 'import')
                 siswa_import($pdo);
+            elseif ($act == 'validasi_pengajuan')
+                siswa_validasi_pengajuan($pdo);
+            elseif ($act == 'acc_pengajuan')
+                siswa_acc_pengajuan($pdo);
             elseif ($act == 'ajax_list')
                 // AJAX endpoint used by the siswa list page for live search
                 siswa_ajax_list($pdo);
@@ -725,6 +1240,10 @@ try {
                 kelas_form($pdo, $_GET['id'] ?? null);
             elseif ($act == 'save')
                 kelas_save($pdo);
+            elseif ($act == 'toggle_jenis')
+                kelas_toggle_jenis($pdo);
+            elseif ($act == 'import_previous')
+                kelas_import_from_previous($pdo);
             elseif ($act == 'delete')
                 kelas_delete($pdo, $_GET['id']);
             else
@@ -753,6 +1272,8 @@ try {
                 struktur_kurikulum_index($pdo);
             elseif ($act == 'save')
                 struktur_kurikulum_save($pdo);
+            elseif ($act == 'import_previous')
+                struktur_kurikulum_import_previous($pdo);
             elseif ($act == 'delete')
                 struktur_kurikulum_delete($pdo, $_GET['id']);
             else
@@ -777,6 +1298,8 @@ try {
                 master_jam_delete($pdo, $_GET['id']);
             elseif ($act == 'update_urutan')
                 master_jam_update_urutan($pdo);
+            elseif ($act == 'copy_day')
+                master_jam_copy_day($pdo);
             else
                 master_jam_index($pdo);
             break;
@@ -790,6 +1313,10 @@ try {
                 kalender_akademik_delete($pdo);
             elseif ($act == 'api')
                 kalender_akademik_api($pdo);
+            elseif ($act == 'import_holidays')
+                kalender_akademik_import_holidays($pdo);
+            elseif ($act == 'export_pdf')
+                kalender_akademik_export_pdf($pdo);
             else
                 kalender_akademik_index($pdo);
             break;
@@ -865,6 +1392,8 @@ try {
                 penugasan_walas_save($pdo);
             elseif ($act == 'save_guru_mapel')
                 penugasan_guru_mapel_save($pdo);
+            elseif ($act == 'update_guru_mapel')
+                penugasan_guru_mapel_update($pdo);
             elseif ($act == 'delete_walas')
                 penugasan_walas_delete($pdo, $_GET['id']);
             elseif ($act == 'delete_guru_mapel')
@@ -892,16 +1421,30 @@ try {
                 cp_tp_index($pdo);
             elseif ($act == 'cp_save')
                 cp_save($pdo);
+            elseif ($act == 'cp_update')
+                cp_update($pdo);
             elseif ($act == 'tp_save')
                 tp_save($pdo);
+            elseif ($act == 'tp_update')
+                tp_update($pdo);
             elseif ($act == 'cp_delete')
-                cp_delete($pdo, $_GET['id']);
+                cp_delete($pdo, $_GET['id'] ?? 0);
             elseif ($act == 'tp_delete')
-                tp_delete($pdo, $_GET['id']);
+                tp_delete($pdo, $_GET['id'] ?? 0);
+            elseif ($act == 'tp_delete_bulk')
+                tp_delete_bulk($pdo);
             elseif ($act == 'tp_import')
                 tp_import($pdo);
             elseif ($act == 'cp_import')
                 cp_import($pdo);
+            elseif ($act == 'download_template')
+                download_template_cp_tp($pdo);
+            elseif ($act == 'ai_generate_tp')
+                cp_tp_ai_generate_tp($pdo);
+            elseif ($act == 'ai_save_bulk')
+                cp_tp_ai_save_bulk($pdo);
+            elseif ($act == 'ai_generate_missing_topics')
+                cp_tp_ai_generate_missing_topics($pdo);
             else
                 cp_tp_index($pdo);
             break;
@@ -1046,6 +1589,8 @@ try {
                 absensi_mapel_form($pdo);
             elseif ($act == 'save')
                 absensi_mapel_save($pdo);
+            elseif ($act == 'sync_lms')
+                absensi_mapel_sync_lms($pdo);
             else
                 absensi_mapel_index($pdo);
             break;
@@ -1054,8 +1599,27 @@ try {
                 input_nilai_index($pdo);
             elseif ($act == 'save')
                 input_nilai_save($pdo);
+            elseif ($act == 'template')
+                input_nilai_template($pdo);
+            elseif ($act == 'import')
+                input_nilai_import($pdo);
             else
                 input_nilai_index($pdo);
+            break;
+
+        case 'rekap_nilai':
+            if ($act == 'simpan_bobot')
+                rekap_nilai_simpan_bobot($pdo);
+            else
+                rekap_nilai_index($pdo);
+            break;
+        case 'cetak_rapor':
+            if ($act == 'preview')          cetak_rapor_preview($pdo);
+            elseif ($act == 'batch')        cetak_rapor_batch($pdo);
+            elseif ($act == 'save_catatan') cetak_rapor_save_catatan($pdo);
+            elseif ($act == 'generate')     cetak_rapor_generate_catatan($pdo);
+            elseif ($act == 'get_catatan')  cetak_rapor_get_catatan($pdo);
+            else                            cetak_rapor_index($pdo);
             break;
         case 'penilaian_sumatif':
             if ($act == 'index')
@@ -1068,8 +1632,46 @@ try {
                 penilaian_sumatif_form_nilai($pdo);
             elseif ($act == 'save_nilai')
                 penilaian_sumatif_save_nilai($pdo);
+            elseif ($act == 'template')
+                penilaian_sumatif_template($pdo);
+            elseif ($act == 'import')
+                penilaian_sumatif_import($pdo);
+            elseif ($act == 'delete_agenda')
+                penilaian_sumatif_delete_agenda($pdo);
             else
                 penilaian_sumatif_index($pdo);
+            break;
+
+        case 'komponen_sikap':
+            require_once __DIR__ . '/../app/controllers/KomponenSikapController.php';
+            KomponenSikapController::index();
+            break;
+
+        case 'penilaian_sikap':
+            require_once __DIR__ . '/../app/controllers/PenilaianSikapController.php';
+            if ($act == 'form_agenda')
+                PenilaianSikapController::form_agenda();
+            elseif ($act == 'save_agenda')
+                PenilaianSikapController::save_agenda();
+            elseif ($act == 'form_nilai')
+                PenilaianSikapController::form_nilai();
+            elseif ($act == 'save_nilai')
+                PenilaianSikapController::save_nilai();
+            elseif ($act == 'delete')
+                PenilaianSikapController::delete();
+            else
+                PenilaianSikapController::index();
+            break;
+        case 'jadwal_piket':
+            if ($act == 'save') {
+                jadwal_piket_save($pdo);
+            } elseif ($act == 'save_non_kbm') {
+                jadwal_piket_save_non_kbm($pdo);
+            } elseif ($act == 'delete') {
+                jadwal_piket_delete($pdo);
+            } else {
+                jadwal_piket_index($pdo);
+            }
             break;
         case 'absensi_piket':
             if ($act == 'index') {
@@ -1081,6 +1683,9 @@ try {
             } else {
                 absensi_piket_index($pdo);
             }
+            break;
+        case 'absensi_scan':
+            include __DIR__ . '/../app/views/absensi_scan_index.php';
             break;
         case 'absensi_guru':
             if ($act == 'index') {
@@ -1132,9 +1737,14 @@ try {
                 ppdb_get_template($pdo);
             elseif ($act == 'import')
                 ppdb_import($pdo);
+            elseif ($act == 'regenerate_nipd')
+                ppdb_regenerate_nipd_form($pdo);    // BARU: Form & Preview Re-Generate NIPD
+            elseif ($act == 'regenerate_nipd_exec')
+                ppdb_regenerate_nipd_exec($pdo);    // BARU: Eksekusi Re-Generate NIPD
             else
                 ppdb_index($pdo);
             break;
+
         case 'mutasi_masuk':
             if ($act == 'form')
                 mutasi_masuk_form($pdo);
@@ -1275,6 +1885,41 @@ try {
             // elseif ($act == 'program_delete_file') tahfidz_proker_delete($pdo); // Deprecated
             else
                 tahfidz_index($pdo);
+            break;
+
+        case 'ai_generator':
+            require_once __DIR__ . '/../app/controllers/AIGeneratorController.php';
+            $act = $_GET['act'] ?? 'index';
+            if ($act == 'index')
+                ai_generator_index($pdo);
+            elseif ($act == 'create')
+                ai_generator_create($pdo);
+            elseif ($act == 'process')
+                ai_generator_process($pdo);
+            elseif ($act == 'get_cp')
+                ai_generator_get_cp($pdo);
+            elseif ($act == 'get_tp')
+                ai_generator_get_tp($pdo);
+            elseif ($act == 'generate_tp')
+                ai_generator_generate_tp($pdo);
+            elseif ($act == 'generate_profil')
+                ai_generator_generate_profil($pdo);
+            elseif ($act == 'upload_ref')
+                ai_generator_upload_ref($pdo);
+            elseif ($act == 'set_manual_ref')
+                ai_generator_set_manual_ref($pdo);
+            elseif ($act == 'clear_ref')
+                ai_generator_clear_ref($pdo);
+            elseif ($act == 'save')
+                ai_generator_save($pdo);
+            elseif ($act == 'delete')
+                ai_generator_delete($pdo);
+            elseif ($act == 'export')
+                ai_generator_export($pdo);
+            elseif ($act == 'preview')
+                ai_generator_preview($pdo);
+            else
+                ai_generator_index($pdo);
             break;
 
         case 'perangkat_upload':
@@ -1447,14 +2092,72 @@ try {
                 laporan_siswa($pdo); // Default laporan jika act tidak ditemukan
             break;
 
+        // ===== CBT TERINTEGRASI =====
+        case 'cbt_dashboard':
+        case 'cbt':
+            require_once '../app/controllers/CbtController.php';
+            CbtController::dashboard($pdo);
+            break;
+
+        case 'cbt_bank_soal':
+            require_once '../app/controllers/CbtController.php';
+            CbtController::bank_soal($pdo, $act);
+            break;
+
+        case 'cbt_paket':
+            CbtController::paket($pdo, $act);
+            break;
+
+        case 'cbt_jadwal':
+            CbtController::jadwal($pdo, $act);
+            break;
+
+        case 'cbt_peserta':
+            CbtController::peserta($pdo, $act);
+            break;
+
+        case 'cbt_hasil':
+            CbtController::hasil($pdo);
+            break;
+
+        case 'chat':
+            chat_index($pdo);
+            break;
+
         default:
-            // Jika modul tidak ditemukan, redirect ke dashboard (atau tampilkan index dashboard)
-            dashboard_index($pdo);
+            // Jika modul tidak ditemukan, redirect ke dashboard sesuai peran
+            if (in_array('Siswa', $_SESSION['roles'] ?? []) && !in_array('Admin', $_SESSION['roles'] ?? []) && !in_array('Guru', $_SESSION['roles'] ?? [])) {
+                siswa_portal_dashboard();
+            } else {
+                dashboard_index($pdo);
+            }
             break;
     }
-} catch (Exception $e) {
-    // Tangani error umum
-    echo "<h1>Error Aplikasi</h1>";
-    echo "<p>Terjadi kesalahan yang tidak terduga. Silakan hubungi administrator.</p>";
-    echo "<p>Detail: " . $e->getMessage() . "</p>";
+} catch (Throwable $e) {
+    // Tangani error umum secara terstandar
+    error_log("Global SIMAKS Error: " . $e->getMessage() . " in " . $e->getFile() . " line " . $e->getLine());
+    http_response_code(500);
+
+    // Jika request berupa API/AJAX, kembalikan JSON
+    if ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') || (isset($mod) && $mod === 'api')) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'msg' => 'Terjadi kendala sistem pada server.',
+            'error' => ini_get('display_errors') ? $e->getMessage() : null
+        ]);
+        exit;
+    }
+
+    $errorMessage = $e->getMessage();
+    $errorFile = $e->getFile();
+    $errorLine = $e->getLine();
+    $errorTrace = $e->getTraceAsString();
+
+    $errorViewPath = __DIR__ . '/../app/views/errors/500.php';
+    if (file_exists($errorViewPath)) {
+        include $errorViewPath;
+    } else {
+        echo "<h1>Terjadi Kendala Sistem</h1><p>Silakan hubungi administrator.</p>";
+    }
 }

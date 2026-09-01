@@ -15,15 +15,43 @@ if (!isset($user_menu) || empty($user_menu)) {
         if (isset($pdo) && isset($_SESSION['role_ids'])) {
             $user_menu = AppMenuModel::getUserMenu($pdo, $_SESSION['role_ids']);
             // Standardize "Penugasan Guru" to "Penugasan GTK" manually for UI consistency if needed
+            $extracted_menus = [];
             foreach ($user_menu as &$m) {
                 if ($m['nama_menu'] == 'Penugasan Guru')
                     $m['nama_menu'] = 'Penugasan GTK';
+                
+                // [NEW] Jika ini menu Guru dan user adalah guru (bukan Admin/TU), arahkan langsung ke profilnya
+                $is_staff = in_array('Admin', $_SESSION['roles'] ?? []) || in_array('TU', $_SESSION['roles'] ?? []);
+                
+                if (($m['nama_menu'] == 'Guru' || $m['link'] === 'guru' || $m['link'] === BASE_URL . 'guru') && isset($_SESSION['id_guru_terkait']) && $_SESSION['id_guru_terkait'] > 0 && !$is_staff) {
+                    $m['nama_menu'] = 'Profil Saya';
+                    $m['link'] = 'profil_guru/detail?id=' . $_SESSION['id_guru_terkait'];
+                    $m['icon'] = 'fas fa-user-circle';
+                }
+
                 if (!empty($m['children'])) {
+                    $new_children = [];
                     foreach ($m['children'] as &$c) {
                         if ($c['nama_menu'] == 'Penugasan Guru')
                             $c['nama_menu'] = 'Penugasan GTK';
+                        
+                        if (($c['nama_menu'] == 'Guru' || $c['link'] === 'guru' || $c['link'] === BASE_URL . 'guru') && isset($_SESSION['id_guru_terkait']) && $_SESSION['id_guru_terkait'] > 0 && !$is_staff) {
+                            $c['nama_menu'] = 'Profil Saya';
+                            $c['link'] = 'profil_guru/detail?id=' . $_SESSION['id_guru_terkait'];
+                            $c['icon'] = 'fas fa-user-circle';
+                            $extracted_menus[] = $c;
+                            continue;
+                        }
+                        $new_children[] = $c;
                     }
+                    $m['children'] = $new_children;
                 }
+            }
+            unset($m);
+            
+            // Masukkan menu yang diekstrak (Profil Saya) ke posisi paling atas (setelah Dashboard)
+            if (!empty($extracted_menus)) {
+                $user_menu = array_merge($extracted_menus, $user_menu);
             }
         }
     }
@@ -46,8 +74,18 @@ if (!function_exists('is_menu_active_dynamic')) {
         $url_parts = parse_url($menu_link);
         parse_str($url_parts['query'] ?? '', $query_params);
 
-        $target_mod = $query_params['mod'] ?? '';
-        $target_act = $query_params['act'] ?? 'index';
+        $path = trim($url_parts['path'] ?? '', '/');
+        // Hilangkan string BASE_URL jika ada (misal menu link mengandung /simaks/)
+        if (defined('BASE_URL') && BASE_URL !== '/') {
+            $base_url_trim = trim(BASE_URL, '/');
+            if (strpos($path, $base_url_trim) === 0) {
+                $path = trim(substr($path, strlen($base_url_trim)), '/');
+            }
+        }
+        $segments = explode('/', $path);
+
+        $target_mod = $query_params['mod'] ?? ($segments[0] ?: '');
+        $target_act = $query_params['act'] ?? ($segments[1] ?? 'index');
 
         // 1. Cek mod
         if ($target_mod !== $current_mod) {
@@ -57,6 +95,47 @@ if (!function_exists('is_menu_active_dynamic')) {
         // 2. Cek act
         if ($target_act !== $current_act) {
             return false;
+        }
+
+        // [FIX] Ekstrak parameter dari segmen Clean URL (mirip public/index.php)
+        if (isset($segments[2]) && !empty($segments[2])) {
+            $mod_seg = $segments[0] ?? '';
+            $extra   = $segments[2];
+
+            $segment3_map = [
+                'tugas_tambahan'     => 'jenis',
+                'ekskul'             => 'id',
+                'kokulikuler'        => 'id',
+                'pembiasaan'         => 'id',
+                'kewirausahaan'      => 'id',
+                'tahfidz'            => 'id',
+                'rekap_nilai'        => 'tab',
+                'cetak_rapor'        => 'tab',
+                'cp_tp'              => 'tab',
+                'jadwal'             => 'tab',
+                'input_nilai'        => 'tab',
+                'absensi_mapel'      => 'tab',
+                'lms'                => 'tab',
+                'profil_guru'        => 'id',
+                'profil_siswa'       => 'id',
+                'siswa'              => 'id',
+                'guru'               => 'id',
+                'kelas'              => 'id',
+                'keuangan_dashboard' => 'tab',
+            ];
+
+            $param_key = $segment3_map[$mod_seg] ?? 'param';
+            if (!isset($query_params[$param_key])) {
+                $query_params[$param_key] = $extra;
+            }
+
+            if (isset($segments[3]) && !empty($segments[3])) {
+                if ($param_key === 'id' && !isset($query_params['tab'])) {
+                    $query_params['tab'] = $segments[3];
+                } elseif ($param_key !== 'id' && !isset($query_params['id'])) {
+                    $query_params['id'] = $segments[3];
+                }
+            }
         }
 
         // 3. Cek parameter tambahan lainnya (misal: type, id, dll)
@@ -233,9 +312,9 @@ if (!function_exists('is_menu_active_dynamic')) {
 
 <aside class="main-sidebar elevation-4">
 
-    <a href="index.php?mod=dashboard"
+    <a href="<?= BASE_URL ?>dashboard"
         class="brand-link brand-link-custom d-flex flex-column align-items-center text-center py-3 w-100">
-        <img src="assets/img/logoapk.png" alt="Logo" class="brand-image-custom img-circle elevation-3 mb-2"
+        <img src="<?= BASE_URL ?>assets/img/logoapk.png" alt="Logo" class="brand-image-custom img-circle elevation-3 mb-2"
             style="float: none !important; margin-right: 0 !important; max-height: 55px !important; width: auto !important;">
         <span class="brand-text font-weight-bold d-block h5 mb-0" style="color: #fff !important;">SIMAKS</span>
         <span class="brand-text-small d-block text-wrap px-3"
@@ -272,17 +351,208 @@ if (!function_exists('is_menu_active_dynamic')) {
             })();
         </script>
 
+                <?php
+                // ============================================================
+                // DETEKSI: apakah user ini murni siswa (bukan admin/guru)?
+                // ============================================================
+                $is_pure_siswa_sidebar = in_array('Siswa', $_SESSION['roles'] ?? [])
+                    && !in_array('Admin', $_SESSION['roles'] ?? [])
+                    && !in_array('Guru', $_SESSION['roles'] ?? []);
+                ?>
+
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false"
+            <ul class="nav nav-pills nav-sidebar flex-column <?= $is_pure_siswa_sidebar ? 'siswa-nav-manual' : '' ?>" <?= $is_pure_siswa_sidebar ? '' : 'data-widget="treeview"' ?> role="menu" data-accordion="false"
                 data-animation-speed="300">
 
-                <li class="nav-item">
-                    <?php $active = ($mod === 'dashboard') ? 'active' : ''; ?>
-                    <a href="index.php?mod=dashboard" class="nav-link <?= $active ?>">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
+                <?php
+                if ($is_pure_siswa_sidebar) {
+                    // Bersihkan $user_menu dari semua item LMS agar tidak duplikat dengan menu manual di bawah
+                    $lms_indicators = ['lms', 'materi', 'tugas', 'kuis', 'ujian'];
+                    $clean_menu = [];
+                    foreach ($user_menu as $m) {
+                        $link_lower = strtolower($m['link'] ?? '');
+                        $name_lower = strtolower($m['nama_menu'] ?? '');
+                        
+                        $is_lms = false;
+                        foreach ($lms_indicators as $ind) {
+                            if (strpos($link_lower, $ind) !== false || strpos($name_lower, $ind) !== false) {
+                                $is_lms = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!$is_lms) $clean_menu[] = $m;
+                    }
+                    $user_menu = $clean_menu;
+                }
+                ?>
+
+                <?php if ($is_pure_siswa_sidebar): ?>
+
+                    <?php
+                    // Variabel aktif & helpers
+                    $act_now  = $act ?? '';
+                    $id_siswa_aktif = $_SESSION['id_siswa_terkait'] ?? 0;
+                    
+                    // --- 1. UTAMA ---
+                    ?>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>siswa_portal/dashboard" class="nav-link <?= ($mod === 'siswa_portal' && in_array($act_now, ['', 'index', 'dashboard'])) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-home text-primary"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>profil_siswa/detail?id=<?= $id_siswa_aktif ?>" class="nav-link <?= ($mod === 'profil_siswa') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-user text-info"></i>
+                            <p>Profil Saya</p>
+                        </a>
+                    </li>
+
+                    <?php
+                    // --- 2. AKADEMIK ---
+                    $akademik_items = [
+                        ['link' => BASE_URL . 'siswa_portal/jadwal',     'icon' => 'fas fa-calendar-alt', 'label' => 'Jadwal Pelajaran'],
+                        ['link' => BASE_URL . 'siswa_portal/materi',     'icon' => 'fas fa-book-open',    'label' => 'Materi Pembelajaran'],
+                        ['link' => BASE_URL . 'siswa_portal/tugas',      'icon' => 'fas fa-tasks',        'label' => 'Penugasan Mandiri'],
+                        ['link' => BASE_URL . 'siswa_portal/cbt',        'icon' => 'fas fa-laptop-code text-danger', 'label' => 'Ujian Online (CBT)'],
+                        ['link' => BASE_URL . 'siswa_portal/nilai',      'icon' => 'fas fa-chart-bar',    'label' => 'Nilai Saya'],
+                        ['link' => BASE_URL . 'siswa_portal/kalender',   'icon' => 'fas fa-calendar-week','label' => 'Kalender Akademik'],
+                    ];
+                    // Define which actions belong to the Akademik treeview
+                    $akademik_acts = ['jadwal', 'materi', 'tugas', 'cbt', 'cbt_kerjakan', 'cbt_room', 'nilai', 'kalender'];
+                    $is_akademik_open = ($mod === 'siswa_portal' && in_array($act_now, $akademik_acts));
+                    ?>
+
+                    <li class="nav-item">
+                        <a href="#collapseAkademik" class="nav-link" data-toggle="collapse" role="button" aria-expanded="<?= $is_akademik_open ? 'true' : 'false' ?>" aria-controls="collapseAkademik">
+                            <i class="nav-icon fas fa-graduation-cap text-success"></i>
+                            <p>Akademik <i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <div class="collapse <?= $is_akademik_open ? 'show' : '' ?>" id="collapseAkademik">
+                            <ul class="nav nav-treeview" style="display: block; padding-left: 15px;">
+                            <?php foreach ($akademik_items as $li): ?>
+                            <li class="nav-item">
+                                <a href="<?= htmlspecialchars($li['link']) ?>" class="nav-link <?= is_menu_active_dynamic($li['link'], $mod, $act_now) ? 'active' : '' ?>">
+                                    <i class="nav-icon <?= $li['icon'] ?>"></i>
+                                    <p><?= $li['label'] ?></p>
+                                </a>
+                            </li>
+                            <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <?php
+                    // --- 3. KEHADIRAN ---
+                    $is_kehadiran_open = ($mod === 'siswa_portal' && in_array($act_now, ['absensi', 'permohonan']));
+                    $absen_kelas_active = ($mod === 'siswa_portal' && $act_now === 'absensi' && ($_GET['tab'] ?? 'kelas') === 'kelas') ? 'active' : '';
+                    $absen_mapel_active = ($mod === 'siswa_portal' && $act_now === 'absensi' && ($_GET['tab'] ?? '') === 'mapel') ? 'active' : '';
+                    $permohonan_active = ($mod === 'siswa_portal' && $act_now === 'permohonan') ? 'active' : '';
+                    ?>
+
+                    <li class="nav-item">
+                        <a href="#collapseKehadiran" class="nav-link" data-toggle="collapse" role="button" aria-expanded="<?= $is_kehadiran_open ? 'true' : 'false' ?>" aria-controls="collapseKehadiran">
+                            <i class="nav-icon fas fa-clipboard-check text-info"></i>
+                            <p>Kehadiran <i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <div class="collapse <?= $is_kehadiran_open ? 'show' : '' ?>" id="collapseKehadiran">
+                            <ul class="nav nav-treeview" style="display: block; padding-left: 15px;">
+                                <li class="nav-item">
+                                    <a href="<?= BASE_URL ?>siswa_portal/absensi?tab=kelas" class="nav-link <?= $absen_kelas_active ?>">
+                                        <i class="nav-icon fas fa-school"></i>
+                                        <p>Absensi Kelas (Piket)</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= BASE_URL ?>siswa_portal/absensi?tab=mapel" class="nav-link <?= $absen_mapel_active ?>">
+                                        <i class="nav-icon fas fa-book"></i>
+                                        <p>Absensi Mapel</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= BASE_URL ?>siswa_portal/permohonan" class="nav-link <?= $permohonan_active ?>">
+                                        <i class="nav-icon fas fa-file-medical text-warning"></i>
+                                        <p>Pengajuan Izin/Sakit</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <?php
+                    // --- 4. PENGEMBANGAN KARAKTER (TREEVIEW HALAMAN MANDIRI) ---
+                    $karakter_acts = ['pembiasaan', 'tahfidz', 'ekskul', 'kokulikuler', 'kewirausahaan', 'progress'];
+                    $is_karakter_open = ($mod === 'siswa_portal' && in_array($act_now, $karakter_acts));
+                    $tab_karakter_now = $_GET['tab'] ?? '';
+                    $karakter_items = [
+                        ['act' => 'pembiasaan',    'icon' => 'fas fa-praying-hands text-success', 'label' => 'Pembiasaan Ibadah'],
+                        ['act' => 'tahfidz',       'icon' => 'fas fa-quran text-primary',         'label' => 'Tahfidz Al-Qur\'an'],
+                        ['act' => 'ekskul',        'icon' => 'fas fa-futbol text-warning',        'label' => 'Ekstrakurikuler'],
+                        ['act' => 'kokulikuler',   'icon' => 'fas fa-shapes text-info',           'label' => 'Kokurikuler'],
+                        ['act' => 'kewirausahaan', 'icon' => 'fas fa-store text-danger',          'label' => 'Kewirausahaan'],
+                    ];
+                    ?>
+
+                    <li class="nav-item">
+                        <a href="#collapseKarakter" class="nav-link" data-toggle="collapse" role="button" aria-expanded="<?= $is_karakter_open ? 'true' : 'false' ?>" aria-controls="collapseKarakter">
+                            <i class="nav-icon fas fa-star text-warning"></i>
+                            <p>Pengembangan Karakter <i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <div class="collapse <?= $is_karakter_open ? 'show' : '' ?>" id="collapseKarakter">
+                            <ul class="nav nav-treeview" style="display: block; padding-left: 15px;">
+                                <?php foreach ($karakter_items as $ki): ?>
+                                <?php 
+                                    $is_item_active = ($mod === 'siswa_portal' && ($act_now === $ki['act'] || ($act_now === 'progress' && $tab_karakter_now === $ki['act'])));
+                                ?>
+                                <li class="nav-item">
+                                    <a href="<?= BASE_URL ?>siswa_portal/<?= $ki['act'] ?>" class="nav-link <?= $is_item_active ? 'active' : '' ?>">
+                                        <i class="nav-icon <?= $ki['icon'] ?>"></i>
+                                        <p><?= $ki['label'] ?></p>
+                                    </a>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <?php
+                    // --- 5. KEUANGAN ---
+                    $tagihan_active = ($mod === 'siswa_portal' && $act_now === 'tagihan') ? 'active' : '';
+                    ?>
+
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>siswa_portal/tagihan" class="nav-link <?= $tagihan_active ?>">
+                            <i class="nav-icon fas fa-file-invoice-dollar text-danger"></i>
+                            <p>Tagihan SPP</p>
+                        </a>
+                    </li>
+
+                    <?php
+                    // --- 6. LAINNYA ---
+                    $chat_active = ($mod === 'chat') ? 'active' : '';
+                    ?>
+
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>chat" class="nav-link <?= $chat_active ?>">
+                            <i class="nav-icon fas fa-comments text-secondary"></i>
+                            <p>Pesan</p>
+                        </a>
+                    </li>
+
+                <?php else: ?>
+                    <?php // Non-siswa: Dashboard standar ?>
+                    <li class="nav-item">
+                        <a href="<?= BASE_URL ?>dashboard" class="nav-link <?= ($mod === 'dashboard') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+
+
+
 
                 <?php
                 // --- DEFINISI FUNGSI REKURSIF ---
@@ -348,7 +618,7 @@ if (!function_exists('is_menu_active_dynamic')) {
                             // 2. Tipe TREEVIEW (Menu dengan Submenu)
                             if ($has_sub) {
                                 echo '<li class="nav-item has-treeview ' . $menuOpenClass . '">';
-                                echo '  <a href="#" class="nav-link ' . $activeClass . '">';
+                                echo '  <a href="#" data-lte-toggle="treeview" data-accordion="false" class="nav-link ' . $activeClass . '">';
                                 echo '    <i class="nav-icon ' . htmlspecialchars($item['icon']) . '"></i>';
                                 echo '    <p>';
                                 echo htmlspecialchars($item['nama_menu']);
@@ -365,8 +635,13 @@ if (!function_exists('is_menu_active_dynamic')) {
                             // 3. Tipe SINGLE LINK (Menu Biasa)
                             else {
                                 if ($item['link'] !== '#') {
+                                    $final_link = $item['link'];
+                                    if (strpos($final_link, 'http') !== 0 && strpos($final_link, '<?=') === false) {
+                                        $final_link = BASE_URL . ltrim($final_link, '/');
+                                    }
+                                    
                                     echo '<li class="nav-item">';
-                                    echo '  <a href="' . htmlspecialchars($item['link']) . '" class="nav-link ' . $activeClass . '">';
+                                    echo '  <a href="' . htmlspecialchars($final_link) . '" class="nav-link ' . $activeClass . '">';
                                     echo '    <i class="nav-icon ' . htmlspecialchars($item['icon']) . '"></i>';
                                     echo '    <p>' . htmlspecialchars($item['nama_menu']) . '</p>';
                                     echo '  </a>';
@@ -378,12 +653,23 @@ if (!function_exists('is_menu_active_dynamic')) {
                 }
 
                 // --- EKSEKUSI RENDER ---
+                // Untuk siswa, $user_menu sudah bersih (LMS sudah dibuang di atas)
                 renderSidebarRecursive($user_menu, $mod, $act);
                 ?>
 
+                <?php if (function_exists('is_cbt_enabled') && is_cbt_enabled()): ?>
+                    <li class="nav-header">EKSTERNAL</li>
+                    <li class="nav-item">
+                        <a href="<?= htmlspecialchars(cbt_base_url()) ?>" class="nav-link" target="_blank">
+                            <i class="nav-icon fas fa-laptop-code"></i>
+                            <p>CBT</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
                 <li class="nav-header">AKUN</li>
                 <li class="nav-item">
-                    <a href="index.php?mod=auth&act=logout" class="nav-link">
+                    <a href="<?= BASE_URL ?>auth/logout" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt text-danger"></i>
                         <p>Logout</p>
                     </a>

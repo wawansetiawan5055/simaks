@@ -5,13 +5,13 @@
     </td>
     <td class="text-center align-middle">
         <div class="btn-group">
-            <a href="index.php?mod=peran&act=form&id=<?= $p['id_peran'] ?>" 
+            <a href="<?= BASE_URL ?>peran/form?id=<?= $p['id_peran'] ?>" 
                class="btn btn-xs btn-outline-warning border-0 p-1 mr-1" 
                style="background: #fffbeb; width: 28px; height: 28px; border-radius: 8px; color: #d97706;" 
                title="Edit"><i class="fas fa-pencil-alt" style="font-size: 0.8rem;"></i></a>
             
             <?php if (!in_array($p['id_peran'], [1, 2, 3])): ?>
-                <a href="index.php?mod=peran&act=delete_action&id=<?= $p['id_peran'] ?>" 
+                <a href="<?= BASE_URL ?>peran/delete_action?id=<?= $p['id_peran'] ?>" 
                    class="btn btn-xs btn-outline-danger border-0 p-1" 
                    style="background: #fef2f2; width: 28px; height: 28px; border-radius: 8px; color: #dc2626;" 
                    title="Hapus" onclick="return confirmDelete(event)">

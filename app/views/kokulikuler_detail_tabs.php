@@ -71,7 +71,7 @@
             }
             ?>
             <div class="col-sm-6 text-end">
-                <a href="index.php?mod=kokulikuler" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left"></i> Kembali</a>
+                <a href="<?= BASE_URL ?>kokulikuler" class="btn btn-secondary btn-sm float-right"><i class="fas fa-arrow-left"></i> Kembali</a>
             </div>
         </div>
     </div>
@@ -83,19 +83,19 @@
             <div class="card-header p-0 pt-1 border-bottom-0">
                 <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link <?= $tab == 'program' || $tab == '' || $tab == 'kegiatan' ? 'active' : '' ?>" href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=program"><i class="fas fa-file-signature"></i> Program Kerja</a>
+                        <a class="nav-link <?= $tab == 'program' || $tab == '' || $tab == 'kegiatan' ? 'active' : '' ?>" href="<?= BASE_URL ?>kokulikuler/index/<?= $kokul['id_kokulikuler'] ?>/program"><i class="fas fa-file-signature"></i> Program Kerja</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= $tab == 'anggota' ? 'active' : '' ?>" href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=anggota"><i class="fas fa-users"></i> Anggota</a>
+                        <a class="nav-link <?= $tab == 'anggota' ? 'active' : '' ?>" href="<?= BASE_URL ?>kokulikuler/index/<?= $kokul['id_kokulikuler'] ?>/anggota"><i class="fas fa-users"></i> Anggota</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= $tab == 'jurnal' ? 'active' : '' ?>" href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=jurnal"><i class="fas fa-book"></i> Jurnal & Absensi</a>
+                        <a class="nav-link <?= $tab == 'jurnal' ? 'active' : '' ?>" href="<?= BASE_URL ?>kokulikuler/index/<?= $kokul['id_kokulikuler'] ?>/jurnal"><i class="fas fa-book"></i> Jurnal & Absensi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= $tab == 'galeri' ? 'active' : '' ?>" href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=galeri"><i class="fas fa-images"></i> Galeri</a>
+                        <a class="nav-link <?= $tab == 'galeri' ? 'active' : '' ?>" href="<?= BASE_URL ?>kokulikuler/index/<?= $kokul['id_kokulikuler'] ?>/galeri"><i class="fas fa-images"></i> Galeri</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?= $tab == 'nilai' ? 'active' : '' ?>" href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=nilai"><i class="fas fa-award"></i> Penilaian</a>
+                        <a class="nav-link <?= $tab == 'nilai' ? 'active' : '' ?>" href="<?= BASE_URL ?>kokulikuler/index/<?= $kokul['id_kokulikuler'] ?>/nilai"><i class="fas fa-award"></i> Penilaian</a>
                     </li>
                 </ul>
             </div>
@@ -159,7 +159,7 @@
                                                                             </button>
                                                                         <?php endif; ?>
                                                                         <button class="btn btn-xs btn-warning p-1" onclick='editAgenda(<?= json_encode($ag) ?>)' title="Edit" style="line-height: 1;"><i class="fas fa-edit fa-xs"></i></button>
-                                                                        <a href="index.php?mod=kokulikuler&act=agenda_delete&id_kokulikuler=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
+                                                                        <a href="<?= BASE_URL ?>kokulikuler/agenda_delete?id_kokulikuler=<?= $id ?>&id_agenda=<?= $ag['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus" style="line-height: 1;"><i class="fas fa-trash fa-xs"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -204,7 +204,7 @@
                                                                         <button class="btn btn-xs btn-info p-1" onclick="previewFile('<?= $pr['file_path'] ?>', 'pdf', '<?= htmlspecialchars($pr['nama_agenda']) ?>')" title="Lihat File" style="line-height: 1;">
                                                                             <i class="fas fa-eye fa-xs"></i>
                                                                         </button>
-                                                                        <a href="index.php?mod=kokulikuler&act=agenda_delete&id_kokulikuler=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
+                                                                        <a href="<?= BASE_URL ?>kokulikuler/agenda_delete?id_kokulikuler=<?= $id ?>&id_agenda=<?= $pr['id_agenda'] ?>" class="btn btn-xs btn-danger btn-delete-confirm p-1" title="Hapus File" style="line-height: 1;">
                                                                             <i class="fas fa-trash fa-xs"></i>
                                                                         </a>
                                                                     </div>
@@ -292,7 +292,7 @@
                     <?php if ($tab == 'jurnal'): ?>
                     <div class="tab-pane fade show active">
                         <div class="mb-3">
-                            <a href="index.php?mod=kokulikuler&act=jurnal_form&id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>" class="btn btn-primary">
+                            <a href="<?= BASE_URL ?>kokulikuler/jurnal_form?id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Isi Jurnal & Absensi
                             </a>
                         </div>
@@ -316,8 +316,8 @@
                                     <td><?= htmlspecialchars($j['materi']) ?></td>
                                     <td><?= $hadir_count ?> Siswa</td>
                                     <td>
-                                        <a href="index.php?mod=kokulikuler&act=jurnal_form&id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                                        <a href="index.php?mod=kokulikuler&act=jurnal_delete&id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-danger btn-delete-confirm"><i class="fas fa-trash"></i></a>
+                                        <a href="<?= BASE_URL ?>kokulikuler/jurnal_form?id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                                        <a href="<?= BASE_URL ?>kokulikuler/jurnal_delete?id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_jurnal=<?= $j['id_jurnal'] ?>" class="btn btn-sm btn-danger btn-delete-confirm"><i class="fas fa-trash"></i></a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -360,7 +360,7 @@
                                                     <button class="btn btn-info btn-xs" onclick="previewFile('<?= $g['file_path'] ?>', 'image', '<?= htmlspecialchars($g['judul'] ?? 'Galeri') ?>')">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <a href="index.php?mod=kokulikuler&act=galeri_delete&id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_galeri=<?= $g['id_galeri'] ?>" 
+                                                    <a href="<?= BASE_URL ?>kokulikuler/galeri_delete?id_kokulikuler=<?= $kokul['id_kokulikuler'] ?>&id_galeri=<?= $g['id_galeri'] ?>" 
                                                        class="btn btn-danger btn-xs btn-delete-confirm">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
@@ -378,49 +378,71 @@
                     <!-- TAB PENILAIAN -->
                     <?php if ($tab == 'nilai'): ?>
                     <div class="tab-pane fade show active" id="nilai" role="tabpanel">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> <strong>Tips:</strong> Klik tombol <span class="badge badge-info"><i class="fas fa-magic"></i> Auto</span> untuk membuat deskripsi penilaian secara otomatis berdasakan Tema dan Project ini.
+                        <div class="alert alert-info d-flex align-items-center" style="gap:10px;">
+                            <i class="fas fa-keyboard fa-lg"></i>
+                            <div>
+                                <strong>Pintasan Keyboard:</strong> Klik baris siswa untuk fokus, lalu tekan
+                                <kbd>A</kbd> = <span class="badge badge-success">Sangat Baik</span> &nbsp;
+                                <kbd>B</kbd> = <span class="badge badge-primary">Baik</span> &nbsp;
+                                <kbd>Enter</kbd> / <kbd>↓</kbd> = Pindah Baris ke Bawah
+                                <br><small><i>Deskripsi akan otomatis terisi seketika saat capaian dipilih.</i></small>
+                            </div>
                         </div>
-                        <form action="index.php?mod=kokulikuler&act=nilai_save" method="POST">
+                        <form action="<?= BASE_URL ?>kokulikuler/nilai_save" method="POST">
                             <input type="hidden" name="id_kokulikuler" value="<?= $kokul['id_kokulikuler'] ?>">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped" id="tableNilai">
+                                <table class="table table-bordered table-hover" id="tableNilai">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th width="5%">No</th>
-                                            <th>Nama Siswa</th>
-                                            <th width="20%">Capaian Profil</th>
-                                            <th>Deskripsi Deskriptif</th>
-                                            <th width="10%">Aksi</th>
+                                            <th width="4%" class="text-center">No</th>
+                                            <th width="15%">Nama Siswa</th>
+                                            <th width="18%" class="text-center">Capaian Profil</th>
+                                            <th width="63%">Deskripsi Capaian</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if (empty($penilaian_list)): ?>
-                                            <tr><td colspan="5" class="text-center">Belum ada anggota terdaftar.</td></tr>
+                                            <tr><td colspan="4" class="text-center text-muted py-4">Belum ada anggota terdaftar.</td></tr>
                                         <?php else: ?>
                                             <?php foreach ($penilaian_list as $i => $n): ?>
-                                            <tr>
-                                                <td><?= $i + 1 ?></td>
-                                                <td class="font-weight-bold"><?= htmlspecialchars($n['nama_siswa']) ?></td>
-                                                <td>
-                                                    <select name="nilai_data[<?= $n['id_siswa'] ?>][nilai]" class="form-control">
-                                                        <option value="">-- Pilih Capaian --</option>
-                                                        <option value="SB" <?= ($n['nilai'] ?? '') == 'SB' ? 'selected' : '' ?>>Sangat Berkembang (SB)</option>
-                                                        <option value="BSH" <?= ($n['nilai'] ?? '') == 'BSH' ? 'selected' : '' ?>>Berkembang Sesuai Harapan (BSH)</option>
-                                                        <option value="MB" <?= ($n['nilai'] ?? '') == 'MB' ? 'selected' : '' ?>>Mulai Berkembang (MB)</option>
-                                                        <option value="BB" <?= ($n['nilai'] ?? '') == 'BB' ? 'selected' : '' ?>>Belum Berkembang (BB)</option>
-                                                    </select>
+                                            <tr class="nilai-row" data-id="<?= $n['id_siswa'] ?>" 
+                                                data-nama="<?= htmlspecialchars($n['nama_siswa']) ?>"
+                                                tabindex="0"
+                                                onclick="setFocusRow(this)"
+                                                style="cursor:pointer; outline:none;">
+                                                <td class="text-center align-middle"><?= $i + 1 ?></td>
+                                                <td class="align-middle font-weight-bold">
+                                                    <?= htmlspecialchars($n['nama_siswa']) ?>
+                                                </td>
+                                                <td class="align-middle text-center">
+                                                    <!-- Hidden input untuk form submit -->
+                                                    <input type="hidden" 
+                                                           name="nilai_data[<?= $n['id_siswa'] ?>][nilai]" 
+                                                           id="val_<?= $n['id_siswa'] ?>"
+                                                           value="<?= htmlspecialchars($n['nilai'] ?? '') ?>">
+                                                    <!-- Toggle Buttons -->
+                                                    <div class="btn-group w-100" role="group">
+                                                        <button type="button" 
+                                                                class="btn btn-capaian btn-sb <?= ($n['nilai'] ?? '') == 'SB' ? 'btn-success active-capaian' : 'btn-outline-success' ?>"
+                                                                onclick="setCapaian(<?= $n['id_siswa'] ?>, 'SB', this); event.stopPropagation();"
+                                                                title="Sangat Baik (A)">
+                                                            <i class="fas fa-star"></i> SB
+                                                        </button>
+                                                        <button type="button" 
+                                                                class="btn btn-capaian btn-b <?= ($n['nilai'] ?? '') == 'B' ? 'btn-primary active-capaian' : 'btn-outline-primary' ?>"
+                                                                onclick="setCapaian(<?= $n['id_siswa'] ?>, 'B', this); event.stopPropagation();"
+                                                                title="Baik (B)">
+                                                            <i class="fas fa-thumbs-up"></i> B
+                                                        </button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <textarea name="nilai_data[<?= $n['id_siswa'] ?>][deskripsi]" 
                                                               id="desc_<?= $n['id_siswa'] ?>" 
-                                                              class="form-control" rows="3" placeholder="Masukkan deskripsi naratif..."><?= htmlspecialchars($n['deskripsi'] ?? '') ?></textarea>
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-info btn-block btn-sm" 
-                                                            onclick="generateDeskripsi(<?= $n['id_siswa'] ?>, '<?= htmlspecialchars(addslashes($n['nama_siswa'])) ?>')">
-                                                        <i class="fas fa-magic"></i> Auto
-                                                    </button>
+                                                              class="form-control form-control-sm" 
+                                                              rows="2" 
+                                                              placeholder="Otomatis terisi saat capaian dipilih atau ketik manual..."
+                                                              onclick="setFocusRow($(this).closest('tr')[0]); event.stopPropagation();"><?= htmlspecialchars($n['deskripsi'] ?? '') ?></textarea>
                                                 </td>
                                             </tr>
                                             <?php endforeach; ?>
@@ -430,7 +452,9 @@
                             </div>
                             <?php if (!empty($penilaian_list)): ?>
                             <div class="text-right mt-3">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Semua Penilaian</button>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save"></i> Simpan Semua Penilaian
+                                </button>
                             </div>
                             <?php endif; ?>
                         </form>
@@ -461,7 +485,7 @@ $(document).ready(function() {
             const studentId = ui.item.data('id');
             let action = (targetList === 'list-right') ? 'add' : 'remove';
             
-            $.post('index.php?mod=kokulikuler&act=update_anggota', {
+            $.post('<?= BASE_URL ?>kokulikuler/update_anggota', {
                 action: action, id_kokul: id_kokul, student_ids: [studentId]
             }, function(res) {
                  if(res.status === 'success') {
@@ -480,7 +504,7 @@ $(document).ready(function() {
     function loadStudents() {
         var q = $('#search-left').val();
         var k = $('#filter-kelas').val();
-        $.getJSON('index.php?mod=kokulikuler&act=search_students', {id_kokul: id_kokul, q: q, id_kelas: k}, function(res){
+        $.getJSON('<?= BASE_URL ?>kokulikuler/search_students', {id_kokul: id_kokul, q: q, id_kelas: k}, function(res){
             if(res.status === 'success'){
                 $('#list-left').empty();
                 res.data.forEach(s => {
@@ -533,40 +557,91 @@ $('#modalAgenda').on('hidden.bs.modal', function () {
     $('#modalAgenda .modal-title').text('Tambah Agenda Kegiatan');
 });
 
-function generateDeskripsi(idSiswa, namaSiswa) {
-    const tema = "<?= addslashes($kokul['tema'] ?? '') ?>";
-    const project = "<?= addslashes($kokul['nama_kegiatan'] ?? '') ?>";
-    const dimensi = <?= json_encode($profil_terpilih_names) ?>;
-    
-    let dimensiStr = "dimensi Profil Pelajar Pancasila";
-    if (dimensi.length > 1) {
-        const last = dimensi.pop();
-        dimensiStr = dimensi.join(', ') + ' dan ' + last;
-    } else if (dimensi.length === 1) {
-        dimensiStr = dimensi[0];
-    }
-    
-    let text = "";
-    const lowerTema = tema.toLowerCase();
-    
-    if (lowerTema.includes('gaya hidup berkelanjutan')) {
-        text = `Siswa menunjukkan dimensi Profil Pelajar Pancasila ${dimensiStr} melalui proyek '${project}'. Ia aktif dalam menanam, merawat, hingga memanen sayuran, membuktikan kepedulian terhadap pangan berkelanjutan dan rasa syukur atas karunia Tuhan.`;
-    } else if (lowerTema.includes('kewirausahaan')) {
-        text = `Melalui proyek '${project}', siswa mengembangkan dimensi ${dimensiStr}. Ia secara mandiri mendesain, membuat, dan memasarkan produk aksesori, menunjukkan jiwa kewirausahaan dan keterampilan praktis yang baik.`;
-    } else if (lowerTema.includes('kebinekaan global')) {
-        text = `Siswa aktif berdiskusi dan mempresentasikan hasil riset tentang '${project}', menunjukkan dimensi ${dimensiStr}. Ia mampu menyimpulkan pentingnya toleransi dalam kehidupan berbangsa.`;
-    } else if (lowerTema.includes('bangunlah jiwa dan raga')) {
-        text = `Dalam kampanye '${project}', siswa menunjukkan dimensi ${dimensiStr}. Ia berani menjadi pembicara, menyusun materi, dan mengajak teman untuk peduli kesehatan mental, menunjukkan empati dan kepedulian sosial.`;
-    } else if (lowerTema.includes('suara demokrasi')) {
-        text = `Siswa aktif menyuarakan pendapatnya secara santun dalam proyek '${project}', menunjukkan dimensi ${dimensiStr}. Ia mampu menghargai perbedaan pilihan dan berkontribusi positif dalam proses demokrasi sekolah.`;
-    } else if (lowerTema.includes('rekayasa dan teknologi')) {
-        text = `Strategi pemecahan masalah yang kreatif ditunjukkan siswa dalam proyek '${project}', mencerminkan dimensi ${dimensiStr}. Ia mampu merancang solusi teknologi tepat guna dengan penuh tanggung jawab.`;
-    } else {
-        text = `Siswa telah menyelesaikan proyek '${project}' dengan tema '${tema}'. Melalui kegiatan ini, siswa menunjukkan perkembangan pada dimensi ${dimensiStr} serta kontribusi positif dalam kerja kelompok.`;
-    }
-    
-    $(`#desc_${idSiswa}`).val(text);
+// =============================================
+// PENILAIAN: Capaian & Deskripsi Otomatis
+// =============================================
+
+var focusedRow = null;
+
+function setFocusRow(tr) {
+    // Hilangkan highlight baris sebelumnya
+    $('.nilai-row').removeClass('table-warning');
+    focusedRow = tr;
+    $(tr).addClass('table-warning');
 }
+
+function setCapaian(idSiswa, nilai, btnEl) {
+    // Update hidden input
+    $('#val_' + idSiswa).val(nilai);
+
+    // Update tombol visual dalam baris yang sama
+    var $row = $(btnEl).closest('tr');
+    $row.find('.btn-sb').removeClass('btn-success active-capaian').addClass('btn-outline-success');
+    $row.find('.btn-b').removeClass('btn-primary active-capaian').addClass('btn-outline-primary');
+
+    if (nilai === 'SB') {
+        $row.find('.btn-sb').removeClass('btn-outline-success').addClass('btn-success active-capaian');
+    } else {
+        $row.find('.btn-b').removeClass('btn-outline-primary').addClass('btn-primary active-capaian');
+    }
+
+    // Auto-generate deskripsi
+    var namaSiswa = $row.data('nama');
+    generateDeskripsi(idSiswa, namaSiswa);
+}
+
+function generateDeskripsi(idSiswa, namaSiswa) {
+    const tema    = "<?= addslashes($kokul['tema'] ?? $kokul['nama_kegiatan'] ?? '') ?>";
+    const dimensi = <?= json_encode($profil_terpilih_names) ?>;
+
+    // Baca nilai capaian saat ini
+    const nilaiVal = $('#val_' + idSiswa).val();
+    const capaianText = (nilaiVal === 'SB') ? 'Sangat Baik' : (nilaiVal === 'B' ? 'Baik' : 'Sangat Baik');
+
+    // Gabung nama dimensi
+    let dimensiStr = 'profil lulusan';
+    if (dimensi.length > 0) {
+        const tmp = [...dimensi];
+        if (tmp.length === 1) {
+            dimensiStr = tmp[0];
+        } else {
+            const last = tmp.pop();
+            dimensiStr = tmp.join(', ') + ' dan ' + last;
+        }
+    }
+
+    // Format deskripsi sesuai permintaan
+    const text = `Ananda ${namaSiswa} menunjukan pencapaian yang ${capaianText} pada dimensi profil lulusan ${dimensiStr} melalui kegiatan ${tema}.`;
+    $('#desc_' + idSiswa).val(text);
+}
+
+// Keyboard shortcut: A = Sangat Baik, B = Baik
+$(document).on('keydown', function(e) {
+    // Hanya aktif di tab nilai & baris terfokus
+    if (!focusedRow) return;
+    // Jangan aktif jika user sedang mengetik di textarea/input
+    if ($(document.activeElement).is('textarea, input, select')) return;
+
+    var idSiswa = $(focusedRow).data('id');
+    var nama    = $(focusedRow).data('nama');
+    var key     = e.key.toUpperCase();
+
+    if (key === 'A') {
+        e.preventDefault();
+        setCapaian(idSiswa, 'SB', focusedRow.querySelector('.btn-sb'));
+    } else if (key === 'B') {
+        e.preventDefault();
+        setCapaian(idSiswa, 'B', focusedRow.querySelector('.btn-b'));
+    } else if (e.key === 'ArrowDown' || e.key === 'Enter') {
+        e.preventDefault();
+        var $next = $(focusedRow).next('.nilai-row');
+        if ($next.length) setFocusRow($next[0]);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        var $prev = $(focusedRow).prev('.nilai-row');
+        if ($prev.length) setFocusRow($prev[0]);
+    }
+});
 </script>
 
 <!-- MODALS -->
@@ -592,7 +667,7 @@ function generateDeskripsi(idSiswa, namaSiswa) {
 <div class="modal fade" id="modalUploadProker" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=kokulikuler&act=program_upload" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kokulikuler/program_upload" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_kokulikuler" value="<?= $kokul['id_kokulikuler'] ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Program Kerja</h5>
@@ -624,7 +699,7 @@ function generateDeskripsi(idSiswa, namaSiswa) {
 <div class="modal fade" id="modalAgenda" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=kokulikuler&act=agenda_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kokulikuler/agenda_save" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_kokulikuler" value="<?= $kokul['id_kokulikuler'] ?>">
                 <input type="hidden" name="id_agenda" id="id_agenda">
                 <div class="modal-header">
@@ -668,7 +743,7 @@ function generateDeskripsi(idSiswa, namaSiswa) {
 <div class="modal fade" id="modalGaleri" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="index.php?mod=kokulikuler&act=galeri_save" method="post" enctype="multipart/form-data">
+            <form action="<?= BASE_URL ?>kokulikuler/galeri_save" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Foto Galeri</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>

@@ -1,13 +1,26 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-file-alt mr-2"></i> Laporan Catatan Kasus Siswa</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Laporan Catatan Kasus Siswa (BK)
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+                    <li class="breadcrumb-item active text-primary font-weight-bold">Laporan Kasus BK</li>
+                </ol>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -51,12 +64,12 @@
             <div class="card-header">
                 <h3 class="card-title">Hasil Laporan</h3>
                 <div class="card-tools">
-                    <a href="index.php?mod=laporan&act=catatan_kasus_export_excel&kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>"
+                    <a href="<?= BASE_URL ?>laporan/catatan_kasus_export_excel?kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>"
                         class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> Export Excel</a>
-                    <a href="index.php?mod=laporan&act=catatan_kasus_export_pdf&kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>"
+                    <a href="<?= BASE_URL ?>laporan/catatan_kasus_export_pdf?kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>"
                         class="btn btn-danger btn-sm" target="_blank"><i class="fas fa-file-pdf"></i> Export PDF</a>
                     <button type="button"
-                        onclick="showReportPreview('index.php?mod=laporan&amp;act=catatan_kasus_print&kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>', 'Laporan Catatan Kasus')"
+                        onclick="showReportPreview('<?= BASE_URL ?>laporan/catatan_kasus_print?kelas=<?= $kelas ?>&tanggal1=<?= $tanggal1 ?>&tanggal2=<?= $tanggal2 ?>', 'Laporan Catatan Kasus')"
                         class="btn btn-info btn-sm" title="Cetak"><i class="fas fa-print"></i> Cetak</button>
                 </div>
             </div>

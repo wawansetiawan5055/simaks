@@ -15,19 +15,17 @@
     <!-- REQUIRED SCRIPTS (Moved to Header to fix dependency issues) -->
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- jQuery UI (Disabled temporarily for debugging Treeview) -->
-    <!--
+    <!-- jQuery UI -->
     <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
     <script>
         $.widget.bridge('uibutton', $.ui.button)
     </script>
-    -->
     <!-- Bootstrap 4 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/adminlte.v3.2.0.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Toast Notification CSS -->
@@ -37,6 +35,26 @@
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Summernote WYSIWYG Editor -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <!-- KaTeX CSS for Summernote Math -->
+        <!-- KaTeX CSS for Summernote Math -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <!-- MathJax for LaTeX / Math Equations Rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- PWA Manifest & Meta -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -250,6 +268,34 @@
         h4,
         .h4 {
             font-size: calc(var(--font-header) * 0.65) !important;
+        }
+
+        /* 🏆 UNIFIED PAGE HEADER TITLE STYLES (Identik dengan Kalender Akademik) */
+        .content-header h1,
+        .content-header h2,
+        .content-header h3,
+        .content-header h4,
+        .content-header .page-title {
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1.35rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            letter-spacing: -0.2px !important;
+            line-height: 1.35 !important;
+            margin: 0 !important;
+        }
+
+        .content-header h1 .badge,
+        .content-header h2 .badge,
+        .content-header h3 .badge,
+        .content-header h4 .badge {
+            font-size: 0.68rem !important;
+            font-weight: 600 !important;
+            letter-spacing: normal !important;
+            text-transform: none !important;
+            vertical-align: middle !important;
+            padding: 4px 8px !important;
+            margin-left: 6px !important;
         }
 
         .card-title {
@@ -836,6 +882,83 @@
         .card-tools .input-group {
             display: flex !important;
             align-items: center !important;
+        }
+
+        /* Mobile-friendly responsive tables and buttons */
+        .table-responsive {
+            overflow-x: auto !important;
+        }
+
+        .table-responsive .table {
+            min-width: 100% !important;
+        }
+
+        .btn-group-toggle.d-flex.flex-wrap .btn {
+            white-space: normal !important;
+        }
+
+        /* ========================================= */
+        /* 📐 COMPACT MATH & ARTICLE TABLE RULES    */
+        /* ========================================= */
+        .article-content table,
+        .content-box table,
+        .table-compact-math {
+            min-width: 560px !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 12px 0 !important;
+        }
+        .article-content table th,
+        .article-content table td,
+        .content-box table th,
+        .content-box table td {
+            padding: 8px 12px !important;
+            vertical-align: middle !important;
+            line-height: 1.4 !important;
+            height: auto !important;
+            word-break: normal !important;
+        }
+        .article-content table th:first-child,
+        .article-content table td:first-child,
+        .content-box table th:first-child,
+        .content-box table td:first-child {
+            width: 45px !important;
+            text-align: center !important;
+            white-space: nowrap !important;
+        }
+        .article-content table th:nth-child(2),
+        .article-content table td:nth-child(2),
+        .content-box table th:nth-child(2),
+        .content-box table td:nth-child(2) {
+            min-width: 180px !important;
+            font-weight: 600;
+        }
+        .article-content table p,
+        .content-box table p {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.35 !important;
+        }
+        .article-content table br,
+        .content-box table br {
+            display: none !important;
+        }
+        .article-content table mjx-container,
+        .article-content table .MathJax,
+        .content-box table mjx-container,
+        .content-box table .MathJax {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: inline-block !important;
+            line-height: 1 !important;
+            vertical-align: middle !important;
+        }
+        .article-content table mjx-container[jax="CHTML"][display="true"],
+        .article-content table mjx-container[jax="SVG"][display="true"],
+        .content-box table mjx-container[jax="CHTML"][display="true"],
+        .content-box table mjx-container[jax="SVG"][display="true"] {
+            margin: 0 !important;
+            display: inline-block !important;
         }
     </style>
 </head>

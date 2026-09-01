@@ -7,7 +7,7 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                <li class="breadcrumb-item"><a href="index.php?mod=keuangan_tarif&act=index">Tarif Khusus</a></li>
+                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>keuangan_tarif/index">Tarif Khusus</a></li>
                 <li class="breadcrumb-item active">Tambah</li>
             </ol>
         </nav>
@@ -25,7 +25,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Form Aturan Tarif</h5>
 
-                        <form action="index.php?mod=keuangan_tarif&act=store" method="POST">
+                        <form action="<?= BASE_URL ?>keuangan_tarif/store" method="POST">
 
                             <div class="row mb-3">
                                 <label class="col-sm-3 col-form-label">Jenis Transaksi</label>
@@ -109,7 +109,7 @@
                             <div class="row mb-3 mt-4">
                                 <div class="col-sm-9 offset-sm-3">
                                     <button type="submit" class="btn btn-primary">Simpan Aturan</button>
-                                    <a href="index.php?mod=keuangan_tarif&act=index" class="btn btn-secondary">Batal</a>
+                                    <a href="<?= BASE_URL ?>keuangan_tarif/index" class="btn btn-secondary">Batal</a>
                                 </div>
                             </div>
 

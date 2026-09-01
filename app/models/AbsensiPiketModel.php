@@ -16,6 +16,34 @@ class AbsensiPiketModel {
     }
 
     /**
+     * Mengambil data absensi yang sudah tersimpan untuk kelas & tanggal tertentu.
+     * Return: array berindeks id_siswa untuk akses cepat di view.
+     */
+    public static function getAbsensiByKelasAndTanggal($pdo, $id_kelas, $tanggal) {
+        $stmt = $pdo->prepare(
+            "SELECT id_siswa, status, keterangan FROM absensi_siswa_piket
+             WHERE id_kelas = ? AND tanggal = ?"
+        );
+        $stmt->execute([$id_kelas, $tanggal]);
+        $result = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $result[$row['id_siswa']] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     * Cek apakah absensi untuk kelas & tanggal sudah pernah diisi.
+     */
+    public static function sudahDiisi($pdo, $id_kelas, $tanggal) {
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM absensi_siswa_piket WHERE id_kelas = ? AND tanggal = ?"
+        );
+        $stmt->execute([$id_kelas, $tanggal]);
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+    /**
      * [REVISI KRUSIAL] Menyimpan semua status absensi piket, termasuk Hadir.
      */
     public static function save($pdo, $data) {

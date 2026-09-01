@@ -297,7 +297,7 @@ $(document).ready(function() {
         if(id_kelas) {
             var tipe = $('#tipe_rekap').val() || 'bulanan';
             // Show loading indicator text on the select itself (optional refactoring, but keeping it simple)
-            window.location.href = 'index.php?mod=keuangan_jurnal_pembantu&id_kelas=' + id_kelas + '&tipe_rekap=' + tipe;
+            window.location.href = '<?= BASE_URL ?>keuangan_jurnal_pembantu?id_kelas=' + id_kelas + '&tipe_rekap=' + tipe;
         }
     });
 

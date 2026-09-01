@@ -48,4 +48,21 @@ class StrukturKurikulumModel {
         $stmt = $pdo->prepare("DELETE FROM struktur_kurikulum WHERE id_struktur=?");
         return $stmt->execute([$id]);
     }
+
+    public static function countByTa($pdo, $id_ta) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM struktur_kurikulum WHERE id_ta = ?");
+        $stmt->execute([$id_ta]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public static function copyFromTa($pdo, $source_ta, $target_ta) {
+        if ($source_ta === $target_ta) {
+            return 0;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO struktur_kurikulum (id_mapel, tingkat, kelompok, alokasi_jp_minggu, id_ta)
+            SELECT id_mapel, tingkat, kelompok, alokasi_jp_minggu, ? FROM struktur_kurikulum WHERE id_ta = ?");
+        $stmt->execute([$target_ta, $source_ta]);
+        return $stmt->rowCount();
+    }
 }

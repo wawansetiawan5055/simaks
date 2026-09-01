@@ -31,16 +31,6 @@
             margin-bottom: 20px;
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 18pt;
-        }
-
-        .header p {
-            margin: 5px 0;
-            font-size: 14pt;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -66,6 +56,13 @@
             margin-bottom: 10px;
         }
 
+        .foto-siswa {
+            width: 3cm;
+            height: 4cm;
+            object-fit: cover;
+            border: 1px solid #999;
+        }
+
         @page {
             size: A4;
             margin: 10mm;
@@ -86,21 +83,16 @@
                 padding: 0;
             }
 
-            .no-print {
-                display: none;
-            }
+            .no-print { display: none; }
 
             .sub-header {
                 -webkit-print-color-adjust: exact;
                 background: #e0e0e0 !important;
             }
 
-            .btn-container {
-                display: none;
-            }
+            .btn-container { display: none; }
         }
 
-        /* Button Styling */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -114,21 +106,10 @@
             display: inline-block;
         }
 
-        .btn-print {
-            background-color: #28a745;
-        }
-
-        .btn-print:hover {
-            background-color: #218838;
-        }
-
-        .btn-close {
-            background-color: #dc3545;
-        }
-
-        .btn-close:hover {
-            background-color: #c82333;
-        }
+        .btn-print { background-color: #28a745; }
+        .btn-print:hover { background-color: #218838; }
+        .btn-close { background-color: #dc3545; }
+        .btn-close:hover { background-color: #c82333; }
 
         .btn-container {
             text-align: center;
@@ -147,57 +128,87 @@
     </div>
 
     <div class="page-container">
-        <!-- HEADER STANDARD -->
+        <!-- KOP SURAT DINAMIS dari Profil Sekolah -->
         <div class="header">
             <?php
-            // Prepare Data for Partial (Hardcoded fallback as this view usually lacks global $kop context)
-            $kop = [
-                'logo' => get_app_logo() ?? 'logo.png',
-                'kop_nama' => 'SMA PLUS AL MANSHURIYAH',
-                'kop_npsn' => '20247166',
-                'kop_alamat' => 'Jl. Kalaparea KM. 5 RT 03 RW 09 Desa Kalaparea Kec. Nagrak Kab. Sukabumi'
-            ];
+            if (!class_exists('ProfilSekolahModel')) {
+                require_once __DIR__ . '/../../models/ProfilSekolahModel.php';
+            }
+            $profil_sekolah  = ProfilSekolahModel::getProfil($pdo);
+            $logo_file       = $profil_sekolah['logo'] ?? null;
+            $logo_src        = $logo_file ? BASE_URL . 'assets/img/' . $logo_file : null;
+            $nama_yayasan    = $profil_sekolah['nama_yayasan'] ?? '';
+            $nama_sekolah_kop = $profil_sekolah['nama_sekolah'] ?? 'NAMA SEKOLAH';
+            $npsn_sekolah    = $profil_sekolah['npsn'] ?? '-';
+            $alamat_sekolah  = $profil_sekolah['alamat'] ?? '-';
             ?>
-            <?php include __DIR__ . '/../partials/kop_surat_laporan.php'; ?>
-            <!-- Add Title Below Standard Kop -->
-            <div style="margin-top: 10px;">
-                <h2 style="font-size: 18pt; margin: 0; font-weight: bold; text-transform: uppercase;">BIODATA SISWA</h2>
+            <div style="font-family:'Times New Roman',serif; display:flex; align-items:center; justify-content:center; color:#000; line-height:1.3; padding:0 0 6px 0; gap:10px;">
+                <?php if ($logo_src): ?>
+                <div style="flex-shrink:0;">
+                    <img src="<?= $logo_src ?>" style="height:85px; width:auto;">
+                </div>
+                <?php endif; ?>
+                <div style="flex-grow:1; text-align:center;">
+                    <?php if (!empty($nama_yayasan)): ?>
+                    <div style="font-size:13pt; font-weight:bold; margin:0;"><?= strtoupper(htmlspecialchars($nama_yayasan)) ?></div>
+                    <?php endif; ?>
+                    <div style="font-size:17pt; font-weight:bold; margin:0;"><?= strtoupper(htmlspecialchars($nama_sekolah_kop)) ?></div>
+                    <div style="font-size:11pt; font-weight:bold; margin:2px 0;">NPSN: <?= htmlspecialchars($npsn_sekolah) ?></div>
+                    <div style="font-size:10pt; margin:0;"><?= htmlspecialchars($alamat_sekolah) ?></div>
+                </div>
+            </div>
+            <!-- Garis kop: di luar flex row agar full width -->
+            <hr style="border:none; border-top:3px double black; margin:4px 0 10px 0; width:100%;">
+            <div style="margin-top:4px;">
+                <h2 style="font-size:16pt; margin:0; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">BIODATA SISWA</h2>
             </div>
         </div>
 
+        <!-- A. DATA PRIBADI dengan foto di pojok kanan -->
         <div class="sub-header">A. DATA PRIBADI SISWA</div>
         <table>
             <tr>
-                <td class="label">Nama Lengkap</td>
-                <td>: <?= htmlspecialchars($siswa['nama']) ?></td>
-            </tr>
-            <tr>
-                <td class="label">NISN</td>
-                <td>: <?= htmlspecialchars($siswa['nisn']) ?></td>
-            </tr>
-            <tr>
-                <td class="label">NIPD</td>
-                <td>: <?= htmlspecialchars($siswa['nipd'] ?? '-') ?></td>
-            </tr>
-            <tr>
-                <td class="label">NIK</td>
-                <td>: <?= htmlspecialchars($siswa['nik'] ?? '-') ?></td>
-            </tr>
-            <tr>
-                <td class="label">Tempat/Tanggal Lahir</td>
-                <td>: <?= htmlspecialchars($siswa['tempat_lahir'] ?? '') ?>,
-                    <?= htmlspecialchars($siswa['tanggal_lahir'] ?? '') ?></td>
-            </tr>
-            <tr>
-                <td class="label">Jenis Kelamin</td>
-                <td>: <?= htmlspecialchars($siswa['jk'] ?? '-') ?></td>
-            </tr>
-            <tr>
-                <td class="label">Sekolah Asal</td>
-                <td>: <?= htmlspecialchars($siswa['sekolah_asal'] ?? '-') ?></td>
+                <td style="vertical-align:top;">
+                    <table style="margin-bottom:0; width:100%;">
+                        <tr>
+                            <td class="label">Nama Lengkap</td>
+                            <td>: <?= htmlspecialchars($siswa['nama']) ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">NISN</td>
+                            <td>: <?= htmlspecialchars($siswa['nisn']) ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">NIPD</td>
+                            <td>: <?= htmlspecialchars($siswa['nipd'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">NIK</td>
+                            <td>: <?= htmlspecialchars($siswa['nik'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Tempat/Tanggal Lahir</td>
+                            <td>: <?= htmlspecialchars($siswa['tempat_lahir'] ?? '') ?>, <?= htmlspecialchars($siswa['tanggal_lahir'] ?? '') ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Jenis Kelamin</td>
+                            <td>: <?= htmlspecialchars($siswa['jk'] ?? '-') ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Sekolah Asal</td>
+                            <td>: <?= htmlspecialchars($siswa['sekolah_asal'] ?? '-') ?></td>
+                        </tr>
+                    </table>
+                </td>
+                <!-- Foto Siswa -->
+                <td style="width:3.5cm; text-align:center; vertical-align:top; padding-left:12px;">
+                    <img src="<?= $avatar_src ?>" class="foto-siswa" alt="Foto Siswa">
+                    <div style="font-size:9pt; margin-top:3px; color:#555;">Foto Siswa</div>
+                </td>
             </tr>
         </table>
 
+        <!-- B. DATA ORANG TUA / WALI -->
         <div class="sub-header">B. DATA ORANG TUA / WALI</div>
         <table>
             <tr>
@@ -212,11 +223,7 @@
                 <td class="label">No. Telp Ayah</td>
                 <td>: <?= htmlspecialchars($profil['telp_ayah'] ?? '-') ?></td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <hr>
-                </td>
-            </tr>
+            <tr><td colspan="2"><hr></td></tr>
             <tr>
                 <td class="label">Nama Ibu</td>
                 <td>: <?= htmlspecialchars($profil['nama_ibu'] ?? '-') ?></td>
@@ -229,11 +236,7 @@
                 <td class="label">No. Telp Ibu</td>
                 <td>: <?= htmlspecialchars($profil['telp_ibu'] ?? '-') ?></td>
             </tr>
-            <tr>
-                <td colspan="2">
-                    <hr>
-                </td>
-            </tr>
+            <tr><td colspan="2"><hr></td></tr>
             <tr>
                 <td class="label">Nama Wali</td>
                 <td>: <?= htmlspecialchars($profil['nama_wali'] ?? '-') ?></td>
@@ -248,23 +251,24 @@
             </tr>
         </table>
 
+        <!-- C. KELENGKAPAN BERKAS -->
         <div class="sub-header">C. KELENGKAPAN BERKAS</div>
         <table>
             <?php
             $files = [
-                'file_ijazah' => 'Ijazah Terakhir',
+                'file_ijazah'         => 'Ijazah Terakhir',
                 'file_kartu_keluarga' => 'Kartu Keluarga',
-                'file_akte_lahir' => 'Akte Kelahiran',
-                'file_ktp_ortu' => 'KTP Orang Tua',
-                'file_kip' => 'Kartu Indonesia Pintar'
+                'file_akte_lahir'     => 'Akte Kelahiran',
+                'file_ktp_ortu'       => 'KTP Orang Tua',
+                'file_kip'            => 'Kartu Indonesia Pintar',
             ];
             foreach ($files as $col => $label):
-                $stat = !empty($profil[$col]) ? "Ada / Terlampir" : "Belum Ada";
-                ?>
-                <tr>
-                    <td class="label"><?= $label ?></td>
-                    <td>: <?= $stat ?></td>
-                </tr>
+                $stat = !empty($profil[$col]) ? '✓ Ada / Terlampir' : '✗ Belum Ada';
+            ?>
+            <tr>
+                <td class="label"><?= $label ?></td>
+                <td>: <?= $stat ?></td>
+            </tr>
             <?php endforeach; ?>
         </table>
 

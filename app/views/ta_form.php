@@ -9,7 +9,7 @@ include __DIR__ . '/partials/header.php'; ?>
 <section class="content">
   <div class="container-fluid">
     <div class="card card-primary">
-      <form action="index.php?mod=ta&act=save" method="POST">
+      <form action="<?= BASE_URL ?>ta/save" method="POST">
         <?php if (!empty($item['id_ta'])): ?>
           <input type="hidden" name="id_ta" value="<?= htmlspecialchars($item['id_ta']) ?>">
         <?php endif; ?>
@@ -38,7 +38,7 @@ include __DIR__ . '/partials/header.php'; ?>
         </div>
         <div class="card-footer">
           <button type="submit" class="btn btn-primary">Simpan</button>
-          <a href="index.php?mod=ta&act=index" class="btn btn-secondary">Batal</a>
+          <a href="<?= BASE_URL ?>ta/index" class="btn btn-secondary">Batal</a>
         </div>
       </form>
     </div>

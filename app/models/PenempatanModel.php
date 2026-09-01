@@ -45,44 +45,34 @@ class PenempatanModel
     public static function getAssignedStudents($pdo, $id_kelas, $id_ta, $activeOnly = false)
     {
         if ($activeOnly) {
-            // Jika hanya yang aktif, cukup query tabel 'siswa' dan cek statusnya
-            // Dan pastikan id_ta_masuk <= id_ta (Bukan siswa masa depan)
+            // [KELOLA] Hanya untuk siswa yang berstatus 'Aktif' saat ini di master
             $sql = "SELECT s.id_siswa, s.nama, s.nisn, s.jk, s.status_aktif
                     FROM siswa s
                     JOIN penempatan_siswa ps ON s.id_siswa = ps.id_siswa
                     WHERE ps.id_kelas = ? AND ps.id_ta = ? 
                     AND s.status_aktif = 'Aktif'
-                    AND (s.id_ta_masuk IS NULL OR s.id_ta_masuk <= ?)
                     ORDER BY s.nama ASC";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$id_kelas, $id_ta, $id_ta]);
+            $stmt->execute([$id_kelas, $id_ta]);
         } else {
-            // Logic HISTORI: Tampilkan semua (Aktif, Alumni, Mutasi)
-            // Tapi difilter agar Alumni/Mutasi hanya muncul di TA mereka terakhir aktif
-            $sql = "SELECT s.id_siswa, s.nama, s.nisn, s.jk, s.status_aktif, s.id_ta_masuk
-                    FROM (
-                        SELECT id_siswa, nama, nisn, jk, status_aktif, id_ta_masuk FROM siswa 
-                        WHERE id_ta_masuk IS NULL OR id_ta_masuk <= :ta1
-                        
-                        UNION ALL
-                        
-                        SELECT id_siswa, nama, nisn, jk, status_aktif, id_ta_masuk FROM siswa_alumni 
-                        WHERE id_ta_lulus >= :ta2 AND (id_ta_masuk IS NULL OR id_ta_masuk <= :ta3)
-                        
-                        UNION ALL
-                        
-                        SELECT id_siswa, nama, nisn, jk, status_aktif, id_ta_masuk FROM siswa_mutasi 
-                        WHERE id_ta_mutasi >= :ta4 AND (id_ta_masuk IS NULL OR id_ta_masuk <= :ta5)
-                    ) s
+            // [LIST/VIEW] Logic HISTORI: Tampilkan semua (Aktif, Alumni, Mutasi)
+            // Namun status_aktif ditampilkan secara temporal (Aktif jika di masa lalu mereka belum lulus/keluar)
+            $sql = "SELECT s.id_siswa, s.nama, s.nisn, s.jk, s.id_ta_masuk,
+                           CASE 
+                             WHEN s.status_aktif = 'Aktif' THEN 'Aktif'
+                             WHEN s.status_aktif = 'Lulus' AND sa.id_ta_lulus >= :ta1 THEN 'Aktif'
+                             WHEN s.status_aktif = 'Keluar' AND sm.id_ta_mutasi > :ta2 THEN 'Aktif'
+                             ELSE s.status_aktif
+                           END AS status_aktif
+                    FROM siswa s
                     JOIN penempatan_siswa ps ON s.id_siswa = ps.id_siswa
+                    LEFT JOIN siswa_alumni sa ON s.id_siswa = sa.id_siswa
+                    LEFT JOIN siswa_mutasi sm ON s.id_siswa = sm.id_siswa
                     WHERE ps.id_kelas = :kelas AND ps.id_ta = :ta6
                     ORDER BY s.nama ASC";
             $stmt = $pdo->prepare($sql);
             $stmt->bindValue(':ta1', $id_ta, PDO::PARAM_INT);
             $stmt->bindValue(':ta2', $id_ta, PDO::PARAM_INT);
-            $stmt->bindValue(':ta3', $id_ta, PDO::PARAM_INT);
-            $stmt->bindValue(':ta4', $id_ta, PDO::PARAM_INT);
-            $stmt->bindValue(':ta5', $id_ta, PDO::PARAM_INT);
             $stmt->bindValue(':kelas', $id_kelas, PDO::PARAM_INT);
             $stmt->bindValue(':ta6', $id_ta, PDO::PARAM_INT);
             $stmt->execute();
@@ -106,10 +96,13 @@ class PenempatanModel
      */
     public static function assignStudent($pdo, $id_siswa, $id_kelas, $id_ta)
     {
-        // Gunakan REPLACE INTO (atau ON DUPLICATE KEY UPDATE) untuk efisiensi
-        // Ini akan menghapus data lama (jika ada) dan memasukkan data baru
-        $sql = "REPLACE INTO penempatan_siswa (id_siswa, id_kelas, id_ta) 
-                VALUES (?, ?, ?)";
+        // 1. Hapus penempatan lama di TA ini agar tidak ada duplikasi
+        $stmt_del = $pdo->prepare("DELETE FROM penempatan_siswa WHERE id_siswa = ? AND id_ta = ?");
+        $stmt_del->execute([$id_siswa, $id_ta]);
+
+        // 2. Masukkan penempatan baru
+        $sql = "INSERT INTO penempatan_siswa (id_siswa, id_kelas, id_ta, status_penempatan) 
+                VALUES (?, ?, ?, 'Aktif')";
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([$id_siswa, $id_kelas, $id_ta]);
     }
@@ -119,8 +112,10 @@ class PenempatanModel
      */
     public static function copyRombel($pdo, $id_kelas_sumber, $id_ta_sumber, $id_kelas_target, $id_ta_target)
     {
-        // 1. Ambil siswa dari sumber
-        $siswa_sumber = self::getAssignedStudents($pdo, $id_kelas_sumber, $id_ta_sumber);
+        // 1. Ambil siswa aktif dari sumber.
+        // Hanya siswa yang ada di tabel utama `siswa` dapat dimasukkan ke `penempatan_siswa`
+        // karena ada foreign key `penempatan_siswa.id_siswa -> siswa.id_siswa`.
+        $siswa_sumber = self::getAssignedStudents($pdo, $id_kelas_sumber, $id_ta_sumber, true);
 
         if (empty($siswa_sumber))
             return 0;
@@ -131,13 +126,6 @@ class PenempatanModel
 
         // 2. Loop insert ke target
         foreach ($siswa_sumber as $siswa) {
-            // Cek apakah siswa masih aktif? (Opsional, tapi sebaiknya ya)
-            // getAssignedStudents sebenarnya sudah join siswa, tapi tidak filter status aktif secara eksplisit di querynya?
-            // Mari cek method getAssignedStudents: "SELECT ... FROM siswa s JOIN ... WHERE ... ORDER ..."
-            // Tidak ada "AND s.status_aktif = 'Aktif'" di sana. Sebaiknya kita filter di sini atau update getAssignedStudents.
-            // Update: Lebih aman filter di sini atau biarkan user memindahkan semua lalu hapus manual yg tidak aktif.
-            // User request: "salin semua". Mari salin semua yang ada di rombel sumber.
-
             if ($stmt->execute([$siswa['id_siswa'], $id_kelas_target, $id_ta_target])) {
                 $count++;
             }

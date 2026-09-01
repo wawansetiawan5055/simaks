@@ -16,8 +16,10 @@ class GuruModel {
      * 1. Menambahkan kode_guru ke SELECT.
      */
     public static function find($pdo, $id) {
-        // Mengambil semua kolom, termasuk 'kode_guru'
-        $stmt = $pdo->prepare("SELECT * FROM guru WHERE id_guru=?");
+        $stmt = $pdo->prepare("SELECT g.*, p.foto as foto_akun 
+                               FROM guru g 
+                               LEFT JOIN pengguna p ON g.id_pengguna = p.id_pengguna 
+                               WHERE g.id_guru=?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -27,9 +29,17 @@ class GuruModel {
      * 1. Menambahkan kode_guru ke query UPDATE dan INSERT.
      */
     public static function save($pdo, $data) {
+        $jenis_guru = $data['jenis_guru'] ?? 'reguler';
+        if (!in_array($jenis_guru, ['reguler', 'koordinator_pjj', 'koordinator_menginduk'])) {
+            $jenis_guru = 'reguler';
+        }
+        $lokasi_tugas = !empty($data['lokasi_tugas']) ? trim($data['lokasi_tugas']) : null;
+
         // Menyiapkan parameter, termasuk data baru
         $params = [
             $data['nama'],
+            $jenis_guru,
+            $lokasi_tugas,
             $data['kode_guru'] ?? null,
             $data['nuptk'] ?? null,
             $data['nik'] ?? null,
@@ -42,16 +52,16 @@ class GuruModel {
 
         if (!empty($data['id_guru'])) {
             // UPDATE
-            $sql = "UPDATE guru SET nama=?, kode_guru=?, nuptk=?, nik=?, jk=?, 
+            $sql = "UPDATE guru SET nama=?, jenis_guru=?, lokasi_tugas=?, kode_guru=?, nuptk=?, nik=?, jk=?, 
                         tempat_lahir=?, tanggal_lahir=?, status_kepegawaian=?, status=? 
                     WHERE id_guru=?";
             $params[] = $data['id_guru']; // Tambahkan ID di akhir
             $stmt = $pdo->prepare($sql);
         } else {
             // INSERT
-            $sql = "INSERT INTO guru (nama, kode_guru, nuptk, nik, jk, tempat_lahir, tanggal_lahir, 
+            $sql = "INSERT INTO guru (nama, jenis_guru, lokasi_tugas, kode_guru, nuptk, nik, jk, tempat_lahir, tanggal_lahir, 
                                      status_kepegawaian, status) 
-                    VALUES (?,?,?,?,?,?,?,?,?)";
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?)";
             $stmt = $pdo->prepare($sql);
         }
         $stmt->execute($params);

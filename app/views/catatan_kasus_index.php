@@ -2,16 +2,35 @@
 require_once __DIR__ . '/../helpers/DateHelper.php';
 include __DIR__.'/partials/header.php'; 
 ?>
-<section class="content-header">
-  <div class="container-fluid"><h1>Catatan Kasus Siswa</h1></div>
-</section>
+<div class="content-header pt-3 mb-2">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Catatan Kasus Siswa (BK / Konseling)
+          </h4>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+          <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+          <li class="breadcrumb-item active text-primary font-weight-bold">Catatan Kasus</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
 <section class="content">
 <div class="container-fluid">
     <?php // Session messages now handled by toast notifications in footer.php ?>
     <?php // Session messages now handled by toast notifications in footer.php ?>
 <div class="card card-primary">
         <div class="card-header"><h3 class="card-title">Input Catatan Kasus Baru</h3></div>
-        <form action="index.php?mod=catatan_kasus&act=save" method="POST">
+        <form action="<?= BASE_URL ?>catatan_kasus/save" method="POST">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
@@ -81,7 +100,7 @@ include __DIR__.'/partials/header.php';
                         <td><?= htmlspecialchars($k['tindak_lanjut']) ?></td>
                         <td><?= htmlspecialchars($k['nama_pelapor']) ?></td>
                         <td>
-                            <a href="index.php?mod=catatan_kasus&act=delete&id=<?= $k['id_catatan'] ?>" class="btn btn-danger btn-sm" onclick="return confirmDelete(event)"><i class="fa fa-trash"></i></a>
+                            <a href="<?= BASE_URL ?>catatan_kasus/delete?id=<?= $k['id_catatan'] ?>" class="btn btn-danger btn-sm" onclick="return confirmDelete(event)"><i class="fa fa-trash"></i></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -96,6 +115,7 @@ include __DIR__.'/partials/header.php';
 document.addEventListener('DOMContentLoaded', function() {
     const kelasSelect = document.getElementById('id_kelas_filter');
     const siswaSelect = document.getElementById('id_siswa');
+    const idTa = <?= json_encode($_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0) ?>;
     
     kelasSelect.addEventListener('change', function() {
         const idKelas = this.value;
@@ -106,12 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Panggil API (Kita gunakan API 'sumatif' yang sudah ada, get_siswa_by_kelas)
-        // Perlu API baru: 'get_siswa_by_kelas'
-        // Untuk sekarang, kita buat API baru di SumatifApiController (perlu diganti nanti)
-        
-        // Kita perlu endpoint API baru untuk ini. Mari kita buat di 'api.php'
-        fetch(`../api/api.php?mod=siswa&act=get_by_kelas&id_kelas=${idKelas}`)
+        fetch(`<?= BASE_URL ?>api.php?mod=siswa&act=get_by_kelas&id_kelas=${idKelas}&id_ta=${idTa}`)
             .then(response => response.json())
             .then(result => {
                 siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';

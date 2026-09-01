@@ -8,6 +8,7 @@
 // 1. Load Environment & Database
 require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/helper.php';
 
 // 2. Start Session (Penting untuk cek login & hak akses)
 if (session_status() == PHP_SESSION_NONE) {
@@ -45,6 +46,11 @@ switch ($mod) {
     case 'siswa':
         require_once __DIR__ . '/../api/SiswaApiController.php';
         SiswaApiController::handle($pdo, $act);
+        break;
+    
+    case 'sumatif':
+        require_once __DIR__ . '/../api/SumatifApiController.php';
+        SumatifApiController::handle($pdo, $act);
         break;
 
     // Tambahkan modul lain jika diperlukan

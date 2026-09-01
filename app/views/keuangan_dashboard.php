@@ -88,15 +88,22 @@
     }
 </style>
 
-<div class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2 align-items-center">
-            <div class="col-sm-6">
-                <h1 class="m-0"><i class="fas fa-chart-line mr-2"></i> Dashboard Keuangan</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Dashboard Keuangan &amp; Kas Sekolah
+                    </h4>
+                </div>
             </div>
-            <div class="col-sm-6 text-right">
-                <a href="index.php?mod=keuangan_dashboard&act=sync_saldo"
-                    class="btn btn-outline-primary btn-sm rounded-pill px-3 sync-btn">
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <a href="<?= BASE_URL ?>keuangan_dashboard/sync_saldo"
+                    class="btn btn-outline-primary btn-sm rounded-pill px-3 sync-btn font-weight-bold shadow-sm">
                     <i class="fas fa-sync-alt mr-1"></i> Sinkronkan Saldo
                 </a>
             </div>
@@ -199,7 +206,7 @@
                         </ul>
                     </div>
                     <div class="card-footer bg-white border-0 text-center pb-4">
-                        <a href="index.php?mod=keuangan_master&act=rekening"
+                        <a href="<?= BASE_URL ?>keuangan_master/rekening"
                             class="btn btn-light btn-block btn-sm rounded-pill text-muted font-weight-bold">
                             <i class="fas fa-cog mr-1"></i> Kelola Rekening
                         </a>
@@ -275,11 +282,11 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white border-0 py-3 d-flex justify-content-end">
-                        <a href="index.php?mod=keuangan_transaksi_masuk"
+                        <a href="<?= BASE_URL ?>keuangan_transaksi_masuk"
                             class="btn btn-success btn-sm rounded-pill px-4 shadow-sm shadow-success mr-2">
                             <i class="fas fa-plus-circle mr-1"></i> Input Pemasukan
                         </a>
-                        <a href="index.php?mod=keuangan_transaksi_keluar"
+                        <a href="<?= BASE_URL ?>keuangan_transaksi_keluar"
                             class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm shadow-danger">
                             <i class="fas fa-minus-circle mr-1"></i> Input Pengeluaran
                         </a>

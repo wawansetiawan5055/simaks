@@ -7,7 +7,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php?mod=dashboard">Home</a></li>
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard">Home</a></li>
                     <li class="breadcrumb-item active">Profil Siswa</li>
                 </ol>
             </div>
@@ -31,36 +31,38 @@
                 <h3 class="card-title">Daftar Siswa</h3>
             </div>
             <div class="card-body">
-                <table class="table table-bordered table-striped" id="tableSiswa">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">No</th>
-                            <th>NISN</th>
-                            <th>Nama Lengkap</th>
-                            <th>L/P</th>
-                            <th>Status</th>
-                            <th style="width: 150px;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $no = 1;
-                        foreach ($siswas as $s): ?>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="tableSiswa">
+                        <thead>
                             <tr>
-                                <td><?= $no++ ?></td>
-                                <td><?= htmlspecialchars($s['nisn'] ?? '-') ?></td>
-                                <td><?= htmlspecialchars($s['nama']) ?></td>
-                                <td><?= htmlspecialchars($s['jk'] ?? '-') ?></td>
-                                <td><?= htmlspecialchars($s['status_aktif'] ?? '-') ?></td>
-                                <td>
-                                    <a href="index.php?mod=profil_siswa&act=detail&id=<?= $s['id_siswa'] ?>"
-                                        class="btn btn-sm btn-primary">
-                                        <i class="fas fa-folder-open"></i> Detail Profil
-                                    </a>
-                                </td>
+                                <th style="width: 50px;">No</th>
+                                <th>NISN</th>
+                                <th>Nama Lengkap</th>
+                                <th>L/P</th>
+                                <th>Status</th>
+                                <th style="width: 150px;">Aksi</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php $no = 1;
+                            foreach ($siswas as $s): ?>
+                                <tr>
+                                    <td><?= $no++ ?></td>
+                                    <td><?= htmlspecialchars($s['nisn'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($s['nama']) ?></td>
+                                    <td><?= htmlspecialchars($s['jk'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($s['status_aktif'] ?? '-') ?></td>
+                                    <td>
+                                        <a href="<?= BASE_URL ?>profil_siswa/detail?id=<?= $s['id_siswa'] ?>"
+                                            class="btn btn-sm btn-primary rounded-pill px-3">
+                                            <i class="fas fa-folder-open mr-1"></i> Detail
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

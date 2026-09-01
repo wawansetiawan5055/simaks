@@ -103,7 +103,7 @@ function checkAssignment($id_guru, $field, $assignments, $roleMap) {
                 <p class="text-muted small mb-0">Atur nominal spesifik per pegawai. Kosongkan untuk menggunakan nilai global.</p>
             </div>
             <div class="text-end">
-                <a href="index.php?mod=keuangan_gaji" class="btn btn-default shadow-sm border mr-2">
+                <a href="<?= BASE_URL ?>keuangan_gaji" class="btn btn-default shadow-sm border mr-2">
                     <i class="fas fa-arrow-left mr-1"></i> Kembali
                 </a>
                 <button type="button" class="btn btn-warning shadow-sm border mr-2" data-toggle="modal" data-target="#modalConfig">
@@ -133,7 +133,7 @@ function checkAssignment($id_guru, $field, $assignments, $roleMap) {
         <?php endif; ?>
 
         <div class="matrix-container glass-card overflow-hidden">
-            <form action="index.php?mod=keuangan_gaji&act=save_setting" method="post" id="formMatrix">
+            <form action="<?= BASE_URL ?>keuangan_gaji/save_setting" method="post" id="formMatrix">
                 <div class="table-responsive" style="max-height: 75vh;">
                     <table class="table table-bordered table-hover mb-0 text-nowrap matrix-table head-fixed">
                         <thead class="text-center text-uppercase font-weight-bold">
@@ -258,7 +258,7 @@ function checkAssignment($id_guru, $field, $assignments, $roleMap) {
             </div>
             <div class="modal-body pt-2">
                 <p class="text-muted small mb-3 ml-1">Nilai di bawah ini menjadi acuan utama jika data pada matrix di atas kosong (Rp 0).</p>
-                <form action="index.php?mod=keuangan_gaji&act=save_config" method="POST" id="formConfigModal">
+                <form action="<?= BASE_URL ?>keuangan_gaji/save_config" method="POST" id="formConfigModal">
                     <div class="row">
                         <!-- HONORARIUM -->
                         <div class="col-md-12 mb-3">

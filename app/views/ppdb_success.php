@@ -152,10 +152,10 @@
         </p>
 
         <div>
-            <a href="index.php?mod=landing&act=ppdb_status&no=<?= $data['no_pendaftaran'] ?>" class="btn btn-primary">
+            <a href="<?= BASE_URL ?>landing/ppdb_status?no=<?= $data['no_pendaftaran'] ?>" class="btn btn-primary">
                 <i class="fas fa-search"></i> Cek Status Pendaftaran
             </a>
-            <a href="index.php?mod=landing" class="btn btn-outline">
+            <a href="<?= BASE_URL ?>landing" class="btn btn-outline">
                 <i class="fas fa-home"></i> Kembali ke Beranda
             </a>
         </div>

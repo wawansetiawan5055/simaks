@@ -3,7 +3,7 @@
  * Provides consistent, beautiful notifications across all modules
  * 
  * @author SIMAKS Development Team
- * @version 1.0.0
+ * @Version 2.3.5
  */
 
 class NotificationManager {

@@ -1,20 +1,25 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-running mr-2"></i> Manajemen Ekstrakurikuler</h1>
-            </div>
-            <div class="col-sm-6 text-end">
-                <div class="float-sm-right">
-                    <button type="button" class="btn btn-primary" onclick="showAddModal()">
-                        <i class="fas fa-plus"></i> Tambah Kegiatan
-                    </button>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-running"></i>
                 </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Kelola Kegiatan Ekstrakurikuler
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-primary btn-sm shadow-sm font-weight-bold rounded-pill px-3" onclick="showAddModal()">
+                    <i class="fas fa-plus mr-1"></i> Tambah Kegiatan
+                </button>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -50,15 +55,15 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">
-                                        <a href="index.php?mod=ekskul&id=<?= $row['id_ekskul'] ?>&tab=program"
-                                            class="btn btn-sm btn-info" title="Kelola">
+                                        <a href="<?= BASE_URL ?>ekskul/index/<?= $row['id_ekskul'] ?>/program"
+                                            class="btn btn-sm btn-info" title="Kelola Program & Penilaian">
                                             <i class="fas fa-cog"></i>
                                         </a>
                                         <button class="btn btn-sm btn-warning" title="Edit"
                                             onclick='editEkskul(<?= json_encode($row) ?>)'>
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <a href="index.php?mod=ekskul&act=delete&id=<?= $row['id_ekskul'] ?>"
+                                        <a href="<?= BASE_URL ?>ekskul/delete?id=<?= $row['id_ekskul'] ?>"
                                             class="btn btn-sm btn-danger" onclick="return confirmDelete(event)" title="Hapus">
                                             <i class="fas fa-trash"></i>
                                         </a>
@@ -77,7 +82,7 @@
 <div class="modal fade" id="modalEkskul" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="index.php?mod=ekskul&act=save" method="post" id="formEkskul">
+            <form action="<?= BASE_URL ?>ekskul/save" method="post" id="formEkskul">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Tambah Ekskul</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>

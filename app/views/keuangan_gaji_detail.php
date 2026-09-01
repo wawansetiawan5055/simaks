@@ -18,20 +18,20 @@ $bulanName = [
                 </p>
             </div>
             <div class="text-end">
-                <a href="index.php?mod=keuangan_gaji&act=print_rekap&id=<?= $gaji['id_gaji'] ?>" target="_blank" class="btn btn-warning shadow-sm border mr-2">
+                <a href="<?= BASE_URL ?>keuangan_gaji/print_rekap?id=<?= $gaji['id_gaji'] ?>" target="_blank" class="btn btn-warning shadow-sm border mr-2">
                     <i class="fas fa-print mr-1"></i> Cetak Rekap
                 </a>
-                <a href="index.php?mod=keuangan_gaji" class="btn btn-default shadow-sm border mr-2">
+                <a href="<?= BASE_URL ?>keuangan_gaji" class="btn btn-default shadow-sm border mr-2">
                     <i class="fas fa-arrow-left mr-1"></i> Kembali
                 </a>
                 <?php if($gaji['status'] == 'DRAFT'): ?>
-                <a href="index.php?mod=keuangan_gaji&act=recalculate&id=<?= $gaji['id_gaji'] ?>" class="btn btn-primary shadow-sm border mr-2" onclick="return confirm('Hitung ulang semua gaji berdasarkan data penugasan dan matrix terbaru?')">
+                <a href="<?= BASE_URL ?>keuangan_gaji/recalculate?id=<?= $gaji['id_gaji'] ?>" class="btn btn-primary shadow-sm border mr-2" onclick="return confirm('Hitung ulang semua gaji berdasarkan data penugasan dan matrix terbaru?')">
                     <i class="fas fa-sync-alt mr-1"></i> Hitung Ulang
                 </a>
-                <a href="index.php?mod=keuangan_gaji&act=finalize&id=<?= $gaji['id_gaji'] ?>" class="btn btn-success shadow-sm border mr-2" onclick="return confirm('Apakah Anda yakin ingin melakukan finalisasi gaji ini? Setelah finalisasi, rincian tidak dapat diubah kembali.')">
+                <a href="<?= BASE_URL ?>keuangan_gaji/finalize?id=<?= $gaji['id_gaji'] ?>" class="btn btn-success shadow-sm border mr-2" onclick="return confirm('Apakah Anda yakin ingin melakukan finalisasi gaji ini? Setelah finalisasi, rincian tidak dapat diubah kembali.')">
                     <i class="fas fa-check-double mr-1"></i> Finalisasi Gaji
                 </a>
-                <a href="index.php?mod=keuangan_gaji&act=delete&id=<?= $gaji['id_gaji'] ?>" class="btn btn-danger shadow-sm" onclick="return confirm('Hapus periode gaji ini?')">
+                <a href="<?= BASE_URL ?>keuangan_gaji/delete?id=<?= $gaji['id_gaji'] ?>" class="btn btn-danger shadow-sm" onclick="return confirm('Hapus periode gaji ini?')">
                     <i class="fas fa-trash mr-1"></i> Hapus
                 </a>
                 <?php endif; ?>
@@ -177,7 +177,7 @@ $bulanName = [
                                     <?= number_format($row['total_diterima'], 0, ',', '.') ?>
                                 </td>
                                 <td class="text-center align-middle">
-                                    <a href="index.php?mod=keuangan_gaji&act=print_slip&id_detail=<?= $row['id_detail'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak Slip">
+                                    <a href="<?= BASE_URL ?>keuangan_gaji/print_slip?id_detail=<?= $row['id_detail'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak Slip">
                                         <i class="fas fa-print"></i>
                                     </a>
                                 </td>

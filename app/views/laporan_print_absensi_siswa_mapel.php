@@ -117,25 +117,25 @@
 
             .page-sheet {
                 background: white;
-                width: 280mm;
-                max-width: 95%;
-                min-height: 210mm;
-                padding: 15mm;
-                margin: 20px auto;
-                box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+                width: 285mm;
+                max-width: 98%;
+                min-height: 190mm;
+                padding: 10mm 12mm;
+                margin: 15px auto;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
                 box-sizing: border-box;
-                transition: transform 0.3s ease;
+                overflow-x: auto;
             }
 
             /* Gold Standard Button Styling - Proportionalized */
-        .btn {
-            height: 38px !important;
-            width: 125px !important;
-            padding: 0 15px !important;
-            border: none !important;
-            border-radius: 6px !important;
-            cursor: pointer;
-            font-size: 13px !important;
+            .btn {
+                height: 38px !important;
+                width: 125px !important;
+                padding: 0 15px !important;
+                border: none !important;
+                border-radius: 6px !important;
+                cursor: pointer;
+                font-size: 13px !important;
                 font-weight: 600 !important;
                 margin: 0 10px !important;
                 color: white !important;
@@ -182,16 +182,26 @@
             }
 
             body,
+            html {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
             .page-sheet {
-                background: white;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                box-shadow: none;
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
             }
 
             @page {
-                margin: 10mm;
+                size: A4 landscape;
+                margin: 8mm 8mm 8mm 8mm;
             }
         }
 
@@ -200,20 +210,72 @@
             font-size: 12px;
         }
 
-        .table-bordered th,
-        .table-bordered td {
+        /* Format Tabel Biasa (Menyatu/Collapsed, Tidak Kotak-Kotak Terpisah) */
+        table {
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            width: 100% !important;
+        }
+
+        .table-bordered {
+            border-collapse: collapse !important;
             border: 1px solid #000 !important;
         }
 
-        .table td,
-        .table th {
-            padding: 0.25rem;
-            vertical-align: middle;
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #000 !important;
+            padding: 3px 4px !important;
+            vertical-align: middle !important;
         }
 
-        .header-table td {
-            padding: 2px;
+        .header-table,
+        .header-table td,
+        .header-table th {
             border: none !important;
+            border-collapse: collapse !important;
+            padding: 1px 5px !important;
+        }
+
+        /* Tabel Bulanan - Kompak untuk mode landscape */
+        .table-bulanan {
+            font-size: 8.5px !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            table-layout: auto;
+        }
+
+        .table-bulanan th,
+        .table-bulanan td {
+            padding: 2px 2px !important;
+            text-align: center;
+            border: 1px solid #000 !important;
+        }
+
+        .table-bulanan .col-nama {
+            text-align: left !important;
+            padding-left: 4px !important;
+            white-space: nowrap;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table-bulanan .col-tgl {
+            width: 17px;
+            min-width: 15px;
+            max-width: 19px;
+            font-size: 8px !important;
+            padding: 2px 0px !important;
+            text-align: center;
+        }
+
+        .table-bulanan .col-rekap {
+            width: 20px;
+            min-width: 18px;
+            font-size: 8px !important;
+            padding: 2px 1px !important;
+            text-align: center;
         }
     </style>
 </head>
@@ -348,25 +410,23 @@
 
             <!-- B. BULANAN -->
         <?php elseif ($jenis_laporan == 'bulanan'): ?>
-            <table class="table table-bordered text-center">
+            <table class="table table-bordered text-center table-bulanan">
                 <thead>
                     <tr class="bg-light">
-                        <th rowspan="2" class="align-middle">No</th>
-                        <th rowspan="2" class="align-middle">NIPD</th>
-                        <th rowspan="2" class="align-middle">NISN</th>
-                        <th rowspan="2" class="align-middle text-left" style="min-width: 200px;">Nama Siswa</th>
+                        <th rowspan="2" class="align-middle" style="width:25px;">No</th>
+                        <th rowspan="2" class="align-middle col-nama">Nama Siswa</th>
                         <th colspan="<?= count($data['dates']) ?>">Tanggal</th>
                         <th colspan="4">Rekap</th>
-                        <th rowspan="2" class="align-middle">%</th>
+                        <th rowspan="2" class="align-middle col-rekap">%</th>
                     </tr>
                     <tr class="bg-light">
                         <?php foreach ($data['dates'] as $dt): ?>
-                            <th style="font-size: 10px; width: 20px;"><?= date('d', strtotime($dt)) ?></th>
+                            <th class="col-tgl"><?= date('d', strtotime($dt)) ?></th>
                         <?php endforeach; ?>
-                        <th width="30">H</th>
-                        <th width="30">S</th>
-                        <th width="30">I</th>
-                        <th width="30">A</th>
+                        <th class="col-rekap">H</th>
+                        <th class="col-rekap">S</th>
+                        <th class="col-rekap">I</th>
+                        <th class="col-rekap">A</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -374,26 +434,24 @@
                     foreach ($data['students'] as $s): ?>
                         <tr>
                             <td><?= $no++ ?></td>
-                            <td><?= $s['nipd'] ?></td>
-                            <td><?= $s['nisn'] ?></td>
-                            <td style="text-align: left !important; padding-left: 5px;"><?= $s['nama'] ?></td>
+                            <td class="col-nama"><?= htmlspecialchars($s['nama']) ?></td>
 
                             <?php foreach ($data['dates'] as $dt):
                                 $st = $s['attendance'][$dt] ?? '-';
                                 $val = ($st != '-') ? strtoupper(substr($st, 0, 1)) : '';
                                 ?>
-                                <td><?= $val ?></td>
+                                <td class="col-tgl"><?= $val ?></td>
                             <?php endforeach; ?>
 
-                            <td><?= $s['summary']['H'] ?></td>
-                            <td><?= $s['summary']['S'] ?></td>
-                            <td><?= $s['summary']['I'] ?></td>
-                            <td><?= $s['summary']['A'] ?></td>
+                            <td class="col-rekap"><?= $s['summary']['H'] ?></td>
+                            <td class="col-rekap"><?= $s['summary']['S'] ?></td>
+                            <td class="col-rekap"><?= $s['summary']['I'] ?></td>
+                            <td class="col-rekap"><?= $s['summary']['A'] ?></td>
                             <?php 
                                 $total_hsia = $s['summary']['H'] + $s['summary']['S'] + $s['summary']['I'] + $s['summary']['A'];
                                 $persen = ($total_hsia > 0) ? round(($s['summary']['H'] / $total_hsia) * 100, 1) : 0;
                             ?>
-                            <td class="font-weight-bold"><?= $persen ?>%</td>
+                            <td class="col-rekap font-weight-bold"><?= $persen ?>%</td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

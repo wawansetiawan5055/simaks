@@ -1,20 +1,31 @@
 <?php include __DIR__.'/partials/header.php'; ?>
-<section class="content-header">
+<div class="content-header pt-3 mb-2">
   <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1>Laporan Jurnal/Agenda KBM</h1>
+    <div class="row align-items-center">
+      <div class="col-sm-6 col-12 d-flex align-items-center">
+        <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+          <i class="fas fa-book-reader"></i>
+        </div>
+        <div>
+          <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+            Laporan Jurnal / Agenda KBM
+          </h4>
+        </div>
+      </div>
+      <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+        <ol class="breadcrumb float-sm-right mb-0 bg-transparent p-0">
+          <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-muted"><i class="fas fa-home mr-1"></i> Beranda</a></li>
+          <li class="breadcrumb-item active text-primary font-weight-bold">Laporan Jurnal KBM</li>
+        </ol>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <section class="content">
 <div class="container-fluid">
     
-    <form method="GET">
-        <input type="hidden" name="mod" value="laporan">
-        <input type="hidden" name="act" value="jurnal">
+    <form method="GET" action="<?= BASE_URL ?>laporan/jurnal">
         
         <div class="filter-box">
             <div class="row align-items-end">
@@ -92,6 +103,18 @@
                 </div>
 
                 <div class="col-md-2 form-group">
+                    <label>Mata Pelajaran</label>
+                    <select name="mapel" class="form-control">
+                        <option value="">-- Semua Mapel --</option>
+                        <?php if (!empty($mapel_list)): foreach($mapel_list as $m_nama): ?>
+                            <option value="<?= htmlspecialchars($m_nama) ?>" <?= (($mapel_filter ?? '') == $m_nama) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($m_nama) ?>
+                            </option>
+                        <?php endforeach; endif; ?>
+                    </select>
+                </div>
+
+                <div class="col-md-2 form-group">
                     <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Tampilkan</button>
                 </div>
             </div>
@@ -103,10 +126,10 @@
         <?php
         // Prepare current filter params for export
         $base_params = [
-            'mod' => 'laporan',
             'jenis_laporan' => $_GET['jenis_laporan'] ?? 'bulanan',
             'kelas' => $kelas,
             'guru' => $guru,
+            'mapel' => $mapel_filter ?? '',
             'tanggal1' => $tanggal1,
             'tanggal2' => $tanggal2,
             'bulan' => $_GET['bulan'] ?? '',
@@ -115,54 +138,58 @@
             'tahun' => $_GET['tahun'] ?? ''
         ];
         
-        $q_excel = http_build_query(array_merge($base_params, ['act' => 'jurnal_export_excel']));
-        $q_pdf   = http_build_query(array_merge($base_params, ['act' => 'jurnal_export_pdf']));
-        $q_print = http_build_query(array_merge($base_params, ['act' => 'jurnal_print']));
+        $q_query = http_build_query($base_params);
         ?>
-        <a href="index.php?<?= $q_excel ?>" class="btn btn-success btn-sm">
+        <a href="<?= BASE_URL ?>laporan/jurnal_export_excel?<?= $q_query ?>" class="btn btn-success btn-sm">
             <i class="fas fa-file-excel"></i> Export Excel
         </a>
-        <a href="index.php?<?= $q_pdf ?>" class="btn btn-danger btn-sm" target="_blank">
+        <a href="<?= BASE_URL ?>laporan/jurnal_export_pdf?<?= $q_query ?>" class="btn btn-danger btn-sm" target="_blank">
             <i class="fas fa-file-pdf"></i> Export PDF
         </a>
-        <button type="button" onclick="showReportPreview('index.php?<?= $q_print ?>', 'Laporan Jurnal Mengajar')" class="btn btn-info btn-sm">
+        <button type="button" onclick="showReportPreview('<?= BASE_URL ?>laporan/jurnal_print?<?= $q_query ?>', 'Laporan Jurnal Mengajar')" class="btn btn-info btn-sm">
             <i class="fas fa-print"></i> Cetak Laporan
         </button>
     </div>
 
     <div class="card card-outline card-success">
         <div class="card-header">
-            <h3 class="card-title">Hasil Laporan</h3>
+            <h3 class="card-title">Hasil Laporan Jurnal KBM</h3>
         </div>
         <div class="card-body p-0 table-responsive">
             <?php if (!empty($list)): ?>
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th style="width: 5%">No</th>
-                        <th style="width: 10%">Tanggal</th>
-                        <th style="width: 10%">Jam / Waktu</th>
-                        <th style="width: 10%">Kelas</th>
-                        <th style="width: 15%">Guru</th>                      
-                        <th style="width: 20%">Capaian/Tujuan Pembelajaran</th>
-                        <th style="width: 15%">Tagihan/Tugas</th>
-                        <th style="width: 15%">Rekap Absensi</th>
+                        <th style="width: 3%">No</th>
+                        <th style="width: 8%">Tanggal</th>
+                        <th style="width: 9%">Jam / Waktu</th>
+                        <th style="width: 6%">Kelas</th>
+                        <th style="width: 12%">Guru</th>                      
+                        <th style="width: 12%">Mata Pelajaran</th>                      
+                        <th style="width: 18%">Capaian/Tujuan</th>
+                        <th style="width: 11%">Tagihan/Tugas</th>
+                        <th style="width: 11%">Rekap Absensi</th>
+                        <th style="width: 10%" class="text-center">Foto KBM</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; foreach($list as $l): ?>
                     <tr>
-                        <td><?= $no++ ?></td>
+                        <td class="text-center"><?= $no++ ?></td>
                         
-                        <td><?= date('d-m-Y', strtotime($l['tanggal'])) ?></td>
+                        <td class="text-center"><?= date('d-m-Y', strtotime($l['tanggal'])) ?></td>
                         
                         <td class="text-center" style="white-space: nowrap;">
                             <?= htmlspecialchars($l['jam_ke']) ?>
                         </td>
                         
-                        <td><?= htmlspecialchars($l['nama_kelas'] ?? '-') ?></td>
+                        <td class="text-center"><?= htmlspecialchars($l['nama_kelas'] ?? '-') ?></td>
                         
                         <td><?= htmlspecialchars($l['guru']) ?></td>
+
+                        <td>
+                            <span class="badge badge-info px-2 py-1"><?= htmlspecialchars($l['nama_mapel'] ?? '-') ?></span>
+                        </td>
                         
                         <td><?= htmlspecialchars($l['tujuan_pembelajaran']) ?></td>
                         
@@ -172,6 +199,15 @@
                             <?= htmlspecialchars($l['catatan_absensi']) ?>
                             <?php if(!empty($l['keterangan'])): ?>
                                 <br><small class="text-muted">Ket: <?= htmlspecialchars($l['keterangan']) ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-center align-middle">
+                            <?php if(!empty($l['foto_kegiatan'])): ?>
+                                <a href="<?= BASE_URL ?>uploads/jurnal/<?= htmlspecialchars($l['foto_kegiatan']) ?>" target="_blank" data-toggle="tooltip" title="Klik untuk memperbesar">
+                                    <img src="<?= BASE_URL ?>uploads/jurnal/<?= htmlspecialchars($l['foto_kegiatan']) ?>" alt="Foto KBM" class="img-thumbnail shadow-sm" style="max-width: 60px; max-height: 50px; object-fit: cover; border-radius: 6px;">
+                                </a>
+                            <?php else: ?>
+                                <span class="badge badge-light text-muted" style="font-size: 0.72rem;">-</span>
                             <?php endif; ?>
                         </td>
                     </tr>

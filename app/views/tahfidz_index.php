@@ -2,18 +2,32 @@
 // tahfidz_index.php
 include __DIR__ . '/partials/header.php'; 
 ?>
+<div class="content-header pt-3 mb-2">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-quran"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Kelola Program Tahfidz Qur'an
+                    </h4>
+                </div>
+            </div>
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-primary btn-sm shadow-sm font-weight-bold rounded-pill px-3" data-toggle="modal" data-target="#modalTahfidz">
+                    <i class="fas fa-plus mr-1"></i> Tambah Kelompok
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card card-outline card-primary shadow-sm">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-quran me-2"></i> Program Tahfidz Qur'an
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalTahfidz">
-                        <i class="fas fa-plus"></i> Tambah Kelompok
-                    </button>
-                </div>
+            <div class="card-header d-none">
             </div>
             <div class="card-body table-responsive p-3">
                 <table class="table table-hover table-striped" id="tableTahfidz">
@@ -52,8 +66,8 @@ include __DIR__ . '/partials/header.php';
                                     </td>
                                     <td class="text-center align-middle">
                                         <div class="btn-group btn-group-sm">
-                                            <a href="index.php?mod=tahfidz&act=index&id=<?= $row['id_tahfidz'] ?>&tab=program" 
-                                               class="btn btn-info" title="Kelola">
+                                            <a href="<?= BASE_URL ?>tahfidz/index/<?= $row['id_tahfidz'] ?>/program" 
+                                               class="btn btn-sm btn-info" title="Kelola Program & Penilaian">
                                                 <i class="fas fa-cog"></i>
                                             </a>
                                             <button type="button" class="btn btn-warning" 
@@ -61,7 +75,7 @@ include __DIR__ . '/partials/header.php';
                                                 title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="index.php?mod=tahfidz&act=delete&id=<?= $row['id_tahfidz'] ?>" 
+                                            <a href="<?= BASE_URL ?>tahfidz/delete?id=<?= $row['id_tahfidz'] ?>" 
                                                class="btn btn-danger" onclick="return confirmDelete(event)" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </a>
@@ -81,7 +95,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalTahfidz" tabindex="-1" role="dialog" aria-labelledby="modalTahfidzLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=tahfidz&act=save" method="post">
+            <form action="<?= BASE_URL ?>tahfidz/save" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTahfidzLabel">Tambah Kelompok Tahfidz</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

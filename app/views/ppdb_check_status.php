@@ -158,7 +158,7 @@
         <div class="card">
             <h1><i class="fas fa-search mr-2"></i> Cek Status Pendaftaran PPDB</h1>
 
-            <form method="POST" action="index.php?mod=landing&act=ppdb_status">
+            <form method="POST" action="<?= BASE_URL ?>landing/ppdb_status">
                 <div class="form-group">
                     <label>Nomor Pendaftaran</label>
                     <input type="text" name="no_pendaftaran"
@@ -227,7 +227,7 @@
         </div>
 
         <div class="back-link">
-            <a href="index.php?mod=landing">
+            <a href="<?= BASE_URL ?>landing">
                 <i class="fas fa-arrow-left"></i> Kembali ke Beranda
             </a>
         </div>

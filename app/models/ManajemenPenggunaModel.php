@@ -55,15 +55,17 @@ class ManajemenPenggunaModel {
 
             // Bagian 1: Simpan ke tabel 'pengguna'
             if ($id_pengguna) { // Update
-                $sql = "UPDATE pengguna SET username = ?, nama_pengguna = ?, email = ? WHERE id_pengguna = ?";
-                $params = [$data['username'], $nama_pengguna, $data['email'], $id_pengguna];
+                $qr_token = 'SIMAKS-QR-' . bin2hex(random_bytes(16));
+                $sql = "UPDATE pengguna SET username = ?, nama_pengguna = ?, email = ?, qr_token = IFNULL(NULLIF(qr_token, ''), ?) WHERE id_pengguna = ?";
+                $params = [$data['username'], $nama_pengguna, $data['email'], $qr_token, $id_pengguna];
                 if (!empty($data['password'])) {
-                    $sql = "UPDATE pengguna SET username = ?, nama_pengguna = ?, email = ?, password = ? WHERE id_pengguna = ?";
-                    $params = [$data['username'], $nama_pengguna, $data['email'], password_hash($data['password'], PASSWORD_DEFAULT), $id_pengguna];
+                    $sql = "UPDATE pengguna SET username = ?, nama_pengguna = ?, email = ?, password = ?, qr_token = IFNULL(NULLIF(qr_token, ''), ?) WHERE id_pengguna = ?";
+                    $params = [$data['username'], $nama_pengguna, $data['email'], password_hash($data['password'], PASSWORD_DEFAULT), $qr_token, $id_pengguna];
                 }
             } else { // Insert
-                $sql = "INSERT INTO pengguna (username, password, nama_pengguna, email) VALUES (?, ?, ?, ?)";
-                $params = [$data['username'], password_hash($data['password'], PASSWORD_DEFAULT), $nama_pengguna, $data['email']];
+                $qr_token = 'SIMAKS-QR-' . bin2hex(random_bytes(16));
+                $sql = "INSERT INTO pengguna (username, password, nama_pengguna, email, qr_token) VALUES (?, ?, ?, ?, ?)";
+                $params = [$data['username'], password_hash($data['password'], PASSWORD_DEFAULT), $nama_pengguna, $data['email'], $qr_token];
             }
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
@@ -138,6 +140,71 @@ class ManajemenPenggunaModel {
         return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function getUsersForCard($pdo, $type = 'all', $id_kelas = null) {
+        $sql = "SELECT p.id_pengguna, p.username, p.nama_pengguna, p.email, p.foto as foto_pengguna, p.qr_token,
+                       GROUP_CONCAT(DISTINCT pr.nama_peran SEPARATOR ', ') as roles,
+                       g.id_guru, g.nuptk, g.nik, g.kode_guru,
+                       s.id_siswa, s.nisn, s.nipd,
+                       COALESCE(s.jk, g.jk, '') AS jk,
+                       (SELECT k.nama_kelas 
+                        FROM penempatan_siswa ps 
+                        JOIN kelas k ON ps.id_kelas = k.id_kelas 
+                        WHERE ps.id_siswa = s.id_siswa 
+                        ORDER BY ps.id_penempatan DESC LIMIT 1) AS nama_kelas
+                FROM pengguna p
+                LEFT JOIN pengguna_peran pp ON p.id_pengguna = pp.id_pengguna
+                LEFT JOIN peran pr ON pp.id_peran = pr.id_peran
+                LEFT JOIN guru g ON p.id_pengguna = g.id_pengguna
+                LEFT JOIN siswa s ON p.id_pengguna = s.id_pengguna";
+
+        $where = [];
+        $params = [];
+
+        if ($type == 'guru') {
+            $where[] = "g.id_guru IS NOT NULL";
+        } elseif ($type == 'siswa') {
+            $where[] = "s.id_siswa IS NOT NULL";
+            if ($id_kelas) {
+                $where[] = "s.id_siswa IN (SELECT id_siswa FROM penempatan_siswa WHERE id_kelas = ?)";
+                $params[] = $id_kelas;
+            }
+        } elseif ($type == 'sistem') {
+            $where[] = "g.id_guru IS NULL AND s.id_siswa IS NULL";
+        }
+
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(" AND ", $where);
+        }
+
+        $sql .= " GROUP BY p.id_pengguna ORDER BY p.nama_pengguna ASC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getUserDetailForCard($pdo, $id_pengguna) {
+        $sql = "SELECT p.id_pengguna, p.username, p.nama_pengguna, p.email, p.foto as foto_pengguna, p.qr_token,
+                       GROUP_CONCAT(DISTINCT pr.nama_peran SEPARATOR ', ') as roles,
+                       g.id_guru, g.nuptk, g.nik, g.kode_guru,
+                       s.id_siswa, s.nisn, s.nipd,
+                       COALESCE(s.jk, g.jk, '') AS jk,
+                       (SELECT k.nama_kelas 
+                        FROM penempatan_siswa ps 
+                        JOIN kelas k ON ps.id_kelas = k.id_kelas 
+                        WHERE ps.id_siswa = s.id_siswa 
+                        ORDER BY ps.id_penempatan DESC LIMIT 1) AS nama_kelas
+                FROM pengguna p
+                LEFT JOIN pengguna_peran pp ON p.id_pengguna = pp.id_pengguna
+                LEFT JOIN guru g ON p.id_pengguna = g.id_pengguna
+                LEFT JOIN siswa s ON p.id_pengguna = s.id_pengguna
+                WHERE p.id_pengguna = ?
+                GROUP BY p.id_pengguna";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id_pengguna]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public static function generateAccounts($pdo, $target, $password) {
         $pdo->beginTransaction();
         try {
@@ -165,8 +232,9 @@ class ManajemenPenggunaModel {
                     if ($stmt_check->fetch()) continue;
 
                     // Insert ke pengguna
-                    $stmt_in = $pdo->prepare("INSERT INTO pengguna (username, password, nama_pengguna) VALUES (?, ?, ?)");
-                    $stmt_in->execute([$username, $default_pass_hash, $g['nama']]);
+                    $qr_token = 'SIMAKS-QR-' . bin2hex(random_bytes(16));
+                    $stmt_in = $pdo->prepare("INSERT INTO pengguna (username, password, nama_pengguna, qr_token) VALUES (?, ?, ?, ?)");
+                    $stmt_in->execute([$username, $default_pass_hash, $g['nama'], $qr_token]);
                     $id_new_user = $pdo->lastInsertId();
 
                     // Hubungkan ke guru
@@ -181,9 +249,9 @@ class ManajemenPenggunaModel {
                     $count++;
                 }
             } elseif ($target == 'siswa') {
-                // Ambil siswa yang tidak punya id_pengguna
+                // Ambil siswa yang tidak punya id_pengguna dan statusnya AKTIF
                 // Gunakan NISN, jika kosong pakai NIPD
-                $sql = "SELECT id_siswa, nama, nisn, nipd FROM siswa WHERE id_pengguna IS NULL";
+                $sql = "SELECT id_siswa, nama, nisn, nipd FROM siswa WHERE id_pengguna IS NULL AND status_aktif = 'Aktif'";
                 $list = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
                 // Ambil ID peran 'Siswa'
@@ -200,8 +268,9 @@ class ManajemenPenggunaModel {
                     $stmt_check->execute([$username]);
                     if ($stmt_check->fetch()) continue;
 
-                    $stmt_in = $pdo->prepare("INSERT INTO pengguna (username, password, nama_pengguna) VALUES (?, ?, ?)");
-                    $stmt_in->execute([$username, $default_pass_hash, $s['nama']]);
+                    $qr_token = 'SIMAKS-QR-' . bin2hex(random_bytes(16));
+                    $stmt_in = $pdo->prepare("INSERT INTO pengguna (username, password, nama_pengguna, qr_token) VALUES (?, ?, ?, ?)");
+                    $stmt_in->execute([$username, $default_pass_hash, $s['nama'], $qr_token]);
                     $id_new_user = $pdo->lastInsertId();
 
                     $stmt_up = $pdo->prepare("UPDATE siswa SET id_pengguna = ? WHERE id_siswa = ?");

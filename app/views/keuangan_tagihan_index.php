@@ -1,15 +1,22 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"><i class="fas fa-file-invoice-dollar mr-2"></i> Daftar Tagihan Siswa</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Daftar Tagihan &amp; Pembayaran Siswa
+                    </h4>
+                </div>
             </div>
-            <div class="col-sm-6 text-right">
-                <a href="index.php?mod=keuangan_tagihan&act=create" class="btn btn-primary shadow-sm" style="border-radius: 8px;">
-                    <i class="fas fa-magic mr-2"></i> Generate Tagihan Massal
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <a href="<?= BASE_URL ?>keuangan_tagihan/create" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm font-weight-bold">
+                    <i class="fas fa-magic mr-1"></i> Generate Tagihan Massal
                 </a>
             </div>
         </div>
@@ -80,7 +87,7 @@
                     </div>
                     
                     <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-filter"></i> Filter</button>
-                    <a href="index.php?mod=keuangan_tagihan&act=index" class="btn btn-sm btn-default ml-1"><i class="fas fa-sync"></i> Reset</a>
+                    <a href="<?= BASE_URL ?>keuangan_tagihan/index" class="btn btn-sm btn-default ml-1"><i class="fas fa-sync"></i> Reset</a>
                 </form>
 
                 <div class="table-responsive">

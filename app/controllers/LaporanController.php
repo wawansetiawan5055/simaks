@@ -313,10 +313,11 @@ function get_data_rekap_kelas($pdo)
             FROM kelas k
             LEFT JOIN penugasan_wali_kelas pwk ON k.id_kelas = pwk.id_kelas AND pwk.id_ta = ?
             LEFT JOIN guru g ON pwk.id_guru = g.id_guru
+            WHERE k.id_kelas IN (SELECT DISTINCT id_kelas FROM penempatan_siswa WHERE id_ta = ?)
             ORDER BY k.tingkat, k.nama_kelas";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id_ta, $id_ta, $id_ta, $id_ta, $id_ta]);
+    $stmt->execute([$id_ta, $id_ta, $id_ta, $id_ta, $id_ta, $id_ta]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -1917,33 +1918,59 @@ function laporan_absensi_guru_export_pdf($pdo)
 }
 
 // ============ LAPORAN JURNAL KBM (TIDAK BERUBAH) ==============
-function helper_format_jam_ke_waktu($pdo, $jam_ke_raw)
+function helper_format_jam_ke_waktu($pdo, $jam_ke_raw, $tanggal = null)
 {
     if (empty($jam_ke_raw))
         return '-';
 
-    // Jika data lama sudah terlanjur format waktu (ada titik dua), rapikan
+    // Jika data lama sudah terlanjur format waktu (ada tanda '-' tapi bukan angka)
     if (strpos($jam_ke_raw, ':') !== false) {
+        // Format lama: "10:00:00 - 12:00:00" → rapikan
         return str_replace(':', '.', $jam_ke_raw);
     }
 
-    // Jika data berupa label "1, 2"
+    // Jika data berupa label "4, 5, 6"
     $labels = explode(',', $jam_ke_raw);
     $labels = array_map('trim', $labels);
+    // Hanya proses yang merupakan angka
+    $labels = array_filter($labels, fn($l) => is_numeric($l));
+    $labels = array_values($labels);
 
     if (empty($labels))
         return $jam_ke_raw;
 
     $placeholders = implode(',', array_fill(0, count($labels), '?'));
 
-    // Ambil Jam Mulai Paling Awal dan Selesai Paling Akhir
-    $sql = "SELECT MIN(jam_mulai) as mulai, MAX(jam_selesai) as selesai 
-            FROM jam_pelajaran 
-            WHERE label_jam_ke IN ($placeholders)";
+    // Tentukan hari mengajar berdasarkan tanggal jurnal
+    // Tabel jam_pelajaran memiliki kolom hari_pelaksanaan
+    $hari_filter = null;
+    if ($tanggal) {
+        $hari_map = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
+        $hari_en = date('l', strtotime($tanggal));
+        $hari_filter = $hari_map[$hari_en] ?? null;
+    }
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($labels);
-    $waktu = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Coba ambil waktu dengan filter hari yang tepat terlebih dahulu
+    $waktu = null;
+    if ($hari_filter) {
+        $sql = "SELECT MIN(jam_mulai) as mulai, MAX(jam_selesai) as selesai 
+                FROM jam_pelajaran 
+                WHERE label_jam_ke IN ($placeholders) AND hari_pelaksanaan = ?";
+        $params = array_merge($labels, [$hari_filter]);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $waktu = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Fallback: jika tidak ada data untuk hari tersebut, ambil dari semua hari
+    if (!$waktu || !$waktu['mulai']) {
+        $sql = "SELECT MIN(jam_mulai) as mulai, MAX(jam_selesai) as selesai 
+                FROM jam_pelajaran 
+                WHERE label_jam_ke IN ($placeholders)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($labels);
+        $waktu = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
     if ($waktu && $waktu['mulai'] && $waktu['selesai']) {
         $start = date('H.i', strtotime($waktu['mulai']));
@@ -1952,6 +1979,44 @@ function helper_format_jam_ke_waktu($pdo, $jam_ke_raw)
     }
 
     return $jam_ke_raw;
+}function helper_get_mapel_for_jurnal($pdo, $id_guru, $id_kelas, $id_ta, $tanggal, $jam_ke_raw) {
+    if (empty($jam_ke_raw)) return '-';
+    
+    $hari_map = ['Sunday'=>'Minggu','Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
+    $hari_en = date('l', strtotime($tanggal));
+    $hari_kbm = $hari_map[$hari_en] ?? '';
+    
+    $labels = explode(',', $jam_ke_raw);
+    $jam_first = trim($labels[0]);
+    
+    $stmt = $pdo->prepare("
+        SELECT m.nama_mapel 
+        FROM jadwal_mengajar jm
+        JOIN jam_pelajaran jp ON jm.id_jam = jp.id_jam
+        JOIN guru_mapel gm ON jm.id_guru_mapel = gm.id_guru_mapel
+        JOIN mapel m ON gm.id_mapel = m.id_mapel
+        WHERE gm.id_guru = ? 
+          AND jm.id_kelas = ? 
+          AND gm.id_ta = ?
+          AND jm.hari_kbm = ?
+          AND jp.label_jam_ke = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$id_guru, $id_kelas, $id_ta, $hari_kbm, $jam_first]);
+    $mapel = $stmt->fetchColumn();
+    
+    if (!$mapel) {
+        $stmt_fb = $pdo->prepare("
+            SELECT GROUP_CONCAT(DISTINCT m.nama_mapel SEPARATOR ', ')
+            FROM guru_mapel gm
+            JOIN mapel m ON gm.id_mapel = m.id_mapel
+            WHERE gm.id_guru = ? AND gm.id_kelas = ? AND gm.id_ta = ?
+        ");
+        $stmt_fb->execute([$id_guru, $id_kelas, $id_ta]);
+        $mapel = $stmt_fb->fetchColumn();
+    }
+    
+    return $mapel ?: '-';
 }
 
 // --- REVISI: CONTROLLER TAMPILAN WEB ---
@@ -1964,9 +2029,10 @@ function laporan_jurnal($pdo)
     $jenis_laporan = $_GET['jenis_laporan'] ?? 'bulanan';
     $kelas = $_GET['kelas'] ?? '';
     $guru = $_GET['guru'] ?? '';
+    $mapel_filter = $_GET['mapel'] ?? '';
     $tanggal1 = $_GET['tanggal1'] ?? '';
     $tanggal2 = $_GET['tanggal2'] ?? '';
-    $bulan = $_GET['bulan'] ?? '';
+    $bulan = $_GET['bulan'] ?? date('m');
     $tahun = $_GET['tahun'] ?? date('Y');
     $bulan_awal = $_GET['bulan_awal'] ?? '';
     $bulan_akhir = $_GET['bulan_akhir'] ?? '';
@@ -1980,7 +2046,7 @@ function laporan_jurnal($pdo)
         $tanggal2 = date('Y-m-t', strtotime("$tahun-$bulan_akhir-01"));
     }
 
-    // Role-based filtering for Class and Teacher lists
+    // Role-based filtering for Class, Teacher, and Mapel lists
     if ($id_guru_login > 0) {
         // Teacher
         $guru_list = $pdo->query("SELECT id_guru, nama FROM guru WHERE id_guru = $id_guru_login")->fetchAll(PDO::FETCH_ASSOC);
@@ -1991,6 +2057,16 @@ function laporan_jurnal($pdo)
         $kelas_list->execute([$id_guru_login, $id_ta_tampil]);
         $kelas_list = $kelas_list->fetchAll(PDO::FETCH_ASSOC);
 
+        $stmt_m = $pdo->prepare("
+            SELECT DISTINCT m.nama_mapel 
+            FROM guru_mapel gm 
+            JOIN mapel m ON gm.id_mapel = m.id_mapel 
+            WHERE gm.id_guru = ? AND gm.id_ta = ? 
+            ORDER BY m.nama_mapel
+        ");
+        $stmt_m->execute([$id_guru_login, $id_ta_tampil]);
+        $mapel_list = $stmt_m->fetchAll(PDO::FETCH_COLUMN);
+
         $guru = $id_guru_login; // Force teacher to their own ID
     } else {
         // Admin
@@ -1998,12 +2074,22 @@ function laporan_jurnal($pdo)
         $stmt->execute([$id_ta_tampil]);
         $kelas_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $guru_list = $pdo->query("SELECT id_guru, nama FROM guru WHERE status='Aktif' ORDER BY nama")->fetchAll(PDO::FETCH_ASSOC);
+
+        $stmt_m = $pdo->prepare("
+            SELECT DISTINCT m.nama_mapel 
+            FROM guru_mapel gm 
+            JOIN mapel m ON gm.id_mapel = m.id_mapel 
+            WHERE gm.id_ta = ? 
+            ORDER BY m.nama_mapel
+        ");
+        $stmt_m->execute([$id_ta_tampil]);
+        $mapel_list = $stmt_m->fetchAll(PDO::FETCH_COLUMN);
     }
 
     $list = [];
 
     if ($id_ta_tampil && $tanggal1 && $tanggal2) {
-        $sql = "SELECT g.nama AS guru, k.nama_kelas, k.tingkat, j.tanggal, j.jam_ke, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, j.keterangan
+        $sql = "SELECT j.id_guru, j.id_kelas, j.id_ta, g.nama AS guru, k.nama_kelas, k.tingkat, j.tanggal, j.jam_ke, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, j.keterangan, j.foto_kegiatan
                 FROM jurnal_kbm j
                 JOIN guru g ON j.id_guru=g.id_guru
                 JOIN kelas k ON j.id_kelas=k.id_kelas
@@ -2025,14 +2111,18 @@ function laporan_jurnal($pdo)
         $stmt->execute($params);
         $raw_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // --- [REVISI] KONVERSI JAM UNTUK TAMPILAN WEB ---
         foreach ($raw_list as $row) {
-            $row['jam_ke'] = helper_format_jam_ke_waktu($pdo, $row['jam_ke']);
+            $nama_mapel = helper_get_mapel_for_jurnal($pdo, $row['id_guru'], $row['id_kelas'], $row['id_ta'], $row['tanggal'], $row['jam_ke']);
+            if (!empty($mapel_filter) && mb_stripos($nama_mapel, $mapel_filter) === false) {
+                continue;
+            }
+            $row['nama_mapel'] = $nama_mapel;
+            $row['jam_ke'] = helper_format_jam_ke_waktu($pdo, $row['jam_ke'], $row['tanggal']);
             $list[] = $row;
         }
     }
 
-    extract(compact('kelas_list', 'guru_list', 'list', 'kelas', 'guru', 'tanggal1', 'tanggal2'));
+    extract(compact('kelas_list', 'guru_list', 'mapel_list', 'list', 'kelas', 'guru', 'mapel_filter', 'tanggal1', 'tanggal2'));
     include __DIR__ . '/../views/laporan_jurnal.php';
 }
 
@@ -2045,6 +2135,7 @@ function laporan_jurnal_print($pdo)
     $jenis_laporan = $_GET['jenis_laporan'] ?? 'bulanan';
     $kelas_id = $_GET['kelas'] ?? '';
     $guru_id = $_GET['guru'] ?? '';
+    $mapel_filter = $_GET['mapel'] ?? '';
     $tanggal1 = $_GET['tanggal1'] ?? '';
     $tanggal2 = $_GET['tanggal2'] ?? '';
     $bulan = $_GET['bulan'] ?? '';
@@ -2069,10 +2160,8 @@ function laporan_jurnal_print($pdo)
     $rows = [];
 
     if ($id_ta_tampil && $tanggal1 && $tanggal2) {
-        $sql = "SELECT 
-                    j.tanggal, j.jam_ke, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, 
-                    g.nama AS nama_guru, k.nama_kelas,
-                    (SELECT m.nama_mapel FROM guru_mapel gm JOIN mapel m ON gm.id_mapel = m.id_mapel WHERE gm.id_guru = j.id_guru AND gm.id_ta = j.id_ta LIMIT 1) AS nama_mapel_guess
+        $sql = "SELECT j.id_guru, j.id_kelas, j.id_ta, j.tanggal, j.jam_ke, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, j.foto_kegiatan, 
+                    g.nama AS nama_guru, k.nama_kelas
                 FROM jurnal_kbm j
                 JOIN guru g ON j.id_guru = g.id_guru
                 JOIN kelas k ON j.id_kelas = k.id_kelas
@@ -2096,8 +2185,13 @@ function laporan_jurnal_print($pdo)
         $hari_indo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
 
         foreach ($data_raw as $d) {
+            $nama_mapel = helper_get_mapel_for_jurnal($pdo, $d['id_guru'], $d['id_kelas'], $d['id_ta'], $d['tanggal'], $d['jam_ke']);
+            if (!empty($mapel_filter) && mb_stripos($nama_mapel, $mapel_filter) === false) {
+                continue;
+            }
+
             $time = strtotime($d['tanggal']);
-            $waktu_final = helper_format_jam_ke_waktu($pdo, $d['jam_ke']);
+            $waktu_final = helper_format_jam_ke_waktu($pdo, $d['jam_ke'], $d['tanggal']);
 
             $rows[] = [
                 'tanggal_raw' => $d['tanggal'],
@@ -2105,10 +2199,11 @@ function laporan_jurnal_print($pdo)
                 'tanggal_indo' => date('d-m-Y', $time),
                 'waktu' => $waktu_final,
                 'guru' => $d['nama_guru'],
-                'mapel' => $d['nama_mapel_guess'] ?? '-',
+                'mapel' => $nama_mapel,
                 'tujuan' => $d['tujuan_pembelajaran'],
                 'tagihan' => $d['tagihan'],
-                'absensi' => $d['catatan_absensi']
+                'absensi' => $d['catatan_absensi'],
+                'foto_kegiatan' => $d['foto_kegiatan'] ?? null
             ];
         }
     }
@@ -2122,42 +2217,29 @@ function laporan_jurnal_print($pdo)
     if ($kelas_id) {
         $stmt_k = $pdo->prepare("SELECT nama_kelas, tingkat FROM kelas WHERE id_kelas = ?");
         $stmt_k->execute([$kelas_id]);
-        $dt_kelas = $stmt_k->fetch(PDO::FETCH_ASSOC);
-        if ($dt_kelas)
-            $info_kelas = $dt_kelas['nama_kelas'];
+        $k_info = $stmt_k->fetch(PDO::FETCH_ASSOC);
+        if ($k_info)
+            $info_kelas = $k_info['nama_kelas'];
     }
 
-    $info_kepsek = $kop['nama_kepala_sekolah'] ?? '(.......................................)';
+    $info_periode = "PERIODE: " . date('d/m/Y', strtotime($tanggal1)) . " s.d. " . date('d/m/Y', strtotime($tanggal2));
 
-    // Signature Logic
-    $right_sig_label = "Wali Kelas";
-    $right_sig_name = "(.......................................)";
+    // Data TTD
+    $info_kepsek = $profil['nama_kepsek'] ?? '.........................';
+    $right_sig_label = "Guru Mata Pelajaran";
+    $right_sig_name = ".........................";
 
     if ($guru_id) {
-        $right_sig_label = "Guru Mata Pelajaran";
-        $right_sig_name = get_formatted_nama_guru($pdo, $guru_id);
-    } elseif ($kelas_id) {
-        // Get Wali Kelas ID
-        $stmt_w = $pdo->prepare("SELECT id_guru FROM penugasan_wali_kelas WHERE id_kelas = ? AND id_ta = ?");
-        $stmt_w->execute([$kelas_id, $id_ta_tampil]);
-        $walas_id = $stmt_w->fetchColumn();
-        if ($walas_id) {
-            $right_sig_name = get_formatted_nama_guru($pdo, $walas_id);
-        }
-    }
-
-    // Periode Info
-    $info_periode = "";
-    $months_id = ['01' => 'JANUARI', '02' => 'FEBRUARI', '03' => 'MARET', '04' => 'APRIL', '05' => 'MEI', '06' => 'JUNI', '07' => 'JULI', '08' => 'AGUSTUS', '09' => 'SEPTEMBER', '10' => 'OKTOBER', '11' => 'NOVEMBER', '12' => 'DESEMBER'];
-
-    if ($jenis_laporan == 'bulanan' && $bulan) {
-        $info_periode = "BULAN : " . $months_id[$bulan] . " " . $tahun;
-    } elseif ($jenis_laporan == 'semester' && $bulan_awal && $bulan_akhir) {
-        $info_periode = "PERIODE : " . $months_id[$bulan_awal] . " - " . $months_id[$bulan_akhir] . " " . $tahun;
+        $stmt_g = $pdo->prepare("SELECT nama FROM guru WHERE id_guru = ?");
+        $stmt_g->execute([$guru_id]);
+        $g_info = $stmt_g->fetch(PDO::FETCH_ASSOC);
+        if ($g_info)
+            $right_sig_name = $g_info['nama'];
     } else {
-        $info_periode = "PERIODE : " . date('d/m/Y', strtotime($tanggal1)) . " s/d " . date('d/m/Y', strtotime($tanggal2));
+        $right_sig_label = "Koordinator Kurikulum";
     }
 
+    $judul = "Laporan Jurnal KBM";
     include __DIR__ . '/../views/laporan_print_preview_jurnal.php';
 }
 
@@ -2169,6 +2251,7 @@ function laporan_jurnal_export_excel($pdo)
     $jenis_laporan = $_GET['jenis_laporan'] ?? 'bulanan';
     $kelas_id = $_GET['kelas'] ?? '';
     $guru_id = $_GET['guru'] ?? '';
+    $mapel_filter = $_GET['mapel'] ?? '';
     $tanggal1 = $_GET['tanggal1'] ?? '';
     $tanggal2 = $_GET['tanggal2'] ?? '';
     $bulan = $_GET['bulan'] ?? '';
@@ -2189,7 +2272,7 @@ function laporan_jurnal_export_excel($pdo)
 
     $list = [];
     if ($id_ta_tampil && $tanggal1 && $tanggal2) {
-        $sql = "SELECT j.tanggal, j.jam_ke, k.nama_kelas, g.nama AS nama_guru, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi
+        $sql = "SELECT j.id_guru, j.id_kelas, j.id_ta, j.tanggal, j.jam_ke, k.nama_kelas, g.nama AS nama_guru, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, j.foto_kegiatan
                 FROM jurnal_kbm j
                 JOIN guru g ON j.id_guru=g.id_guru
                 JOIN kelas k ON j.id_kelas=k.id_kelas
@@ -2210,11 +2293,22 @@ function laporan_jurnal_export_excel($pdo)
     }
 
     $judul = "Laporan Jurnal KBM";
-    $kolom = ['No', 'Tanggal', 'Jam', 'Kelas', 'Guru', 'Tujuan Pembelajaran', 'Tagihan', 'Absensi'];
+    $kolom = ['No', 'Tanggal', 'Jam', 'Kelas', 'Guru', 'Mata Pelajaran', 'Tujuan Pembelajaran', 'Tagihan', 'Absensi', 'Dokumentasi'];
     $rows = [];
     $no = 1;
     foreach ($list as $d) {
-        $rows[] = [$no++, $d['tanggal'], helper_format_jam_ke_waktu($pdo, $d['jam_ke']), $d['nama_kelas'], $d['nama_guru'], $d['tujuan_pembelajaran'], $d['tagihan'], $d['catatan_absensi']];
+        $nama_mapel = helper_get_mapel_for_jurnal($pdo, $d['id_guru'], $d['id_kelas'], $d['id_ta'], $d['tanggal'], $d['jam_ke']);
+        if (!empty($mapel_filter) && mb_stripos($nama_mapel, $mapel_filter) === false) {
+            continue;
+        }
+        $fotoHtml = '-';
+        if (!empty($d['foto_kegiatan'])) {
+            $fotoPath = realpath(__DIR__ . '/../../public/uploads/jurnal/' . $d['foto_kegiatan']);
+            if ($fotoPath && file_exists($fotoPath)) {
+                $fotoHtml = '<img src="' . $fotoPath . '" style="max-width:70px; max-height:50px; object-fit:cover; border-radius:4px;">';
+            }
+        }
+        $rows[] = [$no++, $d['tanggal'], helper_format_jam_ke_waktu($pdo, $d['jam_ke'], $d['tanggal']), $d['nama_kelas'], $d['nama_guru'], $nama_mapel, $d['tujuan_pembelajaran'], $d['tagihan'], $d['catatan_absensi'], $fotoHtml];
     }
     $kop = get_kop_laporan($pdo);
     laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_jurnal");
@@ -2228,6 +2322,7 @@ function laporan_jurnal_export_pdf($pdo)
     $jenis_laporan = $_GET['jenis_laporan'] ?? 'bulanan';
     $kelas_id = $_GET['kelas'] ?? '';
     $guru_id = $_GET['guru'] ?? '';
+    $mapel_filter = $_GET['mapel'] ?? '';
     $tanggal1 = $_GET['tanggal1'] ?? '';
     $tanggal2 = $_GET['tanggal2'] ?? '';
     $bulan = $_GET['bulan'] ?? '';
@@ -2248,7 +2343,7 @@ function laporan_jurnal_export_pdf($pdo)
 
     $list = [];
     if ($id_ta_tampil && $tanggal1 && $tanggal2) {
-        $sql = "SELECT j.tanggal, j.jam_ke, k.nama_kelas, g.nama AS nama_guru, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi
+        $sql = "SELECT j.id_guru, j.id_kelas, j.id_ta, j.tanggal, j.jam_ke, k.nama_kelas, g.nama AS nama_guru, j.tujuan_pembelajaran, j.tagihan, j.catatan_absensi, j.foto_kegiatan
                 FROM jurnal_kbm j
                 JOIN guru g ON j.id_guru=g.id_guru
                 JOIN kelas k ON j.id_kelas=k.id_kelas
@@ -2269,11 +2364,22 @@ function laporan_jurnal_export_pdf($pdo)
     }
 
     $judul = "Laporan Jurnal KBM";
-    $kolom = ['No', 'Tanggal', 'Jam', 'Kelas', 'Guru', 'Tujuan Pembelajaran', 'Tagihan', 'Absensi'];
+    $kolom = ['No', 'Tanggal', 'Jam', 'Kelas', 'Guru', 'Mata Pelajaran', 'Tujuan Pembelajaran', 'Tagihan', 'Absensi', 'Dokumentasi'];
     $rows = [];
     $no = 1;
     foreach ($list as $d) {
-        $rows[] = [$no++, $d['tanggal'], helper_format_jam_ke_waktu($pdo, $d['jam_ke']), $d['nama_kelas'], $d['nama_guru'], $d['tujuan_pembelajaran'], $d['tagihan'], $d['catatan_absensi']];
+        $nama_mapel = helper_get_mapel_for_jurnal($pdo, $d['id_guru'], $d['id_kelas'], $d['id_ta'], $d['tanggal'], $d['jam_ke']);
+        if (!empty($mapel_filter) && mb_stripos($nama_mapel, $mapel_filter) === false) {
+            continue;
+        }
+        $fotoHtml = '-';
+        if (!empty($d['foto_kegiatan'])) {
+            $fotoPath = realpath(__DIR__ . '/../../public/uploads/jurnal/' . $d['foto_kegiatan']);
+            if ($fotoPath && file_exists($fotoPath)) {
+                $fotoHtml = '<img src="' . $fotoPath . '" style="max-width:70px; max-height:50px; object-fit:cover; border-radius:4px;">';
+            }
+        }
+        $rows[] = [$no++, $d['tanggal'], helper_format_jam_ke_waktu($pdo, $d['jam_ke'], $d['tanggal']), $d['nama_kelas'], $d['nama_guru'], $nama_mapel, $d['tujuan_pembelajaran'], $d['tagihan'], $d['catatan_absensi'], $fotoHtml];
     }
     $kop = get_kop_laporan($pdo);
     laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_jurnal");

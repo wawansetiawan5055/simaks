@@ -11,7 +11,7 @@
     <div class="col-md-8 mx-auto">
         <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
 
-            <form action="index.php?mod=manajemen_pengguna&act=save" method="POST">
+            <form action="<?= BASE_URL ?>manajemen_pengguna/save" method="POST">
                 <?php if ($user): ?>
                     <input type="hidden" name="id_pengguna" value="<?= $user['id_pengguna'] ?>">
                 <?php endif; ?>
@@ -121,7 +121,7 @@
                         style="border-radius: 10px;">
                         <i class="fas fa-save mr-2"></i> Simpan Pengguna
                     </button>
-                    <a href="index.php?mod=manajemen_pengguna" class="btn btn-light px-4 font-weight-bold"
+                    <a href="<?= BASE_URL ?>manajemen_pengguna" class="btn btn-light px-4 font-weight-bold"
                         style="border-radius: 10px; color: #64748b;">
                         Batal
                     </a>

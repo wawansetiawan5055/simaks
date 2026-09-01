@@ -335,32 +335,50 @@ function pembiasaan_galeri_upload($pdo)
     if (!is_logged_in())
         redirect('index.php');
     $id_pem = $_POST['id_pembiasaan'];
+    $judul = $_POST['judul'] ?? null;
+    $foto_cam_data = $_POST['foto_cam_data'] ?? '';
 
-    if (isset($_FILES['file_upload']) && $_FILES['file_upload']['error'] == 0) {
-        $upload_dir = 'uploads/pembiasaan/galeri/';
-        if (!is_dir($upload_dir))
-            mkdir($upload_dir, 0777, true);
+    $upload_dir = 'uploads/pembiasaan/galeri/';
+    if (!is_dir($upload_dir))
+        mkdir($upload_dir, 0777, true);
 
+    $target_file = null;
+
+    if (!empty($foto_cam_data) && preg_match('/^data:image\/(\w+);base64,/', $foto_cam_data, $cam_match)) {
+        $raw_base64 = substr($foto_cam_data, strpos($foto_cam_data, ',') + 1);
+        $decoded = base64_decode($raw_base64);
+        $ext = strtolower($cam_match[1]) === 'png' ? 'png' : 'jpg';
+        if ($decoded) {
+            $filename = 'galeri_' . $id_pem . '_' . time() . '.' . $ext;
+            $target_file = $upload_dir . $filename;
+            file_put_contents($target_file, $decoded);
+        }
+    } elseif (isset($_FILES['file_upload']) && $_FILES['file_upload']['error'] == 0) {
         $file_ext = pathinfo($_FILES['file_upload']['name'], PATHINFO_EXTENSION);
         $filename = 'galeri_' . $id_pem . '_' . time() . '.' . $file_ext;
         $target_file = $upload_dir . $filename;
 
-        if (move_uploaded_file($_FILES['file_upload']['tmp_name'], $target_file)) {
-            try {
-                $data = [
-                    'id_pembiasaan' => $id_pem,
-                    'judul' => $_POST['judul'],
-                    'file_path' => $target_file
-                ];
-                PembiasaanModel::saveGaleri($pdo, $data);
-                $_SESSION['pesan_sukses'] = "Foto berhasil diupload.";
-            } catch (Exception $e) {
-                $_SESSION['pesan_error'] = "Error DB: " . $e->getMessage();
-            }
-        } else {
-            $_SESSION['pesan_error'] = "Gagal upload file.";
+        if (!move_uploaded_file($_FILES['file_upload']['tmp_name'], $target_file)) {
+            $target_file = null;
         }
     }
+
+    if ($target_file) {
+        try {
+            $data = [
+                'id_pembiasaan' => $id_pem,
+                'judul' => $judul,
+                'file_path' => $target_file
+            ];
+            PembiasaanModel::saveGaleri($pdo, $data);
+            $_SESSION['pesan_sukses'] = "Foto dokumentasi kegiatan berhasil disimpan.";
+        } catch (Exception $e) {
+            $_SESSION['pesan_error'] = "Error DB: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION['pesan_error'] = "Silakan ambil foto dengan kamera atau pilih file gambar.";
+    }
+
     redirect("index.php?mod=pembiasaan&act=index&id=$id_pem&tab=galeri");
 }
 

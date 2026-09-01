@@ -7,7 +7,7 @@
 
 <section class="content">
     <div class="container-fluid">
-        <form action="index.php?mod=kokulikuler&act=jurnal_save" method="POST">
+        <form action="<?= BASE_URL ?>kokulikuler/jurnal_save" method="POST">
             <input type="hidden" name="id_kokulikuler" value="<?= $kokul['id_kokulikuler'] ?>">
             <?php if ($jurnal): ?>
                 <input type="hidden" name="id_jurnal" value="<?= $jurnal['id_jurnal'] ?>">
@@ -93,7 +93,7 @@
                             </table>
                         </div>
                         <div class="card-footer text-right">
-                             <a href="index.php?mod=kokulikuler&id=<?= $kokul['id_kokulikuler'] ?>&tab=jurnal" class="btn btn-secondary">Batal</a>
+                             <a href="<?= BASE_URL ?>kokulikuler?id=<?= $kokul['id_kokulikuler'] ?>&tab=jurnal" class="btn btn-secondary">Batal</a>
                              <button type="submit" class="btn btn-primary">Simpan Jurnal & Absensi</button>
                         </div>
                     </div>

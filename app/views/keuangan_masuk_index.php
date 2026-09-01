@@ -6,15 +6,22 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 
-<div class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"><i class="fas fa-wallet mr-2"></i> Transaksi Masuk / Pendapatan</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Transaksi Pemasukan &amp; Pendapatan
+                    </h4>
+                </div>
             </div>
-            <div class="col-sm-6 text-right">
-                <button type="button" class="btn btn-primary" onclick="showAddModal()">
-                    <i class="fas fa-plus-circle"></i> Input Pemasukan
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm font-weight-bold" onclick="showAddModal()">
+                    <i class="fas fa-plus-circle mr-1"></i> Input Pemasukan
                 </button>
             </div>
         </div>
@@ -319,7 +326,7 @@
                 matrixData = []; // Reset matrix
 
                 if (id_kelas) {
-                    fetch('index.php?mod=keuangan_get_siswa&id_kelas=' + id_kelas)
+                    fetch('<?= BASE_URL ?>keuangan_get_siswa?id_kelas=' + id_kelas)
                         .then(function (response) { return response.json(); })
                         .then(function (res) {
                             var html = '<option value="">-- Pilih Siswa --</option>';
@@ -377,7 +384,7 @@
             siswaSelect.addEventListener('change', function () {
                 var id_siswa = this.value;
                 if (id_siswa) {
-                    fetch('index.php?mod=keuangan_get_siswa_matrix&id_siswa=' + id_siswa)
+                    fetch('<?= BASE_URL ?>keuangan_get_siswa_matrix?id_siswa=' + id_siswa)
                         .then(function (response) { return response.json(); })
                         .then(function (res) {
                             if (res.status === 'ok') {
@@ -545,7 +552,7 @@
 
                 var formData = new FormData(form);
 
-                fetch('index.php?mod=keuangan_masuk&act=save', {
+                fetch('<?= BASE_URL ?>keuangan_masuk/save', {
                     method: 'POST',
                     body: formData
                 })
@@ -646,9 +653,9 @@
 
     function printKwitansi(id) {
         if (typeof showGlobalPreview === 'function') {
-            showGlobalPreview('index.php?mod=keuangan_masuk_print&id=' + id, 'iframe', 'Cetak Kwitansi');
+            showGlobalPreview('<?= BASE_URL ?>keuangan_masuk_print?id=' + id, 'iframe', 'Cetak Kwitansi');
         } else {
-            window.open('index.php?mod=keuangan_masuk_print&id=' + id, '_blank');
+            window.open('<?= BASE_URL ?>keuangan_masuk_print?id=' + id, '_blank');
         }
     }
 
@@ -684,9 +691,9 @@
         }
 
         if (typeof showGlobalPreview === 'function') {
-            showGlobalPreview('index.php?mod=keuangan_masuk_print&id=' + ids.join(','), 'iframe', 'Cetak Kwitansi Gabungan');
+            showGlobalPreview('<?= BASE_URL ?>keuangan_masuk_print?id=' + ids.join(','), 'iframe', 'Cetak Kwitansi Gabungan');
         } else {
-            window.open('index.php?mod=keuangan_masuk_print&id=' + ids.join(','), '_blank');
+            window.open('<?= BASE_URL ?>keuangan_masuk_print?id=' + ids.join(','), '_blank');
         }
     }
 

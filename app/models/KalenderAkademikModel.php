@@ -137,16 +137,23 @@ class KalenderAkademikModel
     }
 
     /**
-     * Get category color mapping
+     * Get all categories from database
      */
-    public static function getCategoryColors()
+    public static function getCategories($pdo)
     {
-        return [
-            'Libur' => '#dc3545',
-            'Ujian' => '#fd7e14',
-            'Kegiatan Sekolah' => '#007bff',
-            'Rapat' => '#28a745',
-            'Lainnya' => '#6c757d'
-        ];
+        return $pdo->query("SELECT * FROM kalender_kategori ORDER BY id_kategori ASC")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get category color mapping from database
+     */
+    public static function getCategoryColors($pdo)
+    {
+        $categories = self::getCategories($pdo);
+        $colors = [];
+        foreach ($categories as $cat) {
+            $colors[$cat['nama_kategori']] = $cat['warna'];
+        }
+        return $colors;
     }
 }

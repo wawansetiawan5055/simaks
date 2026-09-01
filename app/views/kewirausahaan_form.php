@@ -20,7 +20,7 @@
                             <?= $kewirausahaan ? 'Edit' : 'Tambah' ?> Kewirausahaan
                         </h3>
                     </div>
-                    <form action="index.php?mod=kewirausahaan&act=save" method="post">
+                    <form action="<?= BASE_URL ?>kewirausahaan/save" method="post">
                         <?php if ($kewirausahaan): ?>
                             <input type="hidden" name="id_kewirausahaan" value="<?= $kewirausahaan['id_kewirausahaan'] ?>">
                         <?php endif; ?>
@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <a href="index.php?mod=kewirausahaan" class="btn btn-secondary">Batal</a>
+                            <a href="<?= BASE_URL ?>kewirausahaan" class="btn btn-secondary">Batal</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>

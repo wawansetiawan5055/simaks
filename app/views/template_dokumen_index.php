@@ -57,7 +57,7 @@ include __DIR__ . '/partials/header.php';
                                                     title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <a href="index.php?mod=template_dokumen&act=delete&id=<?= $tpl['id_template'] ?>" 
+                                            <a href="<?= BASE_URL ?>template_dokumen/delete?id=<?= $tpl['id_template'] ?>" 
                                                class="btn btn-danger" 
                                                onclick="return confirmDelete(event)" 
                                                title="Hapus">
@@ -79,7 +79,7 @@ include __DIR__ . '/partials/header.php';
 <div class="modal fade" id="modalTemplate" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <form action="index.php?mod=template_dokumen&act=save" method="post" id="formTemplate">
+            <form action="<?= BASE_URL ?>template_dokumen/save" method="post" id="formTemplate">
                 <input type="hidden" name="id_template" id="id_template">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTemplateLabel">Tambah Template</h5>
@@ -135,6 +135,7 @@ include __DIR__ . '/partials/header.php';
     </div>
 </div>
 
+<style>.tox-notifications-container { display: none !important; }</style>
 <!-- TinyMCE -->
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>

@@ -21,7 +21,17 @@ function hak_akses_index($pdo) {
         return;
     }
 
-    extract(compact('list_peran'));
+    // Hitung jumlah menu aktif (can_read = 1) per peran
+    $stmt_count = $pdo->query("SELECT id_peran, COUNT(id_menu) as total_menu FROM hak_akses WHERE can_read = 1 GROUP BY id_peran");
+    $menu_counts = [];
+    while ($row = $stmt_count->fetch(PDO::FETCH_ASSOC)) {
+        $menu_counts[$row['id_peran']] = (int)$row['total_menu'];
+    }
+
+    // Hitung total menu sistem
+    $total_menu_sistem = (int)$pdo->query("SELECT COUNT(*) FROM app_menu WHERE link != '#'")->fetchColumn();
+
+    extract(compact('list_peran', 'menu_counts', 'total_menu_sistem'));
     include __DIR__ . '/../views/hak_akses_index.php'; 
 }
 

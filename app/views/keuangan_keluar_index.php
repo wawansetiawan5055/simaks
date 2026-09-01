@@ -1,15 +1,22 @@
 <?php include '../app/views/partials/header.php'; ?>
 <?php include '../app/views/partials/sidebar.php'; ?>
 
-<div class="content-header">
+<div class="content-header pt-3 mb-2">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"><i class="fas fa-money-bill-wave mr-2"></i> Transaksi Pengeluaran</h1>
+        <div class="row align-items-center">
+            <div class="col-sm-6 col-12 d-flex align-items-center">
+                <div class="mr-3" style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #ffffff; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div>
+                    <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
+                        Transaksi Pengeluaran Kas
+                    </h4>
+                </div>
             </div>
-            <div class="col-sm-6 text-right">
-                <button type="button" class="btn btn-danger" onclick="showAddModal()">
-                    <i class="fas fa-plus-circle"></i> Input Pengeluaran
+            <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
+                <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm font-weight-bold" onclick="showAddModal()">
+                    <i class="fas fa-plus-circle mr-1"></i> Input Pengeluaran
                 </button>
             </div>
         </div>
@@ -240,7 +247,7 @@
 
                 var formData = new FormData(form);
 
-                fetch('index.php?mod=keuangan_keluar&act=save', {
+                fetch('<?= BASE_URL ?>keuangan_keluar/save', {
                     method: 'POST',
                     body: formData
                 })

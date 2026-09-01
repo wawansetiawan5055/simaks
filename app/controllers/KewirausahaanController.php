@@ -167,29 +167,41 @@ function kewirausahaan_galeri_save($pdo)
 
     $id_kew = $_POST['id_kewirausahaan'];
     $judul = $_POST['judul'] ?? null;
+    $foto_cam_data = $_POST['foto_cam_data'] ?? '';
 
-    // Handle file upload
-    if (isset($_FILES['file_upload']) && $_FILES['file_upload']['error'] == 0) {
-        $upload_dir = 'uploads/kewirausahaan/galeri/';
-        if (!is_dir($upload_dir))
-            mkdir($upload_dir, 0777, true);
+    $upload_dir = 'uploads/kewirausahaan/galeri/';
+    if (!is_dir($upload_dir))
+        mkdir($upload_dir, 0777, true);
 
+    $file_path = null;
+
+    if (!empty($foto_cam_data) && preg_match('/^data:image\/(\w+);base64,/', $foto_cam_data, $cam_match)) {
+        $raw_base64 = substr($foto_cam_data, strpos($foto_cam_data, ',') + 1);
+        $decoded = base64_decode($raw_base64);
+        $ext = strtolower($cam_match[1]) === 'png' ? 'png' : 'jpg';
+        if ($decoded) {
+            $file_name = 'galeri_' . $id_kew . '_' . time() . '.' . $ext;
+            $file_path = $upload_dir . $file_name;
+            file_put_contents($file_path, $decoded);
+        }
+    } elseif (isset($_FILES['file_upload']) && $_FILES['file_upload']['error'] == 0) {
         $file_ext = pathinfo($_FILES['file_upload']['name'], PATHINFO_EXTENSION);
         $file_name = 'galeri_' . $id_kew . '_' . time() . '.' . $file_ext;
         $file_path = $upload_dir . $file_name;
+        if (!move_uploaded_file($_FILES['file_upload']['tmp_name'], $file_path)) {
+            $file_path = null;
+        }
+    }
 
-        if (move_uploaded_file($_FILES['file_upload']['tmp_name'], $file_path)) {
-            try {
-                KewirausahaanModel::saveGaleri($pdo, $id_kew, $file_path, $judul);
-                $_SESSION['pesan_sukses'] = "Foto berhasil diupload.";
-            } catch (Exception $e) {
-                $_SESSION['pesan_error'] = "Error: " . $e->getMessage();
-            }
-        } else {
-            $_SESSION['pesan_error'] = "Gagal upload file.";
+    if ($file_path) {
+        try {
+            KewirausahaanModel::saveGaleri($pdo, $id_kew, $file_path, $judul);
+            $_SESSION['pesan_sukses'] = "Foto dokumentasi kegiatan berhasil disimpan.";
+        } catch (Exception $e) {
+            $_SESSION['pesan_error'] = "Error: " . $e->getMessage();
         }
     } else {
-        $_SESSION['pesan_error'] = "Tidak ada file yang diupload.";
+        $_SESSION['pesan_error'] = "Silakan ambil foto dengan kamera atau pilih file gambar.";
     }
 
     redirect("index.php?mod=kewirausahaan&id=$id_kew&tab=galeri");

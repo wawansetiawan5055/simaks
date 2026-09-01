@@ -1,23 +1,19 @@
 <?php include __DIR__ . '/partials/header.php'; ?>
-<section class="content-header">
+<div class="content-header p-0 pt-3">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1><i class="fas fa-exchange-alt mr-2"></i> Daftar Siswa Mutasi Masuk</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3 px-4 flex-wrap" style="gap: 12px;">
+            <div>
+                <h2 class="m-0 font-weight-bold text-dark"><i class="fas fa-exchange-alt text-primary mr-2"></i> Siswa Mutasi Masuk</h2>
+                <p class="text-muted small mb-0">Pencatatan dan verifikasi berkas siswa pindahan / mutasi masuk dari sekolah lain.</p>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                            data-target="#modalTambahMutasi">
-                            <i class="fas fa-plus"></i> Tambah Data Mutasi
-                        </button>
-                    </li>
-                </ol>
+            <div>
+                <button type="button" class="btn btn-primary btn-sm px-3 shadow-sm font-weight-bold" style="border-radius: 8px;" data-toggle="modal" data-target="#modalTambahMutasi">
+                    <i class="fas fa-plus mr-1"></i> Tambah Data Mutasi
+                </button>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <section class="content">
     <div class="container-fluid">
@@ -25,9 +21,9 @@
             <div class="card-header">
                 <h3 class="card-title">Data Siswa Pindahan (Pending/Diterima)</h3>
                 <div class="card-tools">
-                    <a href="index.php?mod=mutasi_masuk&act=export_excel" class="btn btn-success btn-sm"><i
+                    <a href="<?= BASE_URL ?>mutasi_masuk/export_excel" class="btn btn-success btn-sm"><i
                             class="fas fa-file-excel"></i> Export Excel</a>
-                    <a href="index.php?mod=mutasi_masuk&act=export_pdf" class="btn btn-danger btn-sm"><i
+                    <a href="<?= BASE_URL ?>mutasi_masuk/export_pdf" class="btn btn-danger btn-sm"><i
                             class="fas fa-file-pdf"></i> Export PDF</a>
                 </div>
             </div>
@@ -75,13 +71,13 @@
                                     ?>
                                 </td>
                                 <td>
-                                    <a href="index.php?mod=mutasi_masuk&act=detail&id=<?= $data['id_mutasi']; ?>"
+                                    <a href="<?= BASE_URL ?>mutasi_masuk/detail?id=<?= $data['id_mutasi']; ?>"
                                         class="btn btn-info btn-sm" title="Lihat Detail">
                                         <i class="fas fa-eye"></i>
                                     </a>
 
                                     <?php if ($status == 'Pending'): // Hanya tampilkan jika status masih Pending ?>
-                                        <a href="index.php?mod=mutasi_masuk&act=promote&id=<?= $data['id_mutasi']; ?>"
+                                        <a href="<?= BASE_URL ?>mutasi_masuk/promote?id=<?= $data['id_mutasi']; ?>"
                                             class="btn btn-success btn-sm" title="Verifikasi & Terima Siswa"
                                             onclick="return confirm('Apakah Anda yakin ingin menerima siswa ini dan memindahkannya ke Data Master Siswa Aktif?')">
                                             <i class="fas fa-check"></i> Terima
@@ -109,7 +105,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="index.php?mod=mutasi_masuk&act=save" method="POST">
+            <form action="<?= BASE_URL ?>mutasi_masuk/save" method="POST">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">

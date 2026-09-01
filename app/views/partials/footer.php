@@ -1,39 +1,75 @@
 </div>
 <footer class="main-footer">
     <strong>Copyright &copy; <?= date('Y') ?> <a href="#">SIMAKS</a>.</strong> All rights reserved.
-    <div class="float-right d-none d-sm-inline-block"><b>Version</b> 1.0.0</div>
+    <div class="float-right d-none d-sm-inline-block"><b>Version</b> 2.3.5</div>
 </footer>
 
 </div>
 <!-- END WRAPPER -->
 
 <!-- BOTTOM NAVIGATION BAR (MOBILE ONLY) -->
+<?php
+$peran_aktif = $_SESSION['peran_aktif'] ?? '';
+$is_siswa = ($peran_aktif === 'Siswa' || (function_exists('has_role') && has_role('Siswa') && !has_role('Guru') && !has_role('Admin')));
+
+$current_mod = $_GET['mod'] ?? '';
+$current_act = $_GET['act'] ?? '';
+?>
 <nav class="mobile-bottom-nav d-md-none">
-    <a href="index.php?mod=dashboard"
-        class="nav-item <?= (!isset($_GET['mod']) || $_GET['mod'] == 'dashboard') ? 'active' : '' ?>">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-    </a>
-    <a href="index.php?mod=absensi_mapel"
-        class="nav-item <?= (isset($_GET['mod']) && $_GET['mod'] == 'absensi_mapel') ? 'active' : '' ?>">
-        <i class="fas fa-user-check"></i>
-        <span>Absen</span>
-    </a>
-    <a href="javascript:void(0);" onclick="toggleMobileMenu(event);" class="nav-item">
-        <div class="center-btn">
-            <i class="fas fa-plus"></i>
-        </div>
-        <span>Menu</span>
-    </a>
-    <a href="javascript:void(0);" onclick="$('#modal-jadwal-mengajar').modal('show');" class="nav-item">
-        <i class="fas fa-calendar-check"></i>
-        <span>Jadwal</span>
-    </a>
-    <a href="index.php?mod=jurnal_kbm"
-        class="nav-item <?= (isset($_GET['mod']) && $_GET['mod'] == 'jurnal_kbm') ? 'active' : '' ?>">
-        <i class="fas fa-book"></i>
-        <span>Jurnal</span>
-    </a>
+    <?php if ($is_siswa): ?>
+        <a href="<?= BASE_URL ?>siswa_portal/dashboard"
+            class="nav-item <?= ($current_mod === 'siswa_portal' && ($current_act === 'dashboard' || empty($current_act))) ? 'active' : '' ?>">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="<?= BASE_URL ?>siswa_portal/materi"
+            class="nav-item <?= ($current_mod === 'siswa_portal' && $current_act === 'materi') ? 'active' : '' ?>">
+            <i class="fas fa-book-open"></i>
+            <span>Materi</span>
+        </a>
+        <a href="#" data-widget="pushmenu" class="nav-item">
+            <div class="center-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <span>Menu</span>
+        </a>
+        <a href="<?= BASE_URL ?>siswa_portal/tugas"
+            class="nav-item <?= ($current_mod === 'siswa_portal' && $current_act === 'tugas') ? 'active' : '' ?>">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Tugas</span>
+        </a>
+        <a href="<?= BASE_URL ?>siswa_portal/jadwal"
+            class="nav-item <?= ($current_mod === 'siswa_portal' && $current_act === 'jadwal') ? 'active' : '' ?>">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Jadwal</span>
+        </a>
+    <?php else: ?>
+        <a href="<?= BASE_URL ?>dashboard"
+            class="nav-item <?= (!isset($_GET['mod']) || $_GET['mod'] == 'dashboard') ? 'active' : '' ?>">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="<?= BASE_URL ?>absensi_mapel"
+            class="nav-item <?= (isset($_GET['mod']) && $_GET['mod'] == 'absensi_mapel') ? 'active' : '' ?>">
+            <i class="fas fa-user-check"></i>
+            <span>Absen</span>
+        </a>
+        <a href="#" data-widget="pushmenu" class="nav-item">
+            <div class="center-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <span>Menu</span>
+        </a>
+        <a href="javascript:void(0);" onclick="$('#modal-jadwal-mengajar').modal('show');" class="nav-item">
+            <i class="fas fa-calendar-check"></i>
+            <span>Jadwal</span>
+        </a>
+        <a href="<?= BASE_URL ?>jurnal_kbm"
+            class="nav-item <?= (isset($_GET['mod']) && $_GET['mod'] == 'jurnal_kbm') ? 'active' : '' ?>">
+            <i class="fas fa-book"></i>
+            <span>Jurnal</span>
+        </a>
+    <?php endif; ?>
 </nav>
 
 <style>
@@ -43,15 +79,15 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 65px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
+        height: 60px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
         display: flex;
         justify-content: space-around;
         align-items: center;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.08);
         z-index: 1060;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .mobile-bottom-nav .nav-item {
@@ -60,57 +96,58 @@
         align-items: center;
         justify-content: center;
         color: #64748b;
-        /* Muted slate */
-        text-decoration: none;
-        font-size: 0.75rem;
+        text-decoration: none !important;
+        font-size: 0.72rem;
+        font-weight: 500;
         width: 20%;
         height: 100%;
         transition: all 0.2s ease;
     }
 
     .mobile-bottom-nav .nav-item i {
-        font-size: 1.4rem;
-        margin-bottom: 4px;
-        transition: all 0.2s ease;
+        font-size: 1.15rem;
+        margin-bottom: 2px;
+        transition: transform 0.2s, color 0.2s;
     }
 
     .mobile-bottom-nav .nav-item.active {
-        color: var(--theme-accent, #3b82f6);
-        font-weight: 600;
+        color: #2563eb;
+        font-weight: 700;
     }
 
-    .mobile-bottom-nav .nav-item:active {
-        transform: scale(0.9);
+    .mobile-bottom-nav .nav-item.active i {
+        color: #2563eb;
+        transform: translateY(-2px);
     }
 
-    /* CENTER BUTTON (PLUS ICON) STYLING */
-    .center-btn {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        border-radius: 15px;
+    .mobile-bottom-nav .center-btn {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: #ffffff;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        margin-top: -30px;
-        /* Float effect */
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-        border: 3px solid #fff;
-        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        margin-top: -14px;
+        border: 3px solid #ffffff;
+        transition: transform 0.2s;
     }
 
-    .center-btn i {
-        font-size: 1.4rem !important;
-        margin-bottom: 0 !important;
+    .mobile-bottom-nav .center-btn:hover {
+        transform: scale(1.08);
     }
 
-    .nav-item:active .center-btn {
-        transform: scale(0.9) translateY(5px);
+    .mobile-bottom-nav .center-btn i {
+        font-size: 1rem;
+        color: #ffffff !important;
+        margin-bottom: 0;
     }
 
     .mobile-bottom-nav span {
-        margin-top: 2px;
+        margin-top: 1px;
+        line-height: 1;
     }
 </style>
 <!-- AdminLTE App -->
@@ -179,19 +216,13 @@
 
         // === HELPER FUNCTION: Build API URL dengan routing index.php ===
         function buildApiUrl(apiType, action, params = {}) {
-            const url = new URL(API_URL, window.location.origin);
-            url.searchParams.set('mod', 'api');
-            url.searchParams.set('type', apiType); // dashboard, guru, siswa, dll
-            url.searchParams.set('act', action);
-
-            // Add custom params
+            let url = '<?= BASE_URL ?>index.php?mod=api&type=' + encodeURIComponent(apiType) + '&act=' + encodeURIComponent(action);
             for (const [key, value] of Object.entries(params)) {
                 if (value !== null && value !== '') {
-                    url.searchParams.set(key, value);
+                    url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
                 }
             }
-
-            return url.toString().substring(url.origin.length); // Return relative path
+            return url;
         }
 
         // Variabel Global untuk Data Mentah
@@ -204,15 +235,26 @@
         let chartGuruAbsen = null;
         let chartSiswaAbsen = null;
 
+        // --- 0. SUMMARY CARDS ---
+        function loadSummary(id_ta = null) {
+            let selected_id_ta = id_ta || $('#filter-ta').val() || currentTaId;
+            const requestUrl = buildApiUrl('dashboard', 'summary', { id_ta: selected_id_ta });
+
+            $.getJSON(requestUrl, function (res) {
+                if (res.status == 'ok' && res.data) {
+                    $('#summary-total-siswa').text(res.data.total_siswa.toLocaleString());
+                    $('#summary-total-guru').text(res.data.total_guru.toLocaleString());
+                    $('#summary-total-kelas').text(res.data.total_kelas.toLocaleString());
+                    $('#summary-total-mapel').text(res.data.total_mapel.toLocaleString());
+                }
+            });
+        }
+
         // --- 1. REKAP SISWA ---
         function loadRekapSiswa(id_ta = null) {
-            let selected_id_ta = id_ta || $('#filter-ta').val() || currentTaId;
-            if (!selected_id_ta || selected_id_ta == 0) {
-                $('#rekap-siswa-table tbody').html('<tr><td colspan="7" class="text-center text-danger">Tahun Ajaran belum dipilih.</td></tr>');
-                return;
-            }
+            let selected_id_ta = id_ta || $('#filter-ta').val() || currentTaId || 0;
 
-            $('#rekap-siswa-table tbody').html('<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
+            $('#rekap-siswa-table tbody').html('<tr><td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
 
             const requestUrl = buildApiUrl('dashboard', 'rekap_siswa', { id_ta: selected_id_ta });
             console.log('Loading rekap siswa from:', requestUrl, 'with id_ta:', selected_id_ta);
@@ -229,7 +271,7 @@
                         filterAndRenderRekapSiswa();
                     } else {
                         console.error('API returned error status:', res);
-                        $('#rekap-siswa-table tbody').html('<tr><td colspan="7" class="text-center text-danger">Error: ' + (res.msg || 'Unknown error') + '</td></tr>');
+                        $('#rekap-siswa-table tbody').html('<tr><td colspan="8" class="text-center text-danger">Error: ' + (res.msg || 'Unknown error') + '</td></tr>');
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -242,7 +284,7 @@
                     } else if (jqXHR.status === 500) {
                         errorMsg = 'Server error (500). Response: ' + jqXHR.responseText;
                     }
-                    $('#rekap-siswa-table tbody').html('<tr><td colspan="7" class="text-center text-danger">' + errorMsg + '</td></tr>');
+                    $('#rekap-siswa-table tbody').html('<tr><td colspan="8" class="text-center text-danger">' + errorMsg + '</td></tr>');
                 }
             });
         }
@@ -275,13 +317,14 @@
                     totalKeluar += m_out;
 
                     html += `<tr>
-                    <td class="text-center">${i + 1}</td>
-                    <td class="text-center">${row.nama_kelas}</td>
-                    <td class="text-center">${l}</td>
-                    <td class="text-center">${p}</td>
-                    <td class="text-center"><b>${t}</b></td>
-                    <td class="text-center">${m_in}</td>
-                    <td class="text-center">${m_out}</td>
+                    <td class="text-center" style="white-space: nowrap;">${i + 1}</td>
+                    <td class="text-center font-weight-bold" style="white-space: nowrap;">${row.nama_kelas}</td>
+                    <td class="d-none d-md-table-cell text-left" style="white-space: nowrap;">${row.nama_wali || '-'}</td>
+                    <td class="text-center" style="white-space: nowrap;">${l}</td>
+                    <td class="text-center" style="white-space: nowrap;">${p}</td>
+                    <td class="text-center font-weight-bold" style="white-space: nowrap;">${t}</td>
+                    <td class="text-center" style="white-space: nowrap;">${m_in}</td>
+                    <td class="text-center" style="white-space: nowrap;">${m_out}</td>
                 </tr>`;
                     labels.push(row.nama_kelas);
                     dataL.push(l);
@@ -289,8 +332,9 @@
                 });
 
                 // Add Total Row
-                html += `<tr class="bg-light font-weight-bold">
-                    <td colspan="2" class="text-center">TOTAL</td>
+                html += `<tr class="total-row font-weight-bold">
+                    <td colspan="2" class="text-center d-table-cell d-md-none">TOTAL</td>
+                    <td colspan="3" class="text-center d-none d-md-table-cell">TOTAL</td>
                     <td class="text-center">${totalL}</td>
                     <td class="text-center">${totalP}</td>
                     <td class="text-center">${totalSiswa}</td>
@@ -298,7 +342,7 @@
                     <td class="text-center">${totalKeluar}</td>
                 </tr>`;
             } else {
-                html = '<tr><td colspan="7" class="text-center">Tidak ada data rekap siswa pada filter ini.</td></tr>';
+                html = '<tr><td colspan="8" class="text-center">Tidak ada data rekap siswa pada filter ini.</td></tr>';
             }
 
             $('#rekap-siswa-table tbody').html(html);
@@ -308,9 +352,10 @@
         // --- 2. ABSENSI GURU ---
         function loadAbsensiGuru() {
             let params = getFilterParams('#filter-periode-guru', 'guru');
-            params.id_ta = currentTaId;
+            params.id_ta = $('#filter-ta').val() || currentTaId || 0;
+            params.mode_kbm = $('#filter-mode-guru').val() || 'tatap_muka';
 
-            $('#rekap-absensi-guru-table tbody').html('<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
+            $('#rekap-absensi-guru-table tbody').html('<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
 
             $.getJSON(buildApiUrl('dashboard', 'absensi_guru', params), function (res) {
                 if (res.status == 'ok') {
@@ -318,7 +363,7 @@
                     filterAndRenderAbsensiGuru();
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
-                $('#rekap-absensi-guru-table tbody').html('<tr><td colspan="6" class="text-center text-danger">Gagal memuat data.</td></tr>');
+                $('#rekap-absensi-guru-table tbody').html('<tr><td colspan="7" class="text-center text-danger">Gagal memuat data.</td></tr>');
             });
         }
 
@@ -333,10 +378,11 @@
 
             let html = '';
             if (filteredData && filteredData.length > 0) {
-                filteredData.forEach(d => {
+                filteredData.forEach((d, i) => {
                     let total = parseInt(d.H) + parseInt(d.S) + parseInt(d.I) + parseInt(d.A);
                     let persen = total > 0 ? Math.round((d.H / total) * 100) : 0;
                     html += `<tr>
+                    <td class="text-center">${i + 1}</td>
                     <td>${d.nama}</td> 
                     <td class="text-center text-success">${d.H}</td>
                     <td class="text-center text-warning">${d.S}</td>
@@ -349,7 +395,7 @@
                     chartData.I += parseInt(d.I); chartData.A += parseInt(d.A);
                 });
             } else {
-                html = '<tr><td colspan="6" class="text-center">Tidak ada data.</td></tr>';
+                html = '<tr><td colspan="7" class="text-center">Tidak ada data.</td></tr>';
             }
 
             $('#rekap-absensi-guru-table tbody').html(html);
@@ -359,9 +405,9 @@
         // --- 3. ABSENSI SISWA ---
         function loadAbsensiSiswa() {
             let params = getFilterParams('#filter-periode-siswa', 'siswa');
-            params.id_ta = currentTaId;
+            params.id_ta = $('#filter-ta').val() || currentTaId || 0;
 
-            $('#rekap-absensi-siswa-table tbody').html('<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
+            $('#rekap-absensi-siswa-table tbody').html('<tr><td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>');
 
             $.getJSON(buildApiUrl('dashboard', 'absensi_siswa', params), function (res) {
                 if (res.status == 'ok') {
@@ -369,7 +415,7 @@
                     filterAndRenderAbsensiSiswa();
                 }
             }).fail(function () {
-                $('#rekap-absensi-siswa-table tbody').html('<tr><td colspan="6" class="text-center text-danger">Gagal memuat data.</td></tr>');
+                $('#rekap-absensi-siswa-table tbody').html('<tr><td colspan="8" class="text-center text-danger">Gagal memuat data.</td></tr>');
             });
         }
 
@@ -384,11 +430,12 @@
 
             let html = '';
             if (filteredData && filteredData.length > 0) {
-                filteredData.forEach(d => {
+                filteredData.forEach((d, i) => {
                     let total = parseInt(d.H) + parseInt(d.S) + parseInt(d.I) + parseInt(d.A);
                     let persen = total > 0 ? Math.round((d.H / total) * 100) : 0;
                     html += `<tr>
-                    <td class="text-center">${d.nama_kelas}</td>
+                    <td class="text-center">${i + 1}</td>
+                    <td class="text-center font-weight-bold">${d.nama_kelas}</td>
                     <td class="text-center text-success">${d.H}</td>
                     <td class="text-center text-warning">${d.S}</td>
                     <td class="text-center text-info">${d.I}</td>
@@ -396,7 +443,7 @@
                     <td class="font-weight-bold text-center">${persen}%</td>
                     <td class="text-center">
                         <button class="btn btn-xs btn-primary btn-detail-absen" data-id="${d.id_kelas}" data-nama="${d.nama_kelas}">
-                            <i class="fas fa-search"></i> Detail
+                            <i class="fas fa-search mr-1"></i> Detail
                         </button>
                     </td>
                 </tr>`;
@@ -405,7 +452,7 @@
                     chartData.I += parseInt(d.I); chartData.A += parseInt(d.A);
                 });
             } else {
-                html = '<tr><td colspan="7" class="text-center">Tidak ada data.</td></tr>';
+                html = '<tr><td colspan="8" class="text-center">Tidak ada data.</td></tr>';
             }
 
             $('#rekap-absensi-siswa-table tbody').html(html);
@@ -423,10 +470,13 @@
                         options += `<option value="${ta.id_ta}" ${isSelected}>${ta.nama_ta}</option>`;
                     });
                     taSelect.html(options);
-                    loadRekapSiswa(currentTaId);
+                    let selectedTaId = taSelect.val() || currentTaId || 0;
+                    loadRekapSiswa(selectedTaId);
+                    loadSummary(selectedTaId);
                 } else {
                     taSelect.html('<option value="0">Gagal memuat TA</option>');
                     loadRekapSiswa(currentTaId);
+                    loadSummary(currentTaId);
                 }
             });
         }
@@ -572,23 +622,92 @@
             if (!canvas) return; // Skip if canvas doesn't exist on this page
             if (chartSiswa) chartSiswa.destroy();
             let ctx = canvas.getContext('2d');
+            
+            // Create gradients for a premium feel
+            let gradientL = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientL.addColorStop(0, 'rgba(79, 70, 229, 0.85)'); // Indigo
+            gradientL.addColorStop(1, 'rgba(99, 102, 241, 0.3)');
+
+            let gradientP = ctx.createLinearGradient(0, 0, 0, 350);
+            gradientP.addColorStop(0, 'rgba(236, 72, 153, 0.85)'); // Pink/Rose
+            gradientP.addColorStop(1, 'rgba(244, 63, 94, 0.4)');
+
             chartSiswa = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Laki-laki', data: dataL, backgroundColor: '#007bff' },
-                        { label: 'Perempuan', data: dataP, backgroundColor: '#dc3545' }
+                        { 
+                            label: 'Laki-laki', 
+                            data: dataL, 
+                            backgroundColor: gradientL, 
+                            borderColor: '#4f46e5',
+                            borderWidth: 1.5,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.7
+                        },
+                        { 
+                            label: 'Perempuan', 
+                            data: dataP, 
+                            backgroundColor: gradientP, 
+                            borderColor: '#db2777',
+                            borderWidth: 1.5,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.7
+                        }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: 12,
+                            fontColor: '#475569',
+                            boxWidth: 12,
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltips: {
+                        backgroundColor: '#1e293b',
+                        titleFontFamily: "'Poppins', sans-serif",
+                        titleFontSize: 13,
+                        titleFontColor: '#fff',
+                        bodyFontFamily: "'Poppins', sans-serif",
+                        bodyFontSize: 12,
+                        bodySpacing: 4,
+                        xPadding: 12,
+                        yPadding: 10,
+                        cornerRadius: 8,
+                        displayColors: true
+                    },
                     scales: {
-                        yAxes: [{
+                        xAxes: [{
+                            gridLines: {
+                                display: false
+                            },
                             ticks: {
-                                beginAtZero: true, // WAJIB: Agar grafik selalu mulai dari 0
-                                stepSize: 1 // Agar sumbu Y selalu bilangan bulat
+                                fontFamily: "'Poppins', sans-serif",
+                                fontSize: 11,
+                                fontColor: '#64748b',
+                                padding: 5
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                color: '#f1f5f9',
+                                zeroLineColor: '#e2e8f0'
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 2,
+                                fontFamily: "'Poppins', sans-serif",
+                                fontSize: 11,
+                                fontColor: '#64748b',
+                                padding: 10
                             }
                         }]
                     }
@@ -622,26 +741,58 @@
         loadTahunAjaranFilter();
         loadGuruFilter();
         loadKelasFilter();
+        loadSummary();
 
 
         // EVENTS
-        $('#filter-ta').on('change', function () { loadRekapSiswa($(this).val()); });
+        $('#filter-ta').on('change', function () {
+            const val = $(this).val();
+            loadRekapSiswa(val);
+            loadSummary(val);
+        });
         $('#filter-tingkat').on('change', filterAndRenderRekapSiswa);
 
         $('#apply-filter-absensi-guru').click(loadAbsensiGuru);
         $('#filter-guru-absen').on('change', filterAndRenderAbsensiGuru);
+        $('#filter-mode-guru').on('change', loadAbsensiGuru);
 
         $('#apply-filter-absensi-siswa').click(loadAbsensiSiswa);
         $('#filter-kelas-absen').on('change', filterAndRenderAbsensiSiswa);
 
         // --- LOGIKA MODAL JADWAL (Paste kode ini di bagian bawah) ---
-        // --- LOGIKA MODAL JADWAL (KONFLIK: Sudah ditangani di dashboard.php) ---
-        // $('#modal-jadwal-mengajar').on('show.bs.modal', function (e) {
-        //     ...
-        // });
-        // Dibatalkan agar tidak bentrok dengan logic baru di dashboard.php
+        // --- GLOBAL CHAT NOTIFICATION POLLING ---
+        let prevUnreadCount = 0;
+        const globalSoundReceived = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+
+        function checkGlobalUnread() {
+            $.get('<?= BASE_URL ?>api?type=chat&act=unread_count', function (res) {
+                if (res.status == 'ok') {
+                    let count = parseInt(res.count);
+                    if (count > 0) {
+                        $('#global-chat-badge').text(count).removeClass('d-none');
+                        // Play sound only if count increases (new message)
+                        // AND we are NOT on the chat page (chat page has its own sound logic)
+                        if (count > prevUnreadCount && window.location.href.indexOf('mod=chat') === -1) {
+                            globalSoundReceived.play().catch(e => console.log('Audio blocked'));
+                        }
+                    } else {
+                        $('#global-chat-badge').addClass('d-none');
+                    }
+                    prevUnreadCount = count;
+                }
+            });
+        }
+        setInterval(checkGlobalUnread, 10000); // Check every 10 seconds
+        checkGlobalUnread();
     });
 </script>
+<!-- 2. SUBMENU MODAL -->
+<div class="modal fade" id="submenuModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10500;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="submenuContent"></div>
+    </div>
+</div>
+
 <!-- GLOBAL PREVIEW MODAL (Standardized Style 1: Dark Header + Iframe) -->
 <div class="modal fade" id="modalGlobalPreview" tabindex="-1" role="dialog" aria-labelledby="modalGlobalPreviewLabel"
     aria-hidden="true">
@@ -678,25 +829,40 @@
 
         // Clear previous content
         $body.empty();
+        $body.css({ 'display': 'block', 'align-items': 'initial', 'justify-content': 'initial' });
 
-        if (type === 'image') {
-            // Image Preview (Responsive + Centered)
-            $body.css({
-                'display': 'flex',
-                'align-items': 'center',
-                'justify-content': 'center'
-            });
+        const ext = url.split('.').pop().toLowerCase();
+        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext);
+        const isWord = ['doc', 'docx'].includes(ext);
+        const isPPT = ['ppt', 'pptx'].includes(ext);
+        const isVideo = ['mp4', 'webm', 'ogg'].includes(ext);
+
+        if (type === 'image' || isImage) {
+            // Image Preview
+            $body.css({ 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' });
             content = '<img src="' + url + '" style="max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5);">';
             $body.html(content);
+        } else if (isVideo) {
+            // Video Preview
+            $body.css({ 'display': 'flex', 'align-items': 'center', 'justify-content': 'center' });
+            content = `<video controls autoplay style="max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+                        <source src="${url}" type="video/${ext}">
+                        Browser Anda tidak mendukung pemutaran video.
+                       </video>`;
+            $body.html(content);
         } else {
-            // Iframe Preview (HTML Reports / PDF)
-            $body.css({
-                'display': 'block',
-                'align-items': 'initial',
-                'justify-content': 'initial'
-            });
+            // Iframe Preview (HTML / PDF / Word / PPT)
+            let finalUrl = url;
+            if (isWord || isPPT) {
+                let absoluteUrl = url;
+                if (!url.startsWith('http')) {
+                    absoluteUrl = window.location.origin + '/' + url.replace(/^\//, '');
+                }
+                finalUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(absoluteUrl) + '&embedded=true';
+            }
+
             var iframe = document.createElement('iframe');
-            iframe.src = url;
+            iframe.src = finalUrl;
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
@@ -817,6 +983,63 @@
     });
 </script>
 
+<!-- Summernote WYSIWYG Editor JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<!-- KaTeX & Summernote Math Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="<?= BASE_URL; ?>assets/js/summernote-math.js"></script>
+<script>
+    $(document).ready(function () {
+        if ($('.summernote').length > 0) {
+            $('.summernote').summernote({
+                height: 300,
+                placeholder: 'Tuliskan isi surat / template di sini...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'math']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+        }
+    });
+</script>
+
+<!-- MathJax untuk render rumus matematika dari AI (Gemini, ChatGPT, dll) -->
+<script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+</script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script>
+
+<script>
+window.renderMath = function(targetEl = null) {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        if (targetEl) {
+            MathJax.typesetPromise([targetEl]).catch(function(err){ console.log('MathJax:', err); });
+        } else {
+            MathJax.typesetPromise().catch(function(err){ console.log('MathJax:', err); });
+        }
+    }
+};
+$(document).ready(function() {
+    setTimeout(function() {
+        window.renderMath();
+    }, 300);
+});
+</script>
 <?php include __DIR__ . '/mobile_modals.php'; ?>
 </body>
 
