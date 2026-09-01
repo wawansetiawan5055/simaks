@@ -444,6 +444,147 @@ function audit_log($aksi, $deskripsi, $target_tabel = null, $id_pengguna = null)
 }
 
 /**
+ * Mendapatkan Real Client IP Address (Mendukung Cloudflare Tunnel, Nginx, Proxy)
+ */
+function get_client_ip() {
+    $headers = [
+        'HTTP_CF_CONNECTING_IP',     // Cloudflare Tunnel & Proxy (Paling Akurat)
+        'HTTP_TRUE_CLIENT_IP',       // Cloudflare Enterprise / Akamai
+        'HTTP_X_REAL_IP',            // Nginx Reverse Proxy
+        'HTTP_X_FORWARDED_FOR',      // Standard Reverse Proxy (Multi-hop)
+        'HTTP_CLIENT_IP',
+        'HTTP_X_CLUSTER_CLIENT_IP',
+        'REMOTE_ADDR'                // Standard Web Server Fallback
+    ];
+
+    foreach ($headers as $header) {
+        if (!empty($_SERVER[$header])) {
+            $ipList = explode(',', $_SERVER[$header]);
+            foreach ($ipList as $ip) {
+                $ip = trim($ip);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+    }
+
+    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+}
+
+/**
+ * Parser User-Agent untuk Mendeteksi OS, Browser, Tipe Perangkat, dan Icon
+ */
+function parse_user_agent($userAgent) {
+    if (empty($userAgent) || $userAgent === 'Unknown') {
+        return [
+            'os' => 'Unknown OS',
+            'browser' => 'Unknown Browser',
+            'device_type' => 'desktop',
+            'icon' => 'fas fa-desktop',
+            'label' => 'Perangkat Tidak Diketahui'
+        ];
+    }
+
+    $os = 'Unknown OS';
+    $icon = 'fas fa-desktop';
+    $deviceType = 'desktop';
+
+    // 1. Deteksi OS
+    if (preg_match('/android/i', $userAgent)) {
+        $os = 'Android';
+        $icon = 'fab fa-android text-success';
+        $deviceType = 'mobile';
+        if (preg_match('/android\s+([0-9\.]+)/i', $userAgent, $matches)) {
+            $os .= ' ' . $matches[1];
+        }
+    } elseif (preg_match('/iphone/i', $userAgent)) {
+        $os = 'iPhone (iOS)';
+        $icon = 'fab fa-apple text-dark';
+        $deviceType = 'mobile';
+    } elseif (preg_match('/ipad/i', $userAgent)) {
+        $os = 'iPad (iPadOS)';
+        $icon = 'fab fa-apple text-dark';
+        $deviceType = 'tablet';
+    } elseif (preg_match('/windows nt 10.0/i', $userAgent)) {
+        $os = 'Windows 10/11';
+        $icon = 'fab fa-windows text-primary';
+    } elseif (preg_match('/windows nt 6.3/i', $userAgent)) {
+        $os = 'Windows 8.1';
+        $icon = 'fab fa-windows text-primary';
+    } elseif (preg_match('/windows nt 6.1/i', $userAgent)) {
+        $os = 'Windows 7';
+        $icon = 'fab fa-windows text-primary';
+    } elseif (preg_match('/windows/i', $userAgent)) {
+        $os = 'Windows';
+        $icon = 'fab fa-windows text-primary';
+    } elseif (preg_match('/macintosh|mac os x/i', $userAgent)) {
+        $os = 'macOS';
+        $icon = 'fab fa-apple text-dark';
+    } elseif (preg_match('/linux/i', $userAgent)) {
+        $os = 'Linux';
+        $icon = 'fab fa-linux text-warning';
+    }
+
+    // 2. Deteksi Browser
+    $browser = 'Web Browser';
+    if (preg_match('/edg/i', $userAgent)) {
+        $browser = 'Microsoft Edge';
+    } elseif (preg_match('/chrome|crios/i', $userAgent) && !preg_match('/opr|opera/i', $userAgent)) {
+        $browser = 'Google Chrome';
+    } elseif (preg_match('/firefox|fxios/i', $userAgent)) {
+        $browser = 'Mozilla Firefox';
+    } elseif (preg_match('/safari/i', $userAgent) && !preg_match('/chrome|crios/i', $userAgent)) {
+        $browser = 'Apple Safari';
+    } elseif (preg_match('/opr|opera/i', $userAgent)) {
+        $browser = 'Opera';
+    } elseif (preg_match('/samsungbrowser/i', $userAgent)) {
+        $browser = 'Samsung Internet';
+    }
+
+    return [
+        'os' => $os,
+        'browser' => $browser,
+        'device_type' => $deviceType,
+        'icon' => $icon,
+        'label' => "$os ($browser)"
+    ];
+}
+
+/**
+ * Format Waktu Relatif (Contoh: "2 menit yang lalu", "1 jam yang lalu")
+ */
+function time_elapsed_string($datetime, $full = false) {
+    if (!$datetime) return '-';
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = [
+        'y' => 'tahun',
+        'm' => 'bulan',
+        'w' => 'minggu',
+        'd' => 'hari',
+        'h' => 'jam',
+        'i' => 'menit',
+        's' => 'detik',
+    ];
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v;
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' yang lalu' : 'Baru saja';
+}
+
+/**
  * [BARU] Memformat Nama dengan Gelar (Depan & Belakang)
  * Contoh: Drs. Wawan Setiawan, S.Pd.
  */
