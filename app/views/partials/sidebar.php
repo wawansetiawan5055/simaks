@@ -681,7 +681,7 @@ if (!function_exists('is_menu_active_dynamic')) {
 </aside>
 
 <script>
-// [PERBAIKAN TOTAL] Handler Buka-Tutup (Toggle Collapse/Expand) Menu Sidebar yang Bebas Macet
+// [PERBAIKAN TOTAL] Handler Buka-Tutup Menu & Auto-Scroll Fokus Menu Aktif
 $(document).ready(function () {
     // 1. Hapus listener default AdminLTE agar tidak terjadi benturan ganda (double-toggle)
     $('.nav-sidebar').removeAttr('data-widget');
@@ -710,6 +710,26 @@ $(document).ready(function () {
                     $treeview.css('display', 'block');
                 });
             }
+        }
+    });
+
+    // 3. [FITUR BARU] Otomatis Scroll & Posisikan Menu Aktif agar Selalu Terlihat di Layar
+    setTimeout(function () {
+        var $activeLink = $('.main-sidebar .nav-sidebar .nav-link.active').last();
+        if ($activeLink.length > 0) {
+            var sidebarEl = document.querySelector('.main-sidebar .sidebar');
+            if (sidebarEl) {
+                // Posisikan menu yang aktif di tengah tampilan scroll sidebar
+                $activeLink[0].scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+            }
+        }
+    }, 100);
+
+    // 4. Catat posisi scroll sebelum berpindah halaman agar transisi menu mulus
+    $(document).on('click', '.nav-sidebar a.nav-link:not([href="#"]):not([href^="javascript"])', function () {
+        var sidebarEl = document.querySelector('.main-sidebar .sidebar');
+        if (sidebarEl) {
+            localStorage.setItem('sidebarScrollPos', sidebarEl.scrollTop);
         }
     });
 });
