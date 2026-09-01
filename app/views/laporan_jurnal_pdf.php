@@ -14,11 +14,7 @@
     </style>
 </head>
 <body>
-<div class="kop-sekolah">
-    <h3><?= $kop_nama ?? 'SD/SMP/SMA NEGERI CONTOH' ?></h3>
-    <p><?= $kop_alamat ?? 'Jl. Pendidikan No. 1, Kota Contoh, Telp. 021-12345678' ?></p>
-    <p><?= $kop_npsn ? 'NPSN: '.$kop_npsn : 'NPSN: 12345678' ?></p>
-</div>
+<?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 <h2>Laporan Jurnal/Agenda KBM</h2>
 <table>
 <tr>

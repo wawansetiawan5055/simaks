@@ -378,11 +378,14 @@
 
             <div class="signature-section">
                 <div class="signature-box">
-                    Mengetahui,<br>
+                    <?= htmlspecialchars($kop['kota'] ?? $sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                     Kepala Sekolah
                     <div class="signature-placeholder"></div>
                     <div class="nama-kepsek">
-                        <b><u><?= htmlspecialchars($kop['nama_kepala_sekolah'] ?? '.......................................') ?></u></b>
+                        <b><u><?= htmlspecialchars($kop['nama_kepala_sekolah'] ?? $kop['nama_kepsek'] ?? '.......................................') ?></u></b>
+                        <?php if (!empty($kop['nip_kepala_sekolah'])): ?>
+                            <div style="font-size: 8.5pt; font-weight: normal;">NIP. <?= htmlspecialchars($kop['nip_kepala_sekolah']) ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

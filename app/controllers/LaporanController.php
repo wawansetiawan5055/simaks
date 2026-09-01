@@ -63,19 +63,18 @@ function laporan_export_pdf_render($data, $filename)
 function get_kop_laporan($pdo)
 {
     $profil = ProfilSekolahModel::getProfil($pdo);
-    // Menggunakan data profil jika ada, jika tidak, gunakan data statis
-    return [
-        'nama_yayasan' => $profil['nama_yayasan'] ?? 'YAYASAN TARBIYATUSSHIBYAN INDONESIA', // Use DB or fallback to old hardcoded
-        'kop_nama' => $profil['nama_sekolah'] ?? 'SIMAKS',
-        'kop_alamat' => $profil['alamat'] ?? 'Alamat Sekolah',
-        'kop_npsn' => $profil['npsn'] ?? 'NPSN',
-        'logo' => $profil['logo'] ?? '',
-        // Data Tambahan untuk Tanda Tangan Otomatis
-        'nama_kepala_sekolah' => $profil['nama_kepala_sekolah'] ?? '.......................',
-        'nip_kepala_sekolah' => $profil['nip_kepala_sekolah'] ?? '',
-        // [BARU] Otomatisasi Waka Kurikulum dari Penugasan
-        'nama_waka_kurikulum' => PenugasanModel::getGuruByJabatan($pdo, 'Waka Kurikulum', $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0) ?? '.......................'
-    ];
+    if (!is_array($profil)) $profil = [];
+    $profil['nama_yayasan'] = $profil['nama_yayasan'] ?? '';
+    $profil['kop_nama'] = $profil['nama_sekolah'] ?? 'SIMAKS';
+    $profil['kop_alamat'] = $profil['alamat'] ?? 'Alamat Sekolah';
+    $profil['kop_npsn'] = $profil['npsn'] ?? 'NPSN';
+    $profil['logo'] = $profil['logo'] ?? '';
+    // Data Tambahan untuk Tanda Tangan Otomatis
+    $profil['nama_kepala_sekolah'] = $profil['nama_kepala_sekolah'] ?? $profil['kepala_sekolah'] ?? '.......................';
+    $profil['nip_kepala_sekolah'] = $profil['nip_kepala_sekolah'] ?? '';
+    // [BARU] Otomatisasi Waka Kurikulum dari Penugasan
+    $profil['nama_waka_kurikulum'] = PenugasanModel::getGuruByJabatan($pdo, 'Waka Kurikulum', $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0) ?? '.......................';
+    return $profil;
 }
 // =========================================================
 

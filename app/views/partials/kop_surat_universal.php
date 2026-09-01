@@ -5,11 +5,13 @@
  * Clean, compact line-spacing with dual logos (Kiri & Kanan) and standard government/foundation border.
  */
 
-if (!isset($profil_sekolah_kop)) {
+if (!isset($profil_sekolah_kop) || empty($profil_sekolah_kop['nama_sekolah'])) {
     if (isset($profil) && is_array($profil) && !empty($profil['nama_sekolah'])) {
         $profil_sekolah_kop = $profil;
     } elseif (isset($sekolah) && is_array($sekolah) && !empty($sekolah['nama_sekolah'])) {
         $profil_sekolah_kop = $sekolah;
+    } elseif (isset($kop) && is_array($kop) && !empty($kop['nama_sekolah'])) {
+        $profil_sekolah_kop = $kop;
     } else {
         global $pdo;
         if (isset($pdo)) {

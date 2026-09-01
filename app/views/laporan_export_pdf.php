@@ -131,24 +131,11 @@
 </head>
 <body>
 
-    <header class="kop-surat">
-        <table class="kop-table">
-            <tr>
-                <td class="kop-logo">
-                    <img src="<?= realpath(__DIR__ . '/../../public/' . get_app_logo()) ?>" alt="Logo">
-                </td>
-                <td class="kop-text">
-                    <h1>YAYASAN TARBIYATUSHIBYAN INDONESIA</h1>
-                    <h2><?= htmlspecialchars($kop_nama ?? 'NAMA SEKOLAH') ?></h2>
-                    <p>NPSN: <?= htmlspecialchars($kop_npsn ?? 'N/A') ?></p>
-                    <p><?= htmlspecialchars($kop_alamat ?? 'Alamat Sekolah') ?></p>
-                </td>
-            </tr>
-        </table>
-    </header>
+    <!-- KOP SURAT UNIVERSAL RESMI -->
+    <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
     <footer>
-        Dokumen ini digenerate melalui SIMAKS - Sistem Informasi Manajemen Akademik Sekolah
+        Dokumen ini dicetak melalui SIMAKS - Sistem Informasi Manajemen Akademik Sekolah
     </footer>
 
     <main>
@@ -188,10 +175,13 @@
             <tr>
                 <td>
                     <div class="signature-box">
-                        Mengetahui,<br>
+                        <?= htmlspecialchars($profil['kota'] ?? $kop['kota'] ?? $sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                         Kepala Sekolah
                         <div class="signature-placeholder"></div>
-                        <div class="nama-kepsek">( ....................................... )</div> 
+                        <div class="nama-kepsek"><b><u><?= htmlspecialchars($kop['nama_kepala_sekolah'] ?? $kop['nama_kepsek'] ?? '.......................................') ?></u></b></div>
+                        <?php if (!empty($kop['nip_kepala_sekolah'])): ?>
+                            <div style="font-size: 8.5pt;">NIP. <?= htmlspecialchars($kop['nip_kepala_sekolah']) ?></div>
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
