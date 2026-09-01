@@ -87,7 +87,12 @@ try {
             
             // Insert in chunks of 500
             $chunk = [];
+            $columnNames = null;
             while ($row = $dataStmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($columnNames === null) {
+                    $columnNames = array_map(function($col) { return "`{$col}`"; }, array_keys($row));
+                }
+
                 $escapedValues = array_map(function($val) use ($pdo) {
                     if ($val === null) return 'NULL';
                     return $pdo->quote($val);
@@ -96,15 +101,13 @@ try {
                 $chunk[] = "(" . implode(", ", $escapedValues) . ")";
 
                 if (count($chunk) >= 500) {
-                    $cols = array_map(function($col) { return "`{$col}`"; }, array_keys($row));
-                    fwrite($handle, "INSERT INTO `{$table}` (" . implode(", ", $cols) . ") VALUES\n" . implode(",\n", $chunk) . ";\n");
+                    fwrite($handle, "INSERT INTO `{$table}` (" . implode(", ", $columnNames) . ") VALUES\n" . implode(",\n", $chunk) . ";\n");
                     $chunk = [];
                 }
             }
 
-            if (!empty($chunk)) {
-                $cols = array_map(function($col) { return "`{$col}`"; }, array_keys($row));
-                fwrite($handle, "INSERT INTO `{$table}` (" . implode(", ", $cols) . ") VALUES\n" . implode(",\n", $chunk) . ";\n");
+            if (!empty($chunk) && $columnNames !== null) {
+                fwrite($handle, "INSERT INTO `{$table}` (" . implode(", ", $columnNames) . ") VALUES\n" . implode(",\n", $chunk) . ";\n");
             }
         }
     }
