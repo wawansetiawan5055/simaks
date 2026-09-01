@@ -55,7 +55,7 @@ function laporan_export_pdf_render($data, $filename)
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'landscape');
     $dompdf->render();
-    $dompdf->stream($filename . '.pdf');
+    $dompdf->stream($filename . '.pdf', ["Attachment" => false]);
     exit;
 }
 

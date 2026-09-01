@@ -1,8 +1,7 @@
 <?php
-// app/views/laporan_siswa.php - Laporan Data Siswa with Dual-Tab Inline Paper Studio
+// app/views/laporan_siswa.php - Laporan Data Siswa with Embedded In-Body Native PDF Viewer
 include __DIR__ . '/partials/header.php'; 
 
-$id_ta_tampil = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
 $nama_ta = $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'Tahun Ajaran Aktif';
 $selected_kelas_name = 'Semua Kelas';
 if (!empty($_GET['kelas'])) {
@@ -17,10 +16,10 @@ if (!empty($_GET['kelas'])) {
 $query_params = $_GET;
 unset($query_params['mod'], $query_params['act']);
 $new_query_string = http_build_query($query_params);
+$pdf_url = BASE_URL . 'laporan/siswa_export_pdf?' . $new_query_string;
 ?>
 
 <style>
-/* --- MODERN TAB & DOCUMENT STUDIO STYLING --- */
 .nav-pills-custom .nav-link {
     font-weight: 600;
     font-size: 0.95rem;
@@ -47,126 +46,23 @@ $new_query_string = http_build_query($query_params);
     box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
 }
 
-/* Paper Sheet Studio */
-.simaks-paper-studio-container {
+.pdf-inbody-card {
+    border-radius: 14px;
+    overflow: hidden;
+    height: 820px;
     background-color: #525659;
-    border-radius: 12px;
-    padding: 30px 20px;
-    margin-top: 10px;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 1px solid #cbd5e1;
 }
-
-.simaks-paper-sheet {
-    background: #ffffff;
+.pdf-inbody-frame {
     width: 100%;
-    max-width: 860px;
-    min-height: 1100px;
-    padding: 35px 45px;
-    margin: 0 auto;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-    border-radius: 2px;
-    box-sizing: border-box;
-    font-family: 'Times New Roman', Times, serif;
-    color: #000000;
-}
-
-.simaks-doc-title {
-    text-align: center;
-    font-size: 13pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin: 15px 0 5px 0;
-    line-height: 1.3;
-}
-.simaks-doc-subtitle {
-    text-align: center;
-    font-size: 10pt;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #1e293b;
-}
-
-.simaks-doc-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 25px;
-    font-size: 9.5pt;
-}
-.simaks-doc-table th, 
-.simaks-doc-table td {
-    border: 1px solid #000000;
-    padding: 5px 8px;
-    vertical-align: middle;
-}
-.simaks-doc-table th {
-    background-color: #f1f5f9;
-    font-weight: bold;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 9pt;
-}
-
-.simaks-doc-signature {
-    width: 100%;
-    margin-top: 30px;
+    height: 100%;
     border: none;
-    font-size: 10pt;
-    page-break-inside: avoid;
-}
-.simaks-doc-signature td {
-    border: none;
-    padding: 0;
-    vertical-align: top;
-    text-align: center;
-}
-
-/* @media print (PRINT ENGINE) */
-@media print {
-    body, html {
-        background: #fff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    .main-header, .main-sidebar, .content-header, .nav-pills-custom, .filter-box-card, .btn-studio-toolbar, .main-footer, .no-print {
-        display: none !important;
-    }
-    .content-wrapper, .content, .container-fluid {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #fff !important;
-        border: none !important;
-    }
-    .tab-content > .tab-pane {
-        display: block !important;
-        opacity: 1 !important;
-    }
-    #tab-tabel {
-        display: none !important;
-    }
-    #tab-preview {
-        display: block !important;
-    }
-    .simaks-paper-studio-container {
-        background: transparent !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        min-height: auto !important;
-    }
-    .simaks-paper-sheet {
-        max-width: 100% !important;
-        width: 100% !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+    display: block;
 }
 </style>
 
-<div class="content-header pt-3 mb-2 no-print">
+<div class="content-header pt-3 mb-2">
   <div class="container-fluid">
     <div class="row align-items-center">
       <div class="col-sm-6 col-12 d-flex align-items-center">
@@ -177,7 +73,7 @@ $new_query_string = http_build_query($query_params);
           <h4 class="m-0 font-weight-bold text-dark" style="font-family: 'Poppins', sans-serif;">
             Laporan Data Peserta Didik
           </h4>
-          <p class="text-muted small m-0">Rekapitulasi data siswa aktif per kelas &amp; cetak lembar dokumen resmi</p>
+          <p class="text-muted small m-0">Rekapitulasi data siswa aktif per kelas &amp; pratinjau lembar cetak resmi</p>
         </div>
       </div>
       <div class="col-sm-6 col-12 text-sm-right mt-2 mt-sm-0">
@@ -194,7 +90,7 @@ $new_query_string = http_build_query($query_params);
   <div class="container-fluid">
     
     <!-- DUAL TAB NAVIGATION SWITCHER -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap no-print">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
       <ul class="nav nav-pills nav-pills-custom" id="laporanTab" role="tablist">
         <li class="nav-item">
           <a class="nav-link active" id="tab-tabel-link" data-toggle="pill" href="#tab-tabel" role="tab" aria-controls="tab-tabel" aria-selected="true">
@@ -203,7 +99,7 @@ $new_query_string = http_build_query($query_params);
         </li>
         <li class="nav-item">
           <a class="nav-link" id="tab-preview-link" data-toggle="pill" href="#tab-preview" role="tab" aria-controls="tab-preview" aria-selected="false">
-            <i class="fas fa-file-invoice"></i> 2. Lembar Dokumen Cetak (A4 Live)
+            <i class="fas fa-file-pdf"></i> 2. Pratinjau Dokumen Cetak (PDF Live)
           </a>
         </li>
       </ul>
@@ -222,7 +118,7 @@ $new_query_string = http_build_query($query_params);
       <!-- ============================================================= -->
       <div class="tab-pane fade show active" id="tab-tabel" role="tabpanel" aria-labelledby="tab-tabel-link">
         
-        <div class="card shadow-sm border-0 filter-box-card mb-3 no-print">
+        <div class="card shadow-sm border-0 mb-3">
           <div class="card-body p-3">
             <form method="get" class="m-0">
               <input type="hidden" name="mod" value="laporan">
@@ -248,12 +144,12 @@ $new_query_string = http_build_query($query_params);
                     <a href="<?= BASE_URL ?>laporan/siswa_export_excel?<?= $new_query_string ?>" class="btn btn-success font-weight-bold px-3">
                       <i class="fas fa-file-excel mr-1"></i> Export Excel
                     </a>
-                    <a href="<?= BASE_URL ?>laporan/siswa_export_pdf?<?= $new_query_string ?>" class="btn btn-danger font-weight-bold px-3" target="_blank">
-                      <i class="fas fa-file-pdf mr-1"></i> Download PDF
-                    </a>
                     <button type="button" onclick="$('#tab-preview-link').tab('show')" class="btn btn-primary font-weight-bold px-3">
-                      <i class="fas fa-eye mr-1"></i> Buka Lembar Cetak
+                      <i class="fas fa-print mr-1"></i> Pratinjau Lembar Cetak
                     </button>
+                    <a href="<?= $pdf_url ?>" class="btn btn-danger font-weight-bold px-3" target="_blank">
+                      <i class="fas fa-external-link-alt mr-1"></i> Buka Full PDF
+                    </a>
                   </div>
                 </div>
               </div>
@@ -264,9 +160,9 @@ $new_query_string = http_build_query($query_params);
         <div class="card shadow-sm border-0">
           <div class="card-header bg-white border-bottom-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
             <h3 class="card-title font-weight-bold text-dark">
-              <i class="fas fa-list text-primary mr-1"></i> Daftar Data Siswa
+              <i class="fas fa-list text-primary mr-1"></i> Daftar Data Siswa (<?= htmlspecialchars($selected_kelas_name) ?>)
             </h3>
-            <span class="badge badge-primary px-2 py-1"><?= count($siswa_list) ?> Baris Data</span>
+            <span class="badge badge-primary px-2 py-1"><?= count($siswa_list) ?> Siswa</span>
           </div>
           <div class="card-body table-responsive p-0">
             <table class="table table-hover table-striped text-nowrap m-0">
@@ -320,112 +216,31 @@ $new_query_string = http_build_query($query_params);
       </div>
 
       <!-- ============================================================= -->
-      <!-- TAB 2: LEMBAR PRATINJAU DOKUMEN CETAK (IN-BODY A4 STUDIO) -->
+      <!-- TAB 2: PRATINJAU DOKUMEN CETAK (NATIVE IN-BODY PDF VIEWER) -->
       <!-- ============================================================= -->
       <div class="tab-pane fade" id="tab-preview" role="tabpanel" aria-labelledby="tab-preview-link">
         
-        <!-- Studio Action Toolbar -->
-        <div class="card shadow-sm border-0 mb-3 bg-white btn-studio-toolbar no-print">
+        <div class="card shadow-sm border-0 mb-3 bg-white">
           <div class="card-body p-3 d-flex justify-content-between align-items-center flex-wrap">
             <div>
               <button type="button" onclick="$('#tab-tabel-link').tab('show')" class="btn btn-outline-secondary font-weight-bold">
-                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Tabel
+                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Tabel Data
               </button>
             </div>
             <div class="btn-group shadow-sm mt-2 mt-md-0">
-              <button type="button" onclick="window.print()" class="btn btn-success btn-lg px-4 font-weight-bold">
-                <i class="fas fa-print mr-2"></i> Cetak Lembar Dokumen Sekarang
-              </button>
-              <a href="<?= BASE_URL ?>laporan/siswa_export_pdf?<?= $new_query_string ?>" class="btn btn-danger font-weight-bold px-3 d-flex align-items-center" target="_blank">
-                <i class="fas fa-file-pdf mr-1"></i> Download PDF
+              <a href="<?= $pdf_url ?>" class="btn btn-danger font-weight-bold px-3" target="_blank">
+                <i class="fas fa-external-link-alt mr-1"></i> Buka di Tab Penuh
               </a>
-              <a href="<?= BASE_URL ?>laporan/siswa_export_excel?<?= $new_query_string ?>" class="btn btn-success font-weight-bold px-3 d-flex align-items-center">
-                <i class="fas fa-file-excel mr-1"></i> Excel
+              <a href="<?= BASE_URL ?>laporan/siswa_export_excel?<?= $new_query_string ?>" class="btn btn-success font-weight-bold px-3">
+                <i class="fas fa-file-excel mr-1"></i> Download Excel
               </a>
             </div>
           </div>
         </div>
 
-        <!-- Paper Sheet Container inside Body -->
-        <div class="simaks-paper-studio-container">
-          <div class="simaks-paper-sheet">
-            
-            <!-- KOP SURAT TERPUSAT RESMI -->
-            <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
-
-            <!-- JUDUL & PERIODE DOKUMEN -->
-            <div class="simaks-doc-title">
-              LAPORAN DATA PESERTA DIDIK
-            </div>
-            <div class="simaks-doc-subtitle">
-              Tahun Ajaran <?= htmlspecialchars($nama_ta) ?> &bull; Filter: <?= htmlspecialchars($selected_kelas_name) ?>
-            </div>
-
-            <!-- TABEL DOKUMEN CETAK -->
-            <table class="simaks-doc-table">
-              <thead>
-                <tr>
-                  <th width="4%">No</th>
-                  <th>Nama Lengkap Peserta Didik</th>
-                  <th width="14%">NISN</th>
-                  <th width="14%">NIPD</th>
-                  <th width="6%">L/P</th>
-                  <th width="14%">Kelas</th>
-                  <th width="10%">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if (empty($siswa_list)): ?>
-                  <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; font-style: italic;">
-                      Tidak ada data peserta didik untuk ditampilkan.
-                    </td>
-                  </tr>
-                <?php else: ?>
-                  <?php $no = 1; foreach ($siswa_list as $s): ?>
-                    <tr>
-                      <td style="text-align: center; font-weight: bold;"><?= $no++ ?></td>
-                      <td style="font-weight: bold;"><?= htmlspecialchars($s['nama']) ?></td>
-                      <td style="text-align: center; font-family: monospace;"><?= htmlspecialchars($s['nisn'] ?: '-') ?></td>
-                      <td style="text-align: center; font-family: monospace;"><?= htmlspecialchars($s['nipd'] ?: '-') ?></td>
-                      <td style="text-align: center;"><?= htmlspecialchars($s['jk']) ?></td>
-                      <td style="text-align: center;">Kelas <?= htmlspecialchars($s['nama_kelas'] ?? '-') ?></td>
-                      <td style="text-align: center;"><?= htmlspecialchars($s['status_aktif']) ?></td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </tbody>
-            </table>
-
-            <!-- TANDA TANGAN RESMI -->
-            <?php 
-              $profil_sekolah_ttd = ProfilSekolahModel::getProfil($pdo);
-              $nama_kepsek = $profil_sekolah_ttd['nama_kepala_sekolah'] ?? $profil_sekolah_ttd['kepala_sekolah'] ?? 'Dadun Abdul Manaf, S.E., M.Pd.';
-              $nip_kepsek  = $profil_sekolah_ttd['nip_kepala_sekolah'] ?? '';
-              $kota_sekolah = $profil_sekolah_ttd['kota'] ?? 'Sukabumi';
-            ?>
-            <table class="simaks-doc-signature">
-              <tr>
-                <td width="50%">
-                  Mengetahui,<br>
-                  Kepala Sekolah
-                  <br><br><br><br>
-                  <strong><u><?= htmlspecialchars($nama_kepsek) ?></u></strong>
-                  <?php if (!empty($nip_kepsek)): ?>
-                    <br>NIP. <?= htmlspecialchars($nip_kepsek) ?>
-                  <?php endif; ?>
-                </td>
-                <td width="50%">
-                  <?= htmlspecialchars($kota_sekolah) ?>, <?= tgl_indo() ?><br>
-                  Petugas / Pengelola Data
-                  <br><br><br><br>
-                  <strong><u><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Administrator') ?></u></strong><br>
-                  NIP. -
-                </td>
-              </tr>
-            </table>
-
-          </div>
+        <!-- Embedded Native PDF Stream Card -->
+        <div class="card shadow-sm border-0 pdf-inbody-card mb-4">
+          <iframe id="pdfPreviewFrame" src="<?= $pdf_url ?>" class="pdf-inbody-frame" title="Pratinjau Lembar Cetak PDF"></iframe>
         </div>
 
       </div>
