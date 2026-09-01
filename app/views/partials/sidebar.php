@@ -618,14 +618,14 @@ if (!function_exists('is_menu_active_dynamic')) {
                             // 2. Tipe TREEVIEW (Menu dengan Submenu)
                             if ($has_sub) {
                                 echo '<li class="nav-item has-treeview ' . $menuOpenClass . '">';
-                                echo '  <a href="#" data-lte-toggle="treeview" data-accordion="false" class="nav-link ' . $activeClass . '">';
+                                echo '  <a href="javascript:void(0);" class="nav-link ' . $activeClass . '">';
                                 echo '    <i class="nav-icon ' . htmlspecialchars($item['icon']) . '"></i>';
                                 echo '    <p>';
                                 echo htmlspecialchars($item['nama_menu']);
                                 echo '      <i class="right fas fa-angle-left"></i>';
                                 echo '    </p>';
                                 echo '  </a>';
-                                echo '  <ul class="nav nav-treeview" ' . ($isOpen ? 'style="display: block;"' : '') . '>';
+                                echo '  <ul class="nav nav-treeview" ' . ($isOpen ? 'style="display: block;"' : 'style="display: none;"') . '>';
                                 // Panggil diri sendiri untuk render anak (Submenu)
                                 renderSidebarRecursive($item['children'], $current_mod, $current_act);
                                 echo '  </ul>';
@@ -679,3 +679,35 @@ if (!function_exists('is_menu_active_dynamic')) {
         </nav>
     </div>
 </aside>
+
+<script>
+// [PERBAIKAN] Handler Toggle Treeview Sidebar Responsif & Fleksibel
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof jQuery !== 'undefined') {
+        $(document).off('click.simaksTreeview', '.main-sidebar .has-treeview > .nav-link');
+        $(document).on('click.simaksTreeview', '.main-sidebar .has-treeview > .nav-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $link = $(this);
+            var $parent = $link.closest('.has-treeview');
+            var $treeview = $parent.children('.nav-treeview');
+
+            if ($parent.hasClass('menu-open') || $treeview.is(':visible')) {
+                // Tutup / Collapse Treeview
+                $treeview.stop(true, true).slideUp(200, function () {
+                    $parent.removeClass('menu-open menu-is-opening');
+                    $treeview.css('display', 'none');
+                });
+            } else {
+                // Buka / Expand Treeview
+                $parent.addClass('menu-is-opening');
+                $treeview.stop(true, true).slideDown(200, function () {
+                    $parent.addClass('menu-open').removeClass('menu-is-opening');
+                    $treeview.css('display', 'block');
+                });
+            }
+        });
+    }
+});
+</script>
