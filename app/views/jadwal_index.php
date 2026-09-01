@@ -1,6 +1,6 @@
 <?php include __DIR__.'/partials/header.php'; ?>
 
-<style>
+<<style>
   /* JADWAL PELAJARAN MODERN UI & MOBILE RESPONSIVE */
   .jadwal-header-icon {
     width: 44px;
@@ -35,39 +35,42 @@
     box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
   }
 
-  /* MOBILE DAY SWITCHER */
-  .mobile-day-tabs-wrapper {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 6px 8px;
-    border: 1px solid #e2e8f0;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  }
-  .mobile-day-tabs-wrapper::-webkit-scrollbar {
-    display: none;
-  }
-  .mobile-day-pills {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    margin: 0;
-    min-width: max-content;
-  }
-  .mobile-day-pill {
-    font-size: 0.74rem !important;
-    font-weight: 700 !important;
-    padding: 0.35rem 0.75rem !important;
+  /* DAY FILTER BUTTONS IN CARD FILTER */
+  .day-filter-btn {
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    padding: 0.35rem 0.85rem !important;
     border-radius: 8px !important;
-    white-space: nowrap !important;
     transition: all 0.2s ease !important;
-    color: #64748b;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
   }
-  .mobile-day-pill.active {
-    background-color: #0284c7 !important;
+  .day-filter-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+  .day-filter-btn.active {
+    background: #0284c7 !important;
     color: #ffffff !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.3) !important;
+  }
+
+  /* DAY CARDS STYLING */
+  .card-jadwal-hari {
+    border-radius: 14px !important;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+  }
+  .card-jadwal-hari:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+  }
+
+  .slot-kbm-row:hover {
+    background-color: rgba(2, 132, 199, 0.04) !important;
   }
 
   /* RESPONSIVE MOBILE VIEW (MAX-WIDTH 768px) */
@@ -82,7 +85,6 @@
     .content-header h4 {
       font-size: 0.95rem !important;
     }
-    /* 3 Program Buttons: 3-column equal grid di HP */
     .custom-pills {
       display: grid !important;
       grid-template-columns: 1fr 1fr 1fr !important;
@@ -99,8 +101,9 @@
       justify-content: center !important;
       gap: 4px !important;
     }
-    .card-header h6 {
-      font-size: 0.80rem !important;
+    .day-filter-btn {
+      font-size: 0.70rem !important;
+      padding: 0.30rem 0.55rem !important;
     }
     .table thead th {
       font-size: 0.68rem !important;
@@ -163,17 +166,17 @@
         </ul>
     </div>
 
-    <!-- FILTER PER KELAS / PER GURU MAPEL (Opsi Keseluruhan Dihapus) -->
+    <!-- FILTER PER KELAS / PER GURU + TOMBOL FILTER PER 2 HARI -->
     <div class="col-md-12 mb-3">
-        <div class="card shadow-sm border-0" style="border-radius: 12px; background: #ffffff;">
-            <div class="card-body py-2 px-3">
-                <form id="formJadwalFilter" method="GET" class="row align-items-center" style="gap: 6px 0;">
+        <div class="card shadow-sm border-0" style="border-radius: 14px; background: #ffffff;">
+            <div class="card-body py-2.5 px-3">
+                <form id="formJadwalFilter" method="GET" class="row align-items-center mb-2" style="gap: 6px 0;">
                     <input type="hidden" name="mod" value="jadwal">
                     <input type="hidden" name="program" id="input_program" value="<?= htmlspecialchars($program) ?>">
                     
                     <div class="col-md-auto col-12 d-flex align-items-center mb-1 mb-md-0">
                         <span class="badge badge-primary mr-2 px-2 py-1"><i class="fas fa-filter"></i></span>
-                        <span class="font-weight-bold text-dark" style="font-size: 0.80rem;">FILTER:</span>
+                        <span class="font-weight-bold text-dark" style="font-size: 0.82rem;">FILTER:</span>
                     </div>
                     <div class="col-md-3 col-6">
                         <select name="view" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
@@ -184,7 +187,6 @@
                     <?php if ($view_type == 'guru'): ?>
                         <div class="col-md-4 col-6">
                             <select name="id_guru" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
-                                <option value="">-- Pilih Guru --</option>
                                 <?php foreach ($guru_list as $g): ?>
                                     <option value="<?= $g['id_guru'] ?>" <?= ($id_guru_filter == $g['id_guru']) ? 'selected' : ''; ?>>
                                         <?= htmlspecialchars($g['nama_guru']) ?>
@@ -195,7 +197,6 @@
                     <?php else: ?>
                         <div class="col-md-4 col-6">
                             <select name="id_kelas" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
-                                <option value="">-- Pilih Kelas --</option>
                                 <?php foreach ($filtered_kelas_list as $k): ?>
                                     <?php $jk_suffix = ($k['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : (($k['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : ''); ?>
                                     <option value="<?= $k['id_kelas'] ?>" <?= ($id_kelas_filter == $k['id_kelas']) ? 'selected' : ''; ?>>
@@ -206,175 +207,202 @@
                         </div>
                     <?php endif; ?>
                 </form>
+
+                <!-- TOMBOL FILTER HARI (PER 2 HARI: SENIN-SELASA, RABU-KAMIS, JUMAT-SABTU, MINGGU, SEMUA HARI) -->
+                <div class="d-flex align-items-center flex-wrap pt-2 border-top" style="gap: 6px;">
+                    <span class="font-weight-bold text-muted mr-1 small"><i class="fas fa-calendar-day mr-1"></i>Pilih Hari:</span>
+                    <button type="button" class="btn btn-sm day-filter-btn active" data-target-days="all" onclick="filterJadwalHari('all', this)">
+                        Semua Hari
+                    </button>
+                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Senin,Selasa" onclick="filterJadwalHari(['Senin', 'Selasa'], this)">
+                        Senin - Selasa
+                    </button>
+                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Rabu,Kamis" onclick="filterJadwalHari(['Rabu', 'Kamis'], this)">
+                        Rabu - Kamis
+                    </button>
+                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Jumat,Sabtu" onclick="filterJadwalHari(['Jumat', 'Sabtu'], this)">
+                        Jumat - Sabtu
+                    </button>
+                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Minggu" onclick="filterJadwalHari(['Minggu'], this)">
+                        Minggu
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- MOBILE DAY SWITCHER TABS (Tampil di Layar HP) -->
-    <div class="col-12 d-block d-lg-none mb-3">
-        <div class="mobile-day-tabs-wrapper">
-            <ul class="nav nav-pills mobile-day-pills">
-                <li class="nav-item"><a class="nav-link mobile-day-pill active text-white" href="javascript:void(0)" onclick="switchMobileDay('all', this)">Semua Hari</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Senin', this)">Senin</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Selasa', this)">Selasa</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Rabu', this)">Rabu</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Kamis', this)">Kamis</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Jumat', this)">Jumat</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Sabtu', this)">Sabtu</a></li>
-                <li class="nav-item"><a class="nav-link mobile-day-pill bg-light text-muted" href="javascript:void(0)" onclick="switchMobileDay('Minggu', this)">Minggu</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- TABEL JADWAL SPLIT (SENIN S.D. MINGGU DENGAN HARI DIMERGER) -->
+    <!-- TABEL JADWAL: 1 HARI = 1 CARD TABEL (2 KOLOM DESKTOP GRID) -->
     <?php 
-    $day_palette = [
-        'Senin'  => ['accent' => '#0284c7', 'bg' => '#f0f9ff'],
-        'Selasa' => ['accent' => '#059669', 'bg' => '#f0fdf4'],
-        'Rabu'   => ['accent' => '#d97706', 'bg' => '#fffbeb'],
-        'Kamis'  => ['accent' => '#7c3aed', 'bg' => '#f5f3ff'],
-        'Jumat'  => ['accent' => '#e11d48', 'bg' => '#fff1f2'],
-        'Sabtu'  => ['accent' => '#0891b2', 'bg' => '#ecfeff'],
-        'Minggu' => ['accent' => '#ea580c', 'bg' => '#fff7ed'],
+    $day_colors = [
+        'Senin'  => ['color' => '#0284c7', 'bg_header' => '#f0f9ff', 'icon' => 'fas fa-book-reader'],
+        'Selasa' => ['color' => '#059669', 'bg_header' => '#f0fdf4', 'icon' => 'fas fa-pen-nib'],
+        'Rabu'   => ['color' => '#d97706', 'bg_header' => '#fffbeb', 'icon' => 'fas fa-calculator'],
+        'Kamis'  => ['color' => '#7c3aed', 'bg_header' => '#f5f3ff', 'icon' => 'fas fa-flask'],
+        'Jumat'  => ['color' => '#e11d48', 'bg_header' => '#fff1f2', 'icon' => 'fas fa-praying-hands'],
+        'Sabtu'  => ['color' => '#0891b2', 'bg_header' => '#ecfeff', 'icon' => 'fas fa-laptop-code'],
+        'Minggu' => ['color' => '#ea580c', 'bg_header' => '#fff7ed', 'icon' => 'fas fa-sun'],
     ];
 
-    $groups = [
-        0 => ['Senin', 'Selasa', 'Rabu'],
-        1 => ['Kamis', 'Jumat', 'Sabtu', 'Minggu']
-    ];
-
-    $group_border_colors = [0 => '#0284c7', 1 => '#10b981']; 
+    $all_days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
     ?>
+
     <div class="col-md-12">
-        <div class="row">
-            <?php foreach($groups as $idx => $days): 
-                $accent_card = $group_border_colors[$idx];
+        <div class="row" id="jadwalCardsContainer">
+            <?php foreach ($all_days as $hari_ini): 
+                $theme = $day_colors[$hari_ini] ?? ['color' => '#0284c7', 'bg_header' => '#f8fafc', 'icon' => 'fas fa-calendar'];
+                $day_rows = $result[$hari_ini] ?? [];
+                $total_slots = count($day_rows);
+                $total_jp = 0;
+                foreach ($day_rows as $r) {
+                    if ($r['jenis_jam_pelajaran'] == 'KBM' || $r['jenis_master_kegiatan'] == 'KBM') {
+                        $total_jp += ($r['jp_count'] ?? 1);
+                    }
+                }
             ?>
-            <div class="col-lg-6 mb-4 jadwal-card-group" data-group="<?= $idx ?>">
-                <div class="card shadow-sm border-0 h-100" style="border-radius: 15px; overflow: hidden; border-top: 4px solid <?= $accent_card ?> !important;">
-                    <div class="card-header py-2.5 px-3" style="background: #ffffff; border-bottom: 1px solid rgba(0,0,0,0.05);">
+            <div class="col-lg-6 mb-4 card-day-wrapper" data-hari="<?= $hari_ini ?>">
+                <div class="card card-jadwal-hari border-0 h-100" style="border-top: 4px solid <?= $theme['color'] ?> !important;">
+                    <!-- CARD HEADER PER HARI -->
+                    <div class="card-header py-2.5 px-3" style="background-color: <?= $theme['bg_header'] ?>; border-bottom: 1px solid rgba(0,0,0,0.06);">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="font-weight-bold mb-0" style="color: <?= $accent_card ?>; letter-spacing: 0.5px; text-transform: uppercase;">
-                                <i class="fas fa-calendar-week mr-1.5"></i> 
-                                <?php 
-                                if($view_type == 'guru' && $id_guru_filter) {
-                                    $find = array_filter($guru_list, function($x) use($id_guru_filter) { return $x['id_guru'] == $id_guru_filter; });
-                                    $label = !empty($find) ? reset($find) : null;
-                                    echo $label ? 'GURU: ' . htmlspecialchars($label['nama_guru']) : 'JADWAL GURU';
-                                } elseif($view_type == 'kelas' && $id_kelas_filter) {
-                                    $find = array_filter($kelas_list, function($x) use($id_kelas_filter) { return $x['id_kelas'] == $id_kelas_filter; });
-                                    $label = !empty($find) ? reset($find) : null;
-                                    $jk_suffix = $label && ($label['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : ($label && ($label['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : '');
-                                    echo $label ? 'KELAS: ' . htmlspecialchars($label['nama_kelas']) . $jk_suffix : 'JADWAL KELAS';
-                                } else {
-                                    echo 'HARI ' . strtoupper(implode(' • ', $days));
-                                }
+                            <div class="d-flex align-items-center">
+                                <span class="badge mr-2 px-2.5 py-1 text-white font-weight-bold" style="background-color: <?= $theme['color'] ?>; font-size: 0.78rem; border-radius: 6px; letter-spacing: 0.5px;">
+                                    <i class="<?= $theme['icon'] ?> mr-1"></i> <?= strtoupper($hari_ini) ?>
+                                </span>
+                                <?php if ($view_type === 'kelas' && $id_kelas_filter): 
+                                    $find_k = array_filter($kelas_list, function($x) use($id_kelas_filter) { return $x['id_kelas'] == $id_kelas_filter; });
+                                    $cur_k = !empty($find_k) ? reset($find_k) : null;
                                 ?>
-                            </h6>
-                            <span class="badge badge-pill badge-light border" style="font-size: 0.68rem; color: #64748b;"><?= count($days) ?> HARI</span>
+                                    <span class="font-weight-bold text-dark small">
+                                        Kelas <?= htmlspecialchars($cur_k['nama_kelas'] ?? '') ?>
+                                    </span>
+                                <?php elseif ($view_type === 'guru' && $id_guru_filter): 
+                                    $find_g = array_filter($guru_list, function($x) use($id_guru_filter) { return $x['id_guru'] == $id_guru_filter; });
+                                    $cur_g = !empty($find_g) ? reset($find_g) : null;
+                                ?>
+                                    <span class="font-weight-bold text-dark small">
+                                        <?= htmlspecialchars($cur_g['nama_guru'] ?? '') ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <div>
+                                <?php if ($total_jp > 0): ?>
+                                    <span class="badge badge-pill badge-light border font-weight-bold" style="font-size: 0.70rem; color: <?= $theme['color'] ?>;">
+                                        <?= $total_jp ?> JP
+                                    </span>
+                                <?php endif; ?>
+                                <span class="badge badge-pill badge-light border text-muted" style="font-size: 0.68rem;">
+                                    <?= $total_slots ?> Sesi
+                                </span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- CARD BODY TABLE PER HARI -->
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" style="border-collapse: collapse;">
                                 <thead class="bg-light">
-                                    <tr class="text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                                        <th class="text-center align-middle py-2 border-top-0" style="width: 65px;">HARI</th>
-                                        <th class="text-center align-middle border-top-0" style="width: 105px;">WAKTU</th>
-                                        <th class="text-center align-middle border-top-0" style="width: 75px;">KELAS</th>
-                                        <th class="text-left pl-3 align-middle border-top-0">MAPEL / GURU</th>
-                                        <?php if(has_role(['Admin', 'TU', 'Kurikulum'])): ?>
-                                            <th class="text-center align-middle border-top-0" style="width: 38px;"><i class="fas fa-cog"></i></th>
+                                    <tr class="text-muted" style="font-size: 0.70rem; letter-spacing: 0.5px;">
+                                        <th class="text-center align-middle py-2 border-top-0" style="width: 120px;">WAKTU</th>
+                                        <th class="text-left pl-3 align-middle border-top-0">
+                                            <?= ($view_type === 'guru') ? 'MAPEL & KELAS' : 'MAPEL / GURU PENGAMPU' ?>
+                                        </th>
+                                        <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
+                                            <th class="text-center align-middle border-top-0" style="width: 40px;"><i class="fas fa-cog text-muted"></i></th>
                                         <?php endif; ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php 
-                                    $has_data = false;
-                                    foreach($days as $hari_ini): 
-                                        $style = $day_palette[$hari_ini] ?? ['accent' => '#64748b', 'bg' => '#f8fafc'];
-                                        if (isset($result[$hari_ini]) && !empty($result[$hari_ini])): 
-                                            $has_data = true;
-                                            $day_rows = $result[$hari_ini];
-                                            $total_slots_in_day = count($day_rows);
-                                            foreach($day_rows as $index => $row): 
-                                                $jk_row = $row['jenis_kelas'] ?? 'reguler';
-                                                $mode_row = $row['mode_kbm'] ?? 'offline';
-                                                $display_name = $row['nama_mapel'] ?: ($row['nama_kegiatan_custom'] ?: ($row['nama_kegiatan'] ?? null));
-                                                $is_orphan = empty($display_name) && !empty($row['id_jadwal_mengajar']);
-                                            ?>
-                                            <tr class="jadwal-slot-row" data-hari="<?= $hari_ini ?>" data-jenis="<?= $jk_row ?>" data-mode="<?= $mode_row ?>" style="background-color: <?= $style['bg'] ?>;">
-                                                <!-- KOLOM 1: HARI (DIMERGER VERTICAL / ROWSPAN) -->
-                                                <?php if ($index === 0): ?>
-                                                <td rowspan="<?= $total_slots_in_day ?>" class="align-middle text-center p-1 font-weight-bold border-right jadwal-day-cell" style="background-color: <?= $style['bg'] ?>; border-right: 2px solid <?= $style['accent'] ?> !important; width: 65px;">
-                                                    <span class="badge px-1.5 py-1 font-weight-bold" style="font-size: 0.68rem; color: #fff; background-color: <?= $style['accent'] ?>; border-radius: 6px; letter-spacing: 0.5px;">
-                                                        <?= strtoupper($hari_ini) ?>
-                                                    </span>
-                                                </td>
-                                                <?php endif; ?>
-                                                
-                                                <!-- KOLOM 2: WAKTU -->
-                                                <td class="align-middle text-center p-1.5" style="font-size: 0.74rem; white-space: nowrap; color: #475569; background: #fafafa; border-right: 1px dashed #f1f5f9; width: 105px;">
-                                                    <span class="font-weight-bold text-dark"><?= substr($row['jam_mulai'],0,5) ?></span>
-                                                    <span class="small text-muted mx-0.5">-</span>
-                                                    <span class="font-weight-bold text-muted"><?= substr($row['jam_selesai'],0,5) ?></span>
-                                                    <?php if (($row['jp_count'] ?? 1) > 1): ?>
-                                                        <div><span class="badge badge-light border text-primary font-weight-bold" style="font-size: 0.62rem;"><?= $row['jp_count'] ?> JP</span></div>
+                                    <?php if (!empty($day_rows)): ?>
+                                        <?php foreach ($day_rows as $row): 
+                                            $is_kbm = ($row['jenis_jam_pelajaran'] == 'KBM' || $row['jenis_master_kegiatan'] == 'KBM');
+                                            $jk_row = $row['jenis_kelas'] ?? 'reguler';
+                                            $mode_row = $row['mode_kbm'] ?? 'offline';
+                                            $display_name = $row['nama_mapel'] ?: ($row['nama_kegiatan_custom'] ?: ($row['nama_kegiatan'] ?? null));
+                                            $is_orphan = empty($display_name) && !empty($row['id_jadwal_mengajar']);
+                                        ?>
+                                        <tr class="slot-kbm-row <?= $is_kbm ? '' : 'bg-light' ?>">
+                                            <!-- KOLOM 1: WAKTU -->
+                                            <td class="align-middle text-center p-2" style="font-size: 0.75rem; white-space: nowrap; color: #475569; border-right: 1px dashed #e2e8f0; width: 120px;">
+                                                <div class="font-weight-bold text-dark" style="font-size: 0.78rem;">
+                                                    <?= substr($row['jam_mulai'], 0, 5) ?> - <?= substr($row['jam_selesai'], 0, 5) ?>
+                                                </div>
+                                                <div class="mt-0.5">
+                                                    <?php if (($row['jp_count'] ?? 1) > 1 && $is_kbm): ?>
+                                                        <span class="badge badge-light border text-primary font-weight-bold px-1.5" style="font-size: 0.62rem;">
+                                                            <?= $row['jp_count'] ?> JP
+                                                        </span>
                                                     <?php endif; ?>
                                                     <?php if ($mode_row === 'online'): ?>
-                                                        <div><span class="badge badge-info px-1 py-0.5 rounded-pill font-weight-bold" style="font-size: 0.58rem;">🌐 ONLINE</span></div>
+                                                        <span class="badge badge-info px-1.5 py-0.5 rounded-pill font-weight-bold" style="font-size: 0.58rem;">
+                                                            🌐 ONLINE
+                                                        </span>
                                                     <?php endif; ?>
-                                                </td>
-                                                
-                                                <!-- KOLOM 3: KELAS -->
-                                                <td class="align-middle text-center small font-weight-bold" style="color: #334155; width: 85px;">
-                                                    <?= htmlspecialchars($row['nama_kelas'] ?? '-') ?>
-                                                    <?php if ($jk_row === 'pjj'): ?>
-                                                        <span class="badge badge-success d-block mt-0.5" style="font-size: 0.58rem;">(TERBUKA)</span>
-                                                    <?php elseif ($jk_row === 'menginduk'): ?>
-                                                        <span class="badge badge-warning text-dark d-block mt-0.5" style="font-size: 0.58rem;">(MENGINDUK)</span>
-                                                    <?php endif; ?>
-                                                </td>
+                                                </div>
+                                            </td>
 
-                                                <!-- KOLOM 4: MAPEL / GURU -->
-                                                <td class="align-middle pl-3 py-2">
-                                                    <?php if ($is_orphan): ?>
-                                                        <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
-                                                            <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
-                                                        </div>
-                                                        <div class="text-muted" style="font-size: 0.70rem;">Hapus slot ini dan tambahkan mapel baru</div>
-                                                    <?php else: ?>
-                                                        <div class="text-dark font-weight-bold mb-0" style="font-size: 0.84rem; line-height: 1.25;">
+                                            <!-- KOLOM 2: MAPEL / GURU / BADGE KELAS -->
+                                            <td class="align-middle pl-3 py-2">
+                                                <?php if ($is_orphan): ?>
+                                                    <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
+                                                        <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
+                                                    </div>
+                                                    <div class="text-muted" style="font-size: 0.70rem;">Hapus slot ini dan tambahkan mapel baru</div>
+                                                <?php else: ?>
+                                                    <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                                        <span class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
                                                             <?= htmlspecialchars($display_name ?? '-') ?>
-                                                        </div>
-                                                        <?php if (!empty($row['nama_guru'])): ?>
-                                                            <div class="text-muted" style="font-size: 0.74rem; margin-top: 1px;">
-                                                                <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-50"></i><?= htmlspecialchars($row['nama_guru']) ?>
-                                                            </div>
+                                                        </span>
+                                                        
+                                                        <?php if ($view_type === 'guru' && !empty($row['nama_kelas'])): ?>
+                                                            <!-- BADGE KELAS UNTUK VIEW PER GURU -->
+                                                            <span class="badge badge-primary px-2 py-0.5 font-weight-bold" style="font-size: 0.68rem; border-radius: 6px;">
+                                                                <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
+                                                            </span>
+                                                            <?php if ($jk_row === 'pjj'): ?>
+                                                                <span class="badge badge-success px-1.5 py-0.5" style="font-size: 0.60rem;">TERBUKA</span>
+                                                            <?php elseif ($jk_row === 'menginduk'): ?>
+                                                                <span class="badge badge-warning text-dark px-1.5 py-0.5" style="font-size: 0.60rem;">MENGINDUK</span>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
-                                                    <?php endif; ?>
-                                                </td>
+                                                    </div>
 
-                                                <!-- KOLOM 5: AKSI (HAPUS) -->
-                                                <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
-                                                <td class="text-center align-middle p-1" style="width: 38px;">
-                                                    <?php 
-                                                        $del_ids = !empty($row['ids_jadwal_mengajar']) ? implode(',', array_filter($row['ids_jadwal_mengajar'])) : ($row['id_jadwal_mengajar'] ?? '');
-                                                    ?>
-                                                    <?php if(!empty($del_ids)): ?>
-                                                        <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal"><i class="fas fa-times"></i></a>
+                                                    <?php if ($view_type === 'kelas' && !empty($row['nama_guru'])): ?>
+                                                        <!-- NAMA GURU UNTUK VIEW PER KELAS -->
+                                                        <div class="text-muted" style="font-size: 0.74rem; margin-top: 2px;">
+                                                            <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-50"></i><?= htmlspecialchars($row['nama_guru']) ?>
+                                                        </div>
+                                                    <?php elseif (!$is_kbm): ?>
+                                                        <!-- NON KBM (Tadarus, Upacara, Istirahat, Sholat) -->
+                                                        <div class="text-muted font-italic" style="font-size: 0.70rem; margin-top: 1px;">
+                                                            <i class="fas fa-info-circle mr-1 text-info"></i>Kegiatan Sekolah
+                                                        </div>
                                                     <?php endif; ?>
-                                                </td>
                                                 <?php endif; ?>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                    <?php if(!$has_data): ?>
-                                        <tr><td colspan="5" class="text-center font-italic text-muted py-5 small bg-light">
-                                            <i class="fas fa-calendar-times text-muted mb-2" style="font-size: 2rem; opacity: 0.4;"></i><br>
-                                            Tidak ada jadwal untuk <?= implode(', ', $days) ?>
-                                        </td></tr>
+                                            </td>
+
+                                            <!-- KOLOM 3: AKSI HAPUS -->
+                                            <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
+                                            <td class="text-center align-middle p-1" style="width: 40px;">
+                                                <?php 
+                                                    $del_ids = !empty($row['ids_jadwal_mengajar']) ? implode(',', array_filter($row['ids_jadwal_mengajar'])) : ($row['id_jadwal_mengajar'] ?? '');
+                                                ?>
+                                                <?php if (!empty($del_ids)): ?>
+                                                    <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </td>
+                                            <?php endif; ?>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="3" class="text-center font-italic text-muted py-4 small bg-light">
+                                                <i class="fas fa-calendar-minus text-muted mb-1 d-block" style="font-size: 1.5rem; opacity: 0.35;"></i>
+                                                Tidak ada jadwal kegiatan untuk hari <?= $hari_ini ?>
+                                            </td>
+                                        </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
@@ -493,25 +521,19 @@ function selectProgramTab(program) {
     document.getElementById('formJadwalFilter').submit();
 }
 
-function switchMobileDay(hari, el) {
-    $('.mobile-day-pill').removeClass('active text-white').addClass('bg-light text-muted');
-    $(el).addClass('active text-white').removeClass('bg-light text-muted');
+// FILTER TOMBOL HARI (SEMUA HARI / SENIN-SELASA / RABU-KAMIS / JUMAT-SABTU / MINGGU)
+function filterJadwalHari(days, el) {
+    $('.day-filter-btn').removeClass('active');
+    $(el).addClass('active');
 
-    if (hari === 'all') {
-        $('.jadwal-slot-row').show();
-        $('.jadwal-card-group').show();
+    if (days === 'all') {
+        $('.card-day-wrapper').fadeIn(150);
     } else {
-        $('.jadwal-slot-row').each(function() {
-            if ($(this).data('hari') === hari) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
-        });
-        $('.jadwal-card-group').each(function() {
-            var hasVisible = $(this).find('.jadwal-slot-row:visible').length > 0;
-            if (hasVisible) {
-                $(this).show();
+        var dayArr = Array.isArray(days) ? days : [days];
+        $('.card-day-wrapper').each(function() {
+            var cardDay = $(this).data('hari');
+            if (dayArr.includes(cardDay)) {
+                $(this).fadeIn(150);
             } else {
                 $(this).hide();
             }
