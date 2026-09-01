@@ -1,6 +1,8 @@
 <?php
 
 class RekapNilaiModel {
+    private static $defaultBobotConfig = null;
+
     public static function getKelasDiajar($pdo, $id_guru, $id_ta) {
         $sql = "SELECT DISTINCT k.id_kelas, k.nama_kelas, k.tingkat
                 FROM guru_mapel gm
@@ -28,12 +30,16 @@ class RekapNilaiModel {
         $stmt->execute([$id_guru_mapel, $id_kelas]);
         $custom = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch global defaults
-        $stmtDef = $pdo->query("SELECT config_key, config_value FROM app_config WHERE config_key LIKE 'default_%'");
-        $defaults = [];
-        while ($row = $stmtDef->fetch(PDO::FETCH_ASSOC)) {
-            $defaults[$row['config_key']] = $row['config_value'];
+        // Fetch global defaults (Cached)
+        if (self::$defaultBobotConfig === null) {
+            $stmtDef = $pdo->query("SELECT config_key, config_value FROM app_config WHERE config_key LIKE 'default_%'");
+            $defaults = [];
+            while ($row = $stmtDef->fetch(PDO::FETCH_ASSOC)) {
+                $defaults[$row['config_key']] = $row['config_value'];
+            }
+            self::$defaultBobotConfig = $defaults;
         }
+        $defaults = self::$defaultBobotConfig;
 
         if ($custom) {
             return [

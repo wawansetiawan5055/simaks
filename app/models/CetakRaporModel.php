@@ -2,6 +2,11 @@
 
 class CetakRaporModel {
     private $pdo;
+    private static $sekolahCache = null;
+    private static $subjectsCache = [];
+    private static $bobotCache = [];
+    private static $rekapCache = [];
+    private static $mapelInfoCache = [];
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
@@ -81,16 +86,23 @@ class CetakRaporModel {
         $id_kelas = $biodata['id_kelas'];
         $id_siswa = $biodata['id_siswa'];
 
-        // --- Profil Sekolah ---
-        $sekolah = $this->pdo->query("SELECT * FROM profil_sekolah LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        // --- Profil Sekolah (Cached) ---
+        if (self::$sekolahCache === null) {
+            self::$sekolahCache = $this->pdo->query("SELECT * FROM profil_sekolah LIMIT 1")->fetch(PDO::FETCH_ASSOC) ?: [];
+        }
+        $sekolah = self::$sekolahCache;
 
         // --- Fase dari tingkat ---
         $fase_map = ['X' => 'E', 'XI' => 'F', 'XII' => 'F'];
         $fase = $fase_map[$biodata['tingkat']] ?? 'E';
 
-        // --- Nilai per Mapel (reuse RekapNilaiModel logic) ---
+        // --- Nilai per Mapel (Cached per class) ---
         require_once __DIR__ . '/RekapNilaiModel.php';
-        $subjects = RekapNilaiModel::getSubjectsInClass($this->pdo, $id_kelas, $id_ta);
+        $subKey = $id_kelas . '_' . $id_ta;
+        if (!isset(self::$subjectsCache[$subKey])) {
+            self::$subjectsCache[$subKey] = RekapNilaiModel::getSubjectsInClass($this->pdo, $id_kelas, $id_ta);
+        }
+        $subjects = self::$subjectsCache[$subKey];
 
         $nilai_grouped = [];
         $urutan_kat = [
@@ -100,13 +112,21 @@ class CetakRaporModel {
             'Mulok Yayasan'          => 4,
         ];
 
-        $no_wajib = 1; $no_pilihan = 1; $no_mulok = 1; $no_yayasan = 1;
-
         foreach ($subjects as $sub) {
             $id_gm = $sub['id_guru_mapel'];
-            $bobot  = RekapNilaiModel::getBobotConfig($this->pdo, $id_gm, $id_kelas);
-            $limits = $bobot; // Limits are included in the bobot config
-            $rekap  = RekapNilaiModel::getRekapData($this->pdo, $id_kelas, $id_gm, $id_ta, $limits);
+            $gmKey = $id_gm . '_' . $id_kelas;
+            
+            if (!isset(self::$bobotCache[$gmKey])) {
+                self::$bobotCache[$gmKey] = RekapNilaiModel::getBobotConfig($this->pdo, $id_gm, $id_kelas);
+            }
+            $bobot = self::$bobotCache[$gmKey];
+            $limits = $bobot;
+
+            $rekapKey = $id_kelas . '_' . $id_gm . '_' . $id_ta;
+            if (!isset(self::$rekapCache[$rekapKey])) {
+                self::$rekapCache[$rekapKey] = RekapNilaiModel::getRekapData($this->pdo, $id_kelas, $id_gm, $id_ta, $limits);
+            }
+            $rekap = self::$rekapCache[$rekapKey];
 
             $r = $rekap[$id_penempatan] ?? null;
             if (!$r) continue;
@@ -118,10 +138,13 @@ class CetakRaporModel {
                 + ($r['sts']      ?? 0) * ($bobot['sts']/100)
                 + ($r['sas']      ?? 0) * ($bobot['sas']/100);
 
-            // Get kategori from mapel
-            $stmtM = $this->pdo->prepare("SELECT m.kategori_mapel, m.urutan FROM mapel m JOIN guru_mapel gm ON gm.id_mapel = m.id_mapel WHERE gm.id_guru_mapel = ?");
-            $stmtM->execute([$id_gm]);
-            $mapelInfo = $stmtM->fetch(PDO::FETCH_ASSOC);
+            // Get kategori from mapel (Cached)
+            if (!isset(self::$mapelInfoCache[$id_gm])) {
+                $stmtM = $this->pdo->prepare("SELECT m.kategori_mapel, m.urutan FROM mapel m JOIN guru_mapel gm ON gm.id_mapel = m.id_mapel WHERE gm.id_guru_mapel = ?");
+                $stmtM->execute([$id_gm]);
+                self::$mapelInfoCache[$id_gm] = $stmtM->fetch(PDO::FETCH_ASSOC) ?: ['kategori_mapel' => 'Mata Pelajaran Wajib', 'urutan' => 0];
+            }
+            $mapelInfo = self::$mapelInfoCache[$id_gm];
             $kat = $mapelInfo['kategori_mapel'] ?? 'Mata Pelajaran Wajib';
 
             $nilai_grouped[$kat][] = [
@@ -133,11 +156,6 @@ class CetakRaporModel {
 
         // Sort kategori
         uksort($nilai_grouped, fn($a,$b) => ($urutan_kat[$a]??9) - ($urutan_kat[$b]??9));
-        // Sort mapel within each group by urutan
-        foreach ($nilai_grouped as &$group) {
-            // already in DB order from getSubjectsInClass which orders by nama_mapel
-        }
-        unset($group);
 
         // --- Sikap ---
         $stmt = $this->pdo->prepare("

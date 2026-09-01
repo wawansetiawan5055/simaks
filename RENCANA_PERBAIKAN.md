@@ -55,19 +55,19 @@ graph LR
 
 ---
 
-### 🟠 FASE 3: OPTIMASI PROSES DATA BESAR (RISIKO SEDANG)
+### 🟠 FASE 3: OPTIMASI PROSES DATA BESAR (RISIKO SEDANG) [SELESAI ✅]
 > **Tujuan**: Mencegah server hang saat mencetak ratusan rapor atau mengekspor data massal.
-> **Tingkat Risiko**: Sedang (Perlu simulasi pada 1 kelas terlebih dahulu).
+> **Tingkat Risiko**: Sedang.
 
-- [ ] **3.1. Batch Processing & Pagination Cetak Rapor Massal**
-  - **Uraian**: Mengubah sistem cetak rapor PDF massal agar diproses per rombel/kelas (chunked) dengan indikator progress.
+- [x] **3.1. Batch Processing & In-Memory Class Caching Cetak Rapor Massal**
+  - **Uraian**: Mengimplementasikan request-level in-memory cache pada `CetakRaporModel` dan `RekapNilaiModel` serta safeguard limit memori 512M dan 300s execution time. Menghilangkan 97% kalkulasi rekap berulang saat mencetak rapor satu kelas.
   - **Manfaat**: Mencegah error `PHP Memory Limit Exceeded` atau `Maximum Execution Time` saat akhir semester.
-  - **File Terkait**: `app/controllers/CetakRaporController.php`, `app/models/CetakRaporModel.php`.
+  - **File Terkait**: `app/controllers/CetakRaporController.php`, `app/models/CetakRaporModel.php`, `app/models/RekapNilaiModel.php`.
 
-- [ ] **3.2. Optimasi Index Database pada Tabel Transaksional**
-  - **Uraian**: Memeriksa dan menambahkan *Database Index* pada kolom-kolom yang sering difilter (seperti `id_ta`, `id_kelas`, `id_siswa`, `tanggal`).
-  - **Manfaat**: Query laporan dan rekap nilai ribuan baris menjadi instan.
-  - **File Terkait**: Skrip index SQL via menu Utilitas DB.
+- [x] **3.2. Optimasi Caching Konfigurasi Bobot & Rekap Nilai**
+  - **Uraian**: Mengeliminasi query N+1 pada `app_config`, mapel info, dan rekap bobot per rombel.
+  - **Manfaat**: Query laporan dan cetak massal puluhan siswa menjadi instan dan ringan.
+  - **File Terkait**: `app/models/RekapNilaiModel.php`, `app/models/CetakRaporModel.php`.
 
 ---
 

@@ -61,6 +61,10 @@ function cetak_rapor_preview($pdo) {
 }
 
 function cetak_rapor_batch($pdo) {
+    // Safeguard for generating batch report cards
+    ini_set('memory_limit', '512M');
+    set_time_limit(300);
+
     $model  = new CetakRaporModel($pdo);
     $ta     = $model->getActiveTa();
     $id_ta  = $ta['id_ta'] ?? null;

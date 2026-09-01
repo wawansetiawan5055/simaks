@@ -27,7 +27,8 @@ public/uploads/
 backup/
 backups/
 
-# OS Generated
+# OS & Cloud Generated
+.tmp.driveupload/
 .DS_Store
 Thumbs.db
 desktop.ini
