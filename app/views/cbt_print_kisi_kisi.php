@@ -199,19 +199,8 @@ if (!function_exists('format_cbt_math_output')) {
     </div>
 
     <div class="page-container">
-        <!-- KOP SURAT RESMI -->
-        <div class="kop-surat">
-            <?php if (!empty($sekolah['logo'])): ?>
-                <img src="<?= htmlspecialchars($sekolah['logo']) ?>" class="kop-logo" alt="Logo">
-            <?php else: ?>
-                <img src="uploads/logo_tutwuri.png" onerror="this.style.display='none'" class="kop-logo" alt="Logo">
-            <?php endif; ?>
-            <div class="kop-text">
-                <h3><?= htmlspecialchars($sekolah['yayasan'] ?? 'PEMERINTAH DAERAH PROVINSI') ?></h3>
-                <h2><?= htmlspecialchars($sekolah['nama_sekolah'] ?? 'SMA NEGERI / SWASTA') ?></h2>
-                <p><?= htmlspecialchars($sekolah['alamat_lengkap'] ?? $sekolah['alamat'] ?? 'Jl. Pendidikan No. 1') ?> | Email: <?= htmlspecialchars($sekolah['email'] ?? '-') ?></p>
-            </div>
-        </div>
+        <!-- KOP SURAT RESMI STANDAR UNIVERSAL -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
         <div class="title-box">
             <h4>KISI-KISI PENULISAN SOAL ASESMEN STANDAR KURIKULUM MERDEKA</h4>

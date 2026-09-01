@@ -174,9 +174,11 @@ if (!function_exists('format_cbt_math_output')) {
     </div>
 
     <div class="page-container">
+        <!-- KOP SURAT RESMI STANDAR UNIVERSAL -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
+
         <div style="text-align: center; margin-bottom: 20px;">
-            <h3 style="margin: 0; text-transform: uppercase; font-size: 14pt;"><?= htmlspecialchars($sekolah['nama_sekolah'] ?? 'SIMAKS ACADEMY') ?></h3>
-            <h4 style="margin: 3px 0 0 0; text-transform: uppercase; font-size: 12pt;">KARTU SOAL ASESMEN (STANDAR AKREDITASI)</h4>
+            <h4 style="margin: 0; text-transform: uppercase; font-size: 12pt; font-weight: bold;">KARTU TELAAH SOAL ASESMEN (STANDAR AKREDITASI)</h4>
             <div style="font-size: 10pt; font-style: italic;"><?= htmlspecialchars($paket['nama_paket']) ?> - Tahun Pelajaran <?= htmlspecialchars($paket['tahun_ajaran'] ?? date('Y').'/'.(date('Y')+1)) ?></div>
         </div>
 

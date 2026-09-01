@@ -183,17 +183,8 @@
     </div>
 
     <div class="page">
-        <!-- KOP SURAT RESMI -->
-        <div class="kop-surat">
-            <?php if (!empty($sekolah['logo'])): ?>
-                <img src="<?= htmlspecialchars($sekolah['logo']) ?>" class="kop-logo" alt="Logo">
-            <?php endif; ?>
-            <div class="kop-text">
-                <h2><?= htmlspecialchars($sekolah['nama_sekolah'] ?? 'SMA PLUS AL-MANSHURIYAH') ?></h2>
-                <h3>PANITIA ASESMEN BERBASIS KOMPUTER (CBT)</h3>
-                <p><?= htmlspecialchars($sekolah['alamat'] ?? 'Jl. Raya Pendidikan No. 1') ?> &bull; Telp: <?= htmlspecialchars($sekolah['telepon'] ?? '-') ?> &bull; Email: <?= htmlspecialchars($sekolah['email'] ?? '-') ?></p>
-            </div>
-        </div>
+        <!-- KOP SURAT RESMI STANDAR UNIVERSAL -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
         <div class="judul-dokumen">
             <h4>DAFTAR HADIR PESERTA UJIAN</h4>

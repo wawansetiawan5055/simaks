@@ -337,14 +337,208 @@
 
             </div>
 
+            <!-- CARD 3: KONFIGURASI FORMAT KOP SURAT RESMI & LIVE EDITOR -->
+            <div class="card card-profil-section mb-4" id="seksi_kop_surat">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div class="section-title mb-0 border-0 p-0">
+                            <i class="fas fa-file-invoice text-primary"></i> Format Kop Surat Resmi &amp; Logo Cetak (Live Editor)
+                        </div>
+                        <span class="badge badge-primary px-3 py-1.5 font-weight-normal" style="font-size: 0.82rem; border-radius: 6px;">
+                            <i class="fas fa-check-double mr-1"></i> Standar Tata Naskah Dinas
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <!-- PENGATURAN KOP (KIRI) -->
+                        <div class="col-lg-6 mb-4 mb-lg-0">
+                            
+                            <!-- 1. PRESET TEMPLATE KOP CEPAT -->
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold text-dark small mb-1.5">
+                                    <i class="fas fa-magic text-warning mr-1"></i> Pilihan Standar Template Kop:
+                                </label>
+                                <div class="d-flex flex-wrap" style="gap: 6px;">
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-preset-kop" data-preset="yayasan">
+                                        <i class="fas fa-landmark mr-1"></i> Standar Yayasan / Swasta
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-info btn-preset-kop" data-preset="provinsi">
+                                        <i class="fas fa-building mr-1"></i> Standar Provinsi (SMA/SMK)
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-preset-kop" data-preset="kabupaten">
+                                        <i class="fas fa-city mr-1"></i> Standar Kab/Kota (SMP/SD)
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btn-preset-kop" data-preset="nasional">
+                                        <i class="fas fa-flag mr-1"></i> Standar Nasional (Kementerian)
+                                    </button>
+                                </div>
+                                <input type="hidden" name="model_kop" id="input_model_kop" value="<?= htmlspecialchars($profil['model_kop'] ?? 'yayasan') ?>">
+                            </div>
+
+                            <!-- 2. DUAL LOGO SETTINGS -->
+                            <div class="p-3 bg-light rounded border mb-3">
+                                <label class="font-weight-bold text-dark small mb-2 d-block">
+                                    <i class="fas fa-images text-info mr-1"></i> Pengaturan Logo Ganda (Kiri &amp; Kanan)
+                                </label>
+                                
+                                <div class="row">
+                                    <!-- Logo Kiri -->
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="small font-weight-bold text-dark">Logo Kiri (Instansi / Yayasan)</span>
+                                            <div class="custom-control custom-switch custom-switch-sm">
+                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kiri" name="show_logo_kiri" value="1" <?= (!isset($profil['show_logo_kiri']) || $profil['show_logo_kiri']) ? 'checked' : '' ?>>
+                                                <label class="custom-control-label small text-muted" for="switch_logo_kiri">Tampil</label>
+                                            </div>
+                                        </div>
+                                        <div class="custom-file custom-file-sm">
+                                            <input type="file" class="custom-file-input" id="input_logo_kiri" name="logo_kiri_file" accept="image/*">
+                                            <label class="custom-file-label small" for="input_logo_kiri">Ganti Logo Kiri...</label>
+                                        </div>
+                                        <?php if (!empty($profil['logo_kiri'])): ?>
+                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kiri']) ?></small>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Logo Kanan -->
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="small font-weight-bold text-dark">Logo Kanan (Sekolah)</span>
+                                            <div class="custom-control custom-switch custom-switch-sm">
+                                                <input type="checkbox" class="custom-control-input" id="switch_logo_kanan" name="show_logo_kanan" value="1" <?= (!isset($profil['show_logo_kanan']) || $profil['show_logo_kanan']) ? 'checked' : '' ?>>
+                                                <label class="custom-control-label small text-muted" for="switch_logo_kanan">Tampil</label>
+                                            </div>
+                                        </div>
+                                        <div class="custom-file custom-file-sm">
+                                            <input type="file" class="custom-file-input" id="input_logo_kanan" name="logo_kanan_file" accept="image/*">
+                                            <label class="custom-file-label small" for="input_logo_kanan">Ganti Logo Kanan...</label>
+                                        </div>
+                                        <?php if (!empty($profil['logo_kanan'])): ?>
+                                            <small class="text-muted d-block mt-1 font-italic text-truncate" style="max-width: 220px;">Aktif: <?= htmlspecialchars($profil['logo_kanan']) ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. INPUT BARIS TEKS KOP -->
+                            <div class="form-group mb-2">
+                                <label class="font-weight-bold text-dark small m-0">Baris 1: Instansi Induk / Nama Yayasan / Pemda</label>
+                                <input type="text" name="kop_baris_1" id="input_kop_b1" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>" placeholder="Contoh: YAYASAN TARBIYATUSSHIBYAN INDONESIA">
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label class="font-weight-bold text-dark small m-0">Baris 2: Cabang Dinas / Badan Pengelola (Opsional)</label>
+                                <input type="text" name="kop_baris_2" id="input_kop_b2" class="form-control form-control-sm font-weight-bold" value="<?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>" placeholder="Contoh: DINAS PENDIDIKAN - CABANG DINAS WILAYAH V (kosongkan jika tidak ada)">
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label class="font-weight-bold text-dark small m-0">Baris 3: Nama Satuan Pendidikan (Sekolah / Madrasah) <span class="text-danger">*</span></label>
+                                <input type="text" name="kop_baris_3" id="input_kop_b3" class="form-control form-control-sm font-weight-bold text-primary" value="<?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>" placeholder="Contoh: SMA PLUS AL MANSHURIYAH">
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label class="font-weight-bold text-dark small m-0">Baris 4: NPSN, Akreditasi &amp; Legalitas</label>
+                                <input type="text" name="kop_baris_4" id="input_kop_b4" class="form-control form-control-sm" value="<?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>" placeholder="Contoh: STATUS AKREDITASI: A | NPSN: 20247166">
+                            </div>
+
+                            <div class="form-group mb-2">
+                                <label class="font-weight-bold text-dark small m-0">Baris 5: Alamat, Telepon, Email, Website &amp; Medsos</label>
+                                <textarea name="kop_baris_5" id="input_kop_b5" class="form-control form-control-sm" rows="2" placeholder="Contoh: Jl. Kalaparea KM. 5 RT 03 RW 09 Desa Kalaparea Kec. Nagrak Kab. Sukabumi 43356 | Telp: 0812-3456-7890 | Email: sekolah@gmail.com"><?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?></textarea>
+                            </div>
+
+                            <!-- 4. PILIHAN GAYA GARIS PEMBATAS -->
+                            <div class="form-group mb-0">
+                                <label class="font-weight-bold text-dark small mb-1">Gaya Garis Pembatas Kop:</label>
+                                <select name="style_garis" id="select_style_garis" class="form-control form-control-sm">
+                                    <option value="double" <?= ($profil['style_garis'] ?? 'double') === 'double' ? 'selected' : '' ?>>Garis Ganda Dinas Standar (Tebal-Tipis 3px)</option>
+                                    <option value="thick" <?= ($profil['style_garis'] ?? '') === 'thick' ? 'selected' : '' ?>>Garis Tunggal Tebal (2.5px)</option>
+                                    <option value="single" <?= ($profil['style_garis'] ?? '') === 'single' ? 'selected' : '' ?>>Garis Tunggal Sedang (1.5px)</option>
+                                    <option value="none" <?= ($profil['style_garis'] ?? '') === 'none' ? 'selected' : '' ?>>Tanpa Garis</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- LIVE PREVIEW KOP SURAT (KANAN) -->
+                        <div class="col-lg-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="font-weight-bold text-dark small m-0">
+                                    <i class="fas fa-eye text-success mr-1"></i> Pratinjau Langsung Kop Surat (Live Preview):
+                                </label>
+                                <span class="badge badge-success px-2 py-1 font-weight-normal" style="font-size: 0.75rem;">
+                                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Real-time Line Spacing 1.15
+                                </span>
+                            </div>
+
+                            <!-- BOX PREVIEW KERTAS PUTIH -->
+                            <div class="p-3 bg-white rounded border shadow-sm" style="min-height: 280px; background-color: #ffffff !important; border: 2px dashed #cbd5e1 !important;">
+                                
+                                <div id="live_kop_container" class="simaks-kop-container" style="font-family: 'Times New Roman', Times, serif; color: #000000;">
+                                    <table class="simaks-kop-table" style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <!-- Logo Kiri Preview -->
+                                            <td id="live_logo_left_td" class="simaks-kop-logo-left" style="width: 85px; text-align: left; vertical-align: middle; padding-right: 8px;">
+                                                <img id="live_logo_left_img" src="<?= !empty($profil['logo_kiri']) ? 'assets/img/' . htmlspecialchars($profil['logo_kiri']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kiri" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
+                                            </td>
+
+                                            <!-- Teks Tengah Preview -->
+                                            <td class="simaks-kop-center" style="text-align: center; line-height: 1.15; vertical-align: middle;">
+                                                <div id="live_kop_b1" class="simaks-kop-b1" style="font-size: 11pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15;">
+                                                    <?= htmlspecialchars($profil['kop_baris_1'] ?? ($profil['nama_yayasan'] ?: 'YAYASAN TARBIYATUSSHIBYAN INDONESIA')) ?>
+                                                </div>
+                                                <div id="live_kop_b2" class="simaks-kop-b2" style="font-size: 10.5pt; font-weight: bold; text-transform: uppercase; margin: 0 0 1px 0; line-height: 1.15; <?= empty($profil['kop_baris_2']) ? 'display: none;' : '' ?>">
+                                                    <?= htmlspecialchars($profil['kop_baris_2'] ?? '') ?>
+                                                </div>
+                                                <div id="live_kop_b3" class="simaks-kop-b3" style="font-size: 14pt; font-weight: 900; text-transform: uppercase; margin: 1px 0 2px 0; line-height: 1.15;">
+                                                    <?= htmlspecialchars($profil['kop_baris_3'] ?? ($profil['nama_sekolah'] ?: 'SMA PLUS AL MANSHURIYAH')) ?>
+                                                </div>
+                                                <div id="live_kop_b4" class="simaks-kop-b4" style="font-size: 8.5pt; font-weight: bold; margin: 0 0 1px 0; line-height: 1.15;">
+                                                    <?= htmlspecialchars($profil['kop_baris_4'] ?? ('STATUS AKREDITASI: ' . ($profil['sk_akreditasi'] ?: 'A') . ' | NPSN: ' . ($profil['npsn'] ?: '20247166'))) ?>
+                                                </div>
+                                                <div id="live_kop_b5" class="simaks-kop-b5" style="font-size: 8pt; margin: 0; line-height: 1.15;">
+                                                    <?= htmlspecialchars($profil['kop_baris_5'] ?? (($profil['alamat'] ?? '') . ' | Telp: ' . ($profil['telepon'] ?? '-') . ' | Email: ' . ($profil['email'] ?? '-'))) ?>
+                                                </div>
+                                            </td>
+
+                                            <!-- Logo Kanan Preview -->
+                                            <td id="live_logo_right_td" class="simaks-kop-logo-right" style="width: 85px; text-align: right; vertical-align: middle; padding-left: 8px;">
+                                                <img id="live_logo_right_img" src="<?= !empty($profil['logo_kanan']) ? 'assets/img/' . htmlspecialchars($profil['logo_kanan']) : (!empty($profil['logo']) ? 'assets/img/' . htmlspecialchars($profil['logo']) : '') ?>" alt="Logo Kanan" class="simaks-kop-logo-img" style="max-width: 75px; max-height: 75px; object-fit: contain;">
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Divider Line Preview -->
+                                    <div id="live_kop_divider" class="simaks-kop-divider-double" style="border-top: 3px double #000000; margin-top: 5px; margin-bottom: 8px;"></div>
+                                </div>
+
+                                <!-- SIMULASI KONTEN SURAT CONTOH -->
+                                <div class="text-center text-muted py-3 px-2 bg-light rounded border border-light" style="font-size: 0.8rem; font-family: sans-serif;">
+                                    <div class="font-weight-bold text-dark mb-1">SURAT KETERANGAN / NASKAH UJIAN CBT / LAPORAN RESMI</div>
+                                    <div>Nomor: 421.3 / 108 / SMA-AM / IX / <?= date('Y') ?></div>
+                                    <div class="text-muted small mt-2 font-italic">
+                                        (Contoh isi naskah dokumen cetak resmi SIMAKS dengan kop surat seragam di atas)
+                                    </div>
+                                </div>
+
+                            </div>
+                            
+                            <div class="mt-2.5 small text-muted">
+                                <i class="fas fa-info-circle text-primary mr-1"></i> Format kop surat ini otomatis diterapkan pada seluruh modul: <strong>Naskah Soal CBT, Kartu Peserta Ujian, Berita Acara, Rapor Siswa, Transkrip Nilai, Surat Izin UKS, &amp; Seluruh Menu Laporan</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- TOMBOL SUBMIT FIXED / STICKY BOTTOM CARD -->
             <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body py-3 d-flex justify-content-between align-items-center">
                     <div class="text-muted small">
-                        <i class="fas fa-shield-alt text-success mr-1"></i> Data profil akan otomatis tersinkronisasi ke Rapor, Website Profil Sekolah, dan Portal Akademik.
+                        <i class="fas fa-shield-alt text-success mr-1"></i> Seluruh identitas sekolah, koordinat peta satelit, dan kop surat akan otomatis tersimpan.
                     </div>
                     <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold shadow-sm" style="border-radius: 8px;">
-                        <i class="fas fa-save mr-1.5"></i> Simpan Profil Sekolah
+                        <i class="fas fa-save mr-1.5"></i> Simpan Profil &amp; Format Kop Surat
                     </button>
                 </div>
             </div>
@@ -597,6 +791,155 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // =========================================================
+    // JAVASCRIPT KOP SURAT LIVE EDITOR & DUAL LOGO HANDLER
+    // =========================================================
+    const b1Input = document.getElementById('input_kop_b1');
+    const b2Input = document.getElementById('input_kop_b2');
+    const b3Input = document.getElementById('input_kop_b3');
+    const b4Input = document.getElementById('input_kop_b4');
+    const b5Input = document.getElementById('input_kop_b5');
+    const styleGarisSelect = document.getElementById('select_style_garis');
+
+    const liveB1 = document.getElementById('live_kop_b1');
+    const liveB2 = document.getElementById('live_kop_b2');
+    const liveB3 = document.getElementById('live_kop_b3');
+    const liveB4 = document.getElementById('live_kop_b4');
+    const liveB5 = document.getElementById('live_kop_b5');
+    const liveDivider = document.getElementById('live_kop_divider');
+
+    const switchLogoLeft = document.getElementById('switch_logo_kiri');
+    const switchLogoRight = document.getElementById('switch_logo_kanan');
+    const tdLogoLeft = document.getElementById('live_logo_left_td');
+    const tdLogoRight = document.getElementById('live_logo_right_td');
+    const imgLogoLeft = document.getElementById('live_logo_left_img');
+    const imgLogoRight = document.getElementById('live_logo_right_img');
+
+    const inputLogoLeftFile = document.getElementById('input_logo_kiri');
+    const inputLogoRightFile = document.getElementById('input_logo_kanan');
+
+    function syncLiveKop() {
+        if (liveB1 && b1Input) {
+            liveB1.innerText = b1Input.value.trim();
+            liveB1.style.display = b1Input.value.trim() ? 'block' : 'none';
+        }
+        if (liveB2 && b2Input) {
+            liveB2.innerText = b2Input.value.trim();
+            liveB2.style.display = b2Input.value.trim() ? 'block' : 'none';
+        }
+        if (liveB3 && b3Input) {
+            liveB3.innerText = b3Input.value.trim();
+            liveB3.style.display = b3Input.value.trim() ? 'block' : 'none';
+        }
+        if (liveB4 && b4Input) {
+            liveB4.innerText = b4Input.value.trim();
+            liveB4.style.display = b4Input.value.trim() ? 'block' : 'none';
+        }
+        if (liveB5 && b5Input) {
+            liveB5.innerText = b5Input.value.trim();
+            liveB5.style.display = b5Input.value.trim() ? 'block' : 'none';
+        }
+
+        // Garis Pembatas
+        if (liveDivider && styleGarisSelect) {
+            const st = styleGarisSelect.value;
+            if (st === 'double') {
+                liveDivider.style.display = 'block';
+                liveDivider.style.borderTop = '3px double #000000';
+            } else if (st === 'thick') {
+                liveDivider.style.display = 'block';
+                liveDivider.style.borderTop = '2.5px solid #000000';
+            } else if (st === 'single') {
+                liveDivider.style.display = 'block';
+                liveDivider.style.borderTop = '1.5px solid #000000';
+            } else {
+                liveDivider.style.display = 'none';
+            }
+        }
+
+        // Toggles Logo
+        if (tdLogoLeft && switchLogoLeft) {
+            tdLogoLeft.style.display = switchLogoLeft.checked ? 'table-cell' : 'none';
+        }
+        if (tdLogoRight && switchLogoRight) {
+            tdLogoRight.style.display = switchLogoRight.checked ? 'table-cell' : 'none';
+        }
+    }
+
+    [b1Input, b2Input, b3Input, b4Input, b5Input].forEach(inp => {
+        if (inp) inp.addEventListener('input', syncLiveKop);
+    });
+    if (styleGarisSelect) styleGarisSelect.addEventListener('change', syncLiveKop);
+    if (switchLogoLeft) switchLogoLeft.addEventListener('change', syncLiveKop);
+    if (switchLogoRight) switchLogoRight.addEventListener('change', syncLiveKop);
+
+    // Preset Buttons
+    document.querySelectorAll('.btn-preset-kop').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const preset = this.getAttribute('data-preset');
+            const namaSekolah = document.querySelector('input[name="nama_sekolah"]').value.trim() || 'SMA PLUS AL MANSHURIYAH';
+            const namaYayasan = document.querySelector('input[name="nama_yayasan"]').value.trim() || 'YAYASAN TARBIYATUSSHIBYAN INDONESIA';
+            const npsnVal = document.querySelector('input[name="npsn"]').value.trim() || '20247166';
+            const akreditasiVal = document.querySelector('input[name="sk_akreditasi"]').value.trim() || 'A';
+            const alamatVal = document.getElementById('alamat_sekolah').value.trim() || 'Jl. Kalaparea KM. 5 Desa Kalaparea Kec. Nagrak Kab. Sukabumi';
+            const telpVal = document.querySelector('input[name="telepon"]').value.trim() || '0812-3456-7890';
+            const emailVal = document.querySelector('input[name="email"]').value.trim() || 'sekolah@sch.id';
+
+            document.getElementById('input_model_kop').value = preset;
+
+            if (preset === 'yayasan') {
+                b1Input.value = namaYayasan.toUpperCase();
+                b2Input.value = '';
+                b3Input.value = namaSekolah.toUpperCase();
+                b4Input.value = `STATUS AKREDITASI: ${akreditasiVal} | NPSN: ${npsnVal}`;
+                b5Input.value = `${alamatVal} | Telp: ${telpVal} | Email: ${emailVal}`;
+            } else if (preset === 'provinsi') {
+                b1Input.value = 'PEMERINTAH DAERAH PROVINSI JAWA BARAT';
+                b2Input.value = 'DINAS PENDIDIKAN - CABANG DINAS PENDIDIKAN WILAYAH V';
+                b3Input.value = namaSekolah.toUpperCase();
+                b4Input.value = `NPSN: ${npsnVal} | STATUS AKREDITASI: ${akreditasiVal}`;
+                b5Input.value = `${alamatVal} | Email: ${emailVal}`;
+            } else if (preset === 'kabupaten') {
+                b1Input.value = 'PEMERINTAH KABUPATEN SUKABUMI';
+                b2Input.value = 'DINAS PENDIDIKAN DAN KEBUDAYAAN';
+                b3Input.value = namaSekolah.toUpperCase();
+                b4Input.value = `NPSN: ${npsnVal} | AKREDITASI: ${akreditasiVal}`;
+                b5Input.value = `${alamatVal} | Telp: ${telpVal} | Email: ${emailVal}`;
+            } else if (preset === 'nasional') {
+                b1Input.value = 'KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI';
+                b2Input.value = 'DIREKTORAT JENDERAL PENDIDIKAN DASAR DAN MENENGAH';
+                b3Input.value = namaSekolah.toUpperCase();
+                b4Input.value = `NPSN: ${npsnVal} | STATUS AKREDITASI: ${akreditasiVal}`;
+                b5Input.value = `${alamatVal} | Email: ${emailVal}`;
+            }
+
+            syncLiveKop();
+        });
+    });
+
+    // File Preview for Dual Logos
+    function setupLogoFileInput(inputEl, imgEl) {
+        if (!inputEl) return;
+        inputEl.addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Pilih berkas logo...';
+            let label = this.nextElementSibling;
+            if (label) label.innerText = fileName;
+
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    if (imgEl) imgEl.src = evt.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+    setupLogoFileInput(inputLogoLeftFile, imgLogoLeft);
+    setupLogoFileInput(inputLogoRightFile, imgLogoRight);
+
+    // Initial sync
+    syncLiveKop();
 
     // Invalidate map size to ensure tiles render properly after DOM render
     setTimeout(() => {

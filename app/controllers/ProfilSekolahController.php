@@ -16,7 +16,6 @@ function profil_sekolah_save($pdo) {
         return;
     }
     
-    // PERBAIKAN: Mendefinisikan setiap variabel dari $_POST secara eksplisit
     $data = [
         'nama_sekolah'          => $_POST['nama_sekolah'] ?? '',
         'npsn'                  => $_POST['npsn'] ?? '',
@@ -29,33 +28,63 @@ function profil_sekolah_save($pdo) {
         'email'                 => $_POST['email'] ?? '',
         'website'               => $_POST['website'] ?? '',
         'status_sekolah'        => $_POST['status_sekolah'] ?? 'Swasta',
-        'nama_yayasan'    => $_POST['nama_yayasan'] ?? '',
+        'nama_yayasan'          => $_POST['nama_yayasan'] ?? '',
         'sk_izin_operasional'   => $_POST['sk_izin_operasional'] ?? '',
         'sk_akreditasi'         => $_POST['sk_akreditasi'] ?? '',
         'moto'                  => $_POST['moto'] ?? '',
-        'logo'                  => '' // Default kosong, akan diisi oleh logika upload
+        'logo'                  => '',
+        'model_kop'             => $_POST['model_kop'] ?? 'yayasan',
+        'kop_baris_1'           => $_POST['kop_baris_1'] ?? '',
+        'kop_baris_2'           => $_POST['kop_baris_2'] ?? '',
+        'kop_baris_3'           => $_POST['kop_baris_3'] ?? '',
+        'kop_baris_4'           => $_POST['kop_baris_4'] ?? '',
+        'kop_baris_5'           => $_POST['kop_baris_5'] ?? '',
+        'logo_kiri'             => '',
+        'logo_kanan'            => '',
+        'show_logo_kiri'        => isset($_POST['show_logo_kiri']) ? 1 : 0,
+        'show_logo_kanan'       => isset($_POST['show_logo_kanan']) ? 1 : 0,
+        'style_garis'           => $_POST['style_garis'] ?? 'double'
     ];
     
-    // Logika untuk upload logo (tidak berubah, tapi penting)
-    if (isset($_FILES['logo_sekolah']) && $_FILES['logo_sekolah']['error'] == 0) {
-        // Pastikan folder assets/img ada dan bisa ditulis (writable)
+    $target_dir = __DIR__ . "/../../public/assets/img/";
+    if (!is_dir($target_dir)) {
         $target_dir = "assets/img/";
-        // Buat nama file yang unik untuk menghindari penimpaan
-        $logo_name = "logo_sekolah_" . time() . "_" . basename($_FILES["logo_sekolah"]["name"]);
+    }
+
+    // 1. Upload Logo Utama
+    if (isset($_FILES['logo_sekolah']) && $_FILES['logo_sekolah']['error'] == 0) {
+        $logo_name = "logo_sekolah_" . time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($_FILES["logo_sekolah"]["name"]));
         $target_file = $target_dir . $logo_name;
-        
         if (move_uploaded_file($_FILES["logo_sekolah"]["tmp_name"], $target_file)) {
-            $data['logo'] = $logo_name; // Simpan nama file baru ke data
-            $_SESSION['app_logo'] = $logo_name; // [BARU] Update Session agar logo langsung berubah
+            $data['logo'] = $logo_name;
+            $_SESSION['app_logo'] = $logo_name;
+        }
+    }
+
+    // 2. Upload Logo Kiri Kop
+    if (isset($_FILES['logo_kiri_file']) && $_FILES['logo_kiri_file']['error'] == 0) {
+        $logo_kiri_name = "logo_kiri_" . time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($_FILES["logo_kiri_file"]["name"]));
+        $target_file = $target_dir . $logo_kiri_name;
+        if (move_uploaded_file($_FILES["logo_kiri_file"]["tmp_name"], $target_file)) {
+            $data['logo_kiri'] = $logo_kiri_name;
+        }
+    }
+
+    // 3. Upload Logo Kanan Kop
+    if (isset($_FILES['logo_kanan_file']) && $_FILES['logo_kanan_file']['error'] == 0) {
+        $logo_kanan_name = "logo_kanan_" . time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($_FILES["logo_kanan_file"]["name"]));
+        $target_file = $target_dir . $logo_kanan_name;
+        if (move_uploaded_file($_FILES["logo_kanan_file"]["tmp_name"], $target_file)) {
+            $data['logo_kanan'] = $logo_kanan_name;
         }
     }
     
     ProfilSekolahModel::save($pdo, $data);
     
     if (function_exists('audit_log')) {
-        audit_log('UPDATE', "Memperbarui Data Profil Sekolah ({$data['nama_sekolah']})", 'profil_sekolah');
+        audit_log('UPDATE', "Memperbarui Data Profil & Konfigurasi Kop Surat Sekolah ({$data['nama_sekolah']})", 'profil_sekolah');
     }
     
-    $_SESSION['pesan_sukses'] = "Profil sekolah berhasil diperbarui!";
+    $_SESSION['pesan_sukses'] = "Profil dan konfigurasi Kop Surat sekolah berhasil diperbarui!";
     redirect('index.php?mod=profil_sekolah');
 }

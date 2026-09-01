@@ -112,12 +112,8 @@
     </div>
 
     <div class="page">
-        <!-- KOP SURAT -->
-        <div class="kop-header">
-            <h2><?= strtoupper(htmlspecialchars($sekolah['nama_sekolah'] ?? 'SEKOLAH MENENGAH')) ?></h2>
-            <h3>UNIT KESEHATAN SEKOLAH (UKS)</h3>
-            <p><?= htmlspecialchars($sekolah['alamat'] ?? '') ?> <?= !empty($sekolah['telepon']) ? ' | Telp: ' . htmlspecialchars($sekolah['telepon']) : '' ?></p>
-        </div>
+        <!-- KOP SURAT RESMI STANDAR UNIVERSAL -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
         <!-- JUDUL SURAT -->
         <div class="surat-title">

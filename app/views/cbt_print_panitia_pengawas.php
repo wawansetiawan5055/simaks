@@ -107,16 +107,8 @@ $sesi = $_GET['sesi'] ?? 'Sesi 1';
 
 <div class="page">
     
-    <!-- KOP SURAT RESMI -->
-    <div class="kop-surat">
-        <?php $logoUrl = !empty($profil['logo']) ? BASE_URL . 'assets/img/' . $profil['logo'] : BASE_URL . 'assets/img/logo.png'; ?>
-        <img src="<?= $logoUrl ?>" alt="Logo Sekolah" class="kop-logo" onerror="this.src='https://placehold.co/80x80?text=LOGO'">
-        <div class="kop-text">
-            <h2><?= htmlspecialchars($profil['nama_yayasan'] ?? 'YAYASAN PENDIDIKAN') ?></h2>
-            <h2><?= htmlspecialchars($profil['nama_sekolah'] ?? 'SEKOLAH INDONESIA') ?></h2>
-            <p><?= htmlspecialchars($profil['alamat'] ?? 'Jl. Pendidikan No. 1') ?> | Telp: <?= htmlspecialchars($profil['telepon'] ?? '-') ?> | Website: <?= htmlspecialchars($profil['website'] ?? '-') ?></p>
-        </div>
-    </div>
+    <!-- KOP SURAT RESMI STANDAR UNIVERSAL -->
+    <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
     <!-- 1. TATA TERTIB PESERTA & PENGAWAS -->
     <?php if ($mode === 'print_tata_tertib' || $mode === 'tata_tertib'): ?>

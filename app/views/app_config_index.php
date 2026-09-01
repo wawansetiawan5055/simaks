@@ -152,6 +152,12 @@ if (file_exists($header_path)) {
                                 <i class="fas fa-sign-in-alt mr-2"></i>Halaman Login
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="kop-tab" data-toggle="pill" href="#tab-kop"
+                                role="tab" aria-controls="tab-kop" aria-selected="false">
+                                <i class="fas fa-file-invoice mr-2"></i>Kop Surat &amp; Cetak
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -620,6 +626,39 @@ if (file_exists($header_path)) {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- TAB 5: KOP SURAT & LOGO CETAK -->
+                        <div class="tab-pane fade" id="tab-kop" role="tabpanel" aria-labelledby="kop-tab">
+                            <div class="row justify-content-center">
+                                <div class="col-md-9">
+                                    <div class="card shadow-sm border" style="border-radius: 12px;">
+                                        <div class="card-body p-4 text-center">
+                                            <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: #eff6ff; color: #3b82f6; font-size: 1.8rem;">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </div>
+                                            <h4 class="font-weight-bold text-dark mb-2">Konfigurasi Format Kop Surat Resmi</h4>
+                                            <p class="text-muted mx-auto mb-4" style="max-width: 550px;">
+                                                Format kop surat, pemilihan model standar (Nasional, Provinsi, Kab/Kota, Yayasan), dual logo (kiri/kanan), dan live editor interaktif dikelola secara terpusat di menu <strong>Profil Sekolah</strong> agar selalu sinkron dengan identitas lembaga.
+                                            </p>
+                                            
+                                            <div class="p-3 bg-light rounded border mb-4 text-left" style="max-width: 650px; margin: 0 auto;">
+                                                <div class="font-weight-bold small text-dark mb-2"><i class="fas fa-check-circle text-success mr-1"></i> Cakupan Penerapan Kop Surat Seragam:</div>
+                                                <ul class="mb-0 small text-muted pl-3">
+                                                    <li><strong>CBT / Ujian Online:</strong> Naskah Soal, Kisi-Kisi, Kartu Soal, Kunci Jawaban, Daftar Hadir, Berita Acara, &amp; Kartu Panitia/Pengawas.</li>
+                                                    <li><strong>Menu Laporan:</strong> Rekap Nilai, Presensi Siswa, Jurnal KBM, Rekap Mutasi, &amp; Keuangan.</li>
+                                                    <li><strong>Surat &amp; Administrasi:</strong> Surat Keterangan, Surat Izin UKS, Biodata Profil Siswa &amp; Guru.</li>
+                                                </ul>
+                                            </div>
+
+                                            <a href="<?= BASE_URL ?>profil_sekolah#seksi_kop_surat" class="btn btn-primary btn-lg px-4 shadow-sm font-weight-bold rounded-pill">
+                                                <i class="fas fa-external-link-alt mr-2"></i> Buka Editor Kop Surat di Profil Sekolah
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <div class="card-footer bg-white border-top-0 p-4 text-center">

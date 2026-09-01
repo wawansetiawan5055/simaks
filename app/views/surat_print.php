@@ -117,21 +117,8 @@
     <button class="no-print" onclick="window.print()">Cetak Sekarang</button>
 
     <div class="container">
-        <!-- Kop Surat -->
-        <div class="kop-surat">
-            <?php if(!empty($sekolah['logo'])): ?>
-                <img src="<?= BASE_URL ?>uploads/<?= $sekolah['logo'] ?>" class="kop-logo" alt="Logo">
-            <?php else: ?>
-                <div style="width: 80px;"></div>
-            <?php endif; ?>
-            <div class="kop-text">
-                <h2><?= $sekolah['nama_yayasan'] ?? 'YAYASAN PENDIDIKAN' ?></h2>
-                <h1><?= $sekolah['nama_sekolah'] ?></h1>
-                <p><?= $sekolah['alamat'] ?>, Telp: <?= $sekolah['telepon'] ?? $sekolah['telp'] ?? '-' ?></p>
-                <p>Email: <?= $sekolah['email'] ?> | Website: <?= $sekolah['website'] ?></p>
-                <p>NPSN: <?= $sekolah['npsn'] ?></p>
-            </div>
-        </div>
+        <!-- Kop Surat Resmi Standar Universal -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
         <!-- Nomor & Perihal -->
         <div class="surat-info">

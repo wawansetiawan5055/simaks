@@ -670,3 +670,13 @@ if (!function_exists('format_cbt_math_output')) {
         return $text;
     }
 }
+
+if (!function_exists('render_kop_surat')) {
+    /**
+     * Render Standard Universal Kop Surat for SIMAKS Print Documents
+     */
+    function render_kop_surat($profil_data = null) {
+        $profil_sekolah_kop = $profil_data;
+        include __DIR__ . '/../app/views/partials/kop_surat_universal.php';
+    }
+}

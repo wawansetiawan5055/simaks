@@ -128,37 +128,9 @@
     </div>
 
     <div class="page-container">
-        <!-- KOP SURAT DINAMIS dari Profil Sekolah -->
+        <!-- KOP SURAT DINAMIS STANDAR UNIVERSAL -->
         <div class="header">
-            <?php
-            if (!class_exists('ProfilSekolahModel')) {
-                require_once __DIR__ . '/../../models/ProfilSekolahModel.php';
-            }
-            $profil_sekolah  = ProfilSekolahModel::getProfil($pdo);
-            $logo_file       = $profil_sekolah['logo'] ?? null;
-            $logo_src        = $logo_file ? BASE_URL . 'assets/img/' . $logo_file : null;
-            $nama_yayasan    = $profil_sekolah['nama_yayasan'] ?? '';
-            $nama_sekolah_kop = $profil_sekolah['nama_sekolah'] ?? 'NAMA SEKOLAH';
-            $npsn_sekolah    = $profil_sekolah['npsn'] ?? '-';
-            $alamat_sekolah  = $profil_sekolah['alamat'] ?? '-';
-            ?>
-            <div style="font-family:'Times New Roman',serif; display:flex; align-items:center; justify-content:center; color:#000; line-height:1.3; padding:0 0 6px 0; gap:10px;">
-                <?php if ($logo_src): ?>
-                <div style="flex-shrink:0;">
-                    <img src="<?= $logo_src ?>" style="height:85px; width:auto;">
-                </div>
-                <?php endif; ?>
-                <div style="flex-grow:1; text-align:center;">
-                    <?php if (!empty($nama_yayasan)): ?>
-                    <div style="font-size:13pt; font-weight:bold; margin:0;"><?= strtoupper(htmlspecialchars($nama_yayasan)) ?></div>
-                    <?php endif; ?>
-                    <div style="font-size:17pt; font-weight:bold; margin:0;"><?= strtoupper(htmlspecialchars($nama_sekolah_kop)) ?></div>
-                    <div style="font-size:11pt; font-weight:bold; margin:2px 0;">NPSN: <?= htmlspecialchars($npsn_sekolah) ?></div>
-                    <div style="font-size:10pt; margin:0;"><?= htmlspecialchars($alamat_sekolah) ?></div>
-                </div>
-            </div>
-            <!-- Garis kop: di luar flex row agar full width -->
-            <hr style="border:none; border-top:3px double black; margin:4px 0 10px 0; width:100%;">
+            <?php include __DIR__ . '/../partials/kop_surat_universal.php'; ?>
             <div style="margin-top:4px;">
                 <h2 style="font-size:16pt; margin:0; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">BIODATA SISWA</h2>
             </div>
