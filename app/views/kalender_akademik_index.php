@@ -167,80 +167,83 @@ $is_manager = in_array(1, $_SESSION['role_ids'] ?? []) ||
       font-size: 0.64rem !important;
       padding: 1px 3px !important;
       border-radius: 4px !important;
-    /* PREVIEW STUDIO STYLES */
-    .preview-unified-card {
-      border-radius: 12px;
-      overflow: hidden;
-      background-color: #323639;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      border: 1px solid #45494d;
-      margin-bottom: 20px;
+      margin-bottom: 1px !important;
     }
-    .preview-unified-header {
-      background: #2a2e33;
-      padding: 10px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #3f4448;
-    }
-    .preview-unified-title {
-      color: #f1f5f9;
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-icon-studio {
-      color: #cbd5e1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-icon-studio:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-    .btn-icon-studio-danger {
-      color: #fca5a5;
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-icon-studio-danger:hover {
-      color: #ffffff;
-      background: #ef4444;
-      border-color: #ef4444;
-    }
-    .preview-unified-body {
-      height: calc(100vh - 120px);
-      min-height: 680px;
-      width: 100%;
-      position: relative;
-      background-color: #525659;
-    }
-    .preview-unified-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
+  }
+
+  /* --- UNIFIED PREVIEW STUDIO STYLES (GLOBAL) --- */
+  .preview-unified-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #323639;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid #45494d;
+    margin-bottom: 20px;
+  }
+  .preview-unified-header {
+    background: #2a2e33;
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #3f4448;
+  }
+  .preview-unified-title {
+    color: #f1f5f9;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-icon-studio {
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-icon-studio:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .btn-icon-studio-danger {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-icon-studio-danger:hover {
+    color: #ffffff;
+    background: #ef4444;
+    border-color: #ef4444;
+  }
+  .preview-unified-body {
+    height: calc(100vh - 120px);
+    min-height: 680px;
+    width: 100%;
+    position: relative;
+    background-color: #525659;
+  }
+  .preview-unified-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
   }
 </style>
 
