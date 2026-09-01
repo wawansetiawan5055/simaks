@@ -35,19 +35,19 @@
     ?>
     <div class="container">
         <div class="header">
-            <h2>SLIP GAJI GURU & KARYAWAN</h2>
-            <p><?= $_SESSION['nama_sekolah'] ?? 'SMK TELKOM LAMPUNG' ?></p>
-            <p>Periode: <strong><?= $bulanName[$data['bulan']] ?? date('F', mktime(0,0,0,$data['bulan'],1)) ?> <?= $data['tahun'] ?></strong></p>
+            <h2>SLIP GAJI GURU &amp; KARYAWAN</h2>
+            <p style="font-weight: bold; font-size: 11pt;"><?= htmlspecialchars($sekolah['nama_sekolah'] ?? $_SESSION['nama_sekolah'] ?? 'SIMAKS ACADEMY') ?></p>
+            <p>Periode: <strong><?= bulan_indo($data['bulan']) ?> <?= $data['tahun'] ?></strong></p>
         </div>
 
         <table class="info-table">
             <tr>
                 <td width="15%">Nama</td>
                 <td width="2%">:</td>
-                <td width="33%"><strong><?= $data['nama_guru'] ?></strong></td>
+                <td width="33%"><strong><?= htmlspecialchars($data['nama_guru']) ?></strong></td>
                 <td width="15%">ID Pegawai</td>
                 <td width="2%">:</td>
-                <td width="33%"><?= $data['id_guru'] ?> / <?= $data['nip'] ?? '-' ?></td>
+                <td width="33%"><?= htmlspecialchars($data['id_guru']) ?> / <?= htmlspecialchars($data['nip'] ?? '-') ?></td>
             </tr>
             <tr>
                 <td>Jabatan</td>
@@ -55,7 +55,7 @@
                 <td>Guru / Staff</td>
                 <td>Tanggal Cetak</td>
                 <td>:</td>
-                <td><?= date('d/m/Y') ?></td>
+                <td><?= tgl_indo() ?></td>
             </tr>
         </table>
 

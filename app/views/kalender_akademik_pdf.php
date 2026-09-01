@@ -225,34 +225,8 @@
 </head>
 <body>
 
-    <header class="kop-surat">
-        <table class="kop-table">
-            <tr>
-                <td class="kop-logo">
-                    <?php 
-                    $logoFile = __DIR__ . '/../../public/' . $kop['logo'];
-                    $logoBase64 = '';
-                    if (!empty($kop['logo']) && file_exists($logoFile)) {
-                        $type = pathinfo($logoFile, PATHINFO_EXTENSION);
-                        $data = file_get_contents($logoFile);
-                        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                    ?>
-                    <?php if ($logoBase64): ?>
-                        <img src="<?= $logoBase64 ?>" alt="Logo">
-                    <?php else: ?>
-                        <div style="width: 60px; height: 60px; border: 1px solid #ccc; text-align: center; line-height: 60px; font-size: 8pt;">LOGO</div>
-                    <?php endif; ?>
-                </td>
-                <td class="kop-text">
-                    <h1><?= htmlspecialchars($kop['nama_yayasan']) ?></h1>
-                    <h2><?= htmlspecialchars($kop['nama_sekolah']) ?></h2>
-                    <p>NPSN: <?= htmlspecialchars($kop['npsn']) ?></p>
-                    <p><?= htmlspecialchars($kop['alamat']) ?></p>
-                </td>
-            </tr>
-        </table>
-    </header>
+    <!-- Universal Centralized Kop Surat -->
+    <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
     <div class="report-title">
         KALENDER AKADEMIK <?= htmlspecialchars($ta['nama_ta']) ?>
@@ -431,11 +405,11 @@
             <td style="width: 50%;"></td>
             <td>
                 <div class="signature-box">
-                    Mengetahui,<br>
+                    <?= htmlspecialchars($sekolah['kota'] ?? $kop['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                     Kepala Sekolah
                     <div class="signature-space"></div>
-                    <strong><?= htmlspecialchars($kop['nama_kepsek']) ?></strong>
-                    <?php if ($kop['nip_kepsek']): ?>
+                    <strong><?= htmlspecialchars($kop['nama_kepsek'] ?? $sekolah['kepala_sekolah'] ?? '-') ?></strong>
+                    <?php if (!empty($kop['nip_kepsek'])): ?>
                         <br>NIP. <?= htmlspecialchars($kop['nip_kepsek']) ?>
                     <?php endif; ?>
                 </div>

@@ -47,10 +47,30 @@ $logo_utama = $profil_sekolah_kop['logo'] ?? '';
 $logo_kiri  = !empty($profil_sekolah_kop['logo_kiri']) ? $profil_sekolah_kop['logo_kiri'] : $logo_utama;
 $logo_kanan = !empty($profil_sekolah_kop['logo_kanan']) ? $profil_sekolah_kop['logo_kanan'] : $logo_utama;
 
-// Resolve Image Paths
+// Resolve Image Paths (Automatic Base64 embedding for 100% compatibility with Dompdf & Browser Prints)
 $path_base = defined('BASE_URL') ? BASE_URL : '';
-$src_kiri  = !empty($logo_kiri) ? $path_base . 'assets/img/' . $logo_kiri : '';
-$src_kanan = !empty($logo_kanan) ? $path_base . 'assets/img/' . $logo_kanan : '';
+$resolve_kop_img = function($logo_file) use ($path_base) {
+    if (empty($logo_file)) return '';
+    $possible_paths = [
+        __DIR__ . '/../../../public/assets/img/' . $logo_file,
+        __DIR__ . '/../../../public/' . $logo_file,
+        __DIR__ . '/../../../public/uploads/' . $logo_file
+    ];
+    foreach ($possible_paths as $p) {
+        if (file_exists($p) && is_file($p)) {
+            $ext = strtolower(pathinfo($p, PATHINFO_EXTENSION));
+            $mime = ($ext === 'svg') ? 'image/svg+xml' : (($ext === 'png') ? 'image/png' : 'image/jpeg');
+            $data = @file_get_contents($p);
+            if ($data !== false && strlen($data) > 0) {
+                return 'data:' . $mime . ';base64,' . base64_encode($data);
+            }
+        }
+    }
+    return $path_base . 'assets/img/' . $logo_file;
+};
+
+$src_kiri  = !empty($logo_kiri) ? $resolve_kop_img($logo_kiri) : '';
+$src_kanan = !empty($logo_kanan) ? $resolve_kop_img($logo_kanan) : '';
 
 $style_garis = $profil_sekolah_kop['style_garis'] ?? 'double';
 ?>

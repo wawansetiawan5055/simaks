@@ -175,17 +175,8 @@
     </div>
 
     <div class="page">
-        <!-- KOP SURAT RESMI -->
-        <div class="kop-surat">
-            <?php if (!empty($sekolah['logo'])): ?>
-                <img src="<?= htmlspecialchars($sekolah['logo']) ?>" class="kop-logo" alt="Logo">
-            <?php endif; ?>
-            <div class="kop-text">
-                <h2><?= htmlspecialchars($sekolah['nama_sekolah'] ?? 'SMA PLUS AL-MANSHURIYAH') ?></h2>
-                <h3>LAPORAN ANALISIS KUANTITATIF BUTIR SOAL ASESMEN</h3>
-                <p><?= htmlspecialchars($sekolah['alamat'] ?? 'Jl. Raya Pendidikan No. 1') ?> &bull; Tahun Ajaran 2026/2027</p>
-            </div>
-        </div>
+        <!-- KOP SURAT UNIVERSAL STANDAR -->
+        <?php include __DIR__ . '/partials/kop_surat_universal.php'; ?>
 
         <div class="judul-dokumen">
             <h4>ANALISIS TINGKAT KESUKARAN, DAYA PEMBEDA &amp; DISTRIBUSI PENGECOH</h4>
@@ -283,6 +274,26 @@
             &bull; <strong>Daya Pembeda (D):</strong> $D \ge 0.40$ (Sangat Baik) &bull; $0.30 \le D < 0.40$ (Baik) &bull; $0.20 \le D < 0.30$ (Cukup / Perlu Revisi) &bull; $D < 0.20$ (Jelek / Dibuang).<br>
             &bull; <strong>Rekomendasi:</strong> Butir soal diterima jika memiliki daya pembeda yang baik dan efektivitas pengecoh yang berfungsi merata.
         </div>
+
+        <!-- TANDA TANGAN -->
+        <table style="width: 100%; margin-top: 30px; border: none; font-size: 0.88rem;">
+            <tr>
+                <td style="width: 50%; border: none; text-align: center;">
+                    Mengetahui,<br>
+                    Kepala Sekolah
+                    <br><br><br><br>
+                    <strong><u><?= htmlspecialchars($sekolah['kepala_sekolah'] ?? 'Nama Kepala Sekolah, M.Pd') ?></u></strong><br>
+                    NIP. <?= htmlspecialchars($sekolah['nip_kepala_sekolah'] ?? '19700101XXXXXXXXXX') ?>
+                </td>
+                <td style="width: 50%; border: none; text-align: center;">
+                    <?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
+                    Guru Pengampu Mata Pelajaran
+                    <br><br><br><br>
+                    <strong><u><?= htmlspecialchars($jadwal['penyusun'] ?? $jadwal['nama_guru'] ?? 'Guru Mata Pelajaran') ?></u></strong><br>
+                    NIP. -
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>
