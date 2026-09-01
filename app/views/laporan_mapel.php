@@ -199,7 +199,13 @@ $excel_url = BASE_URL . 'laporan/mapel_export_excel';
         </div>
       </div>
       <div class="preview-unified-body">
-        <iframe id="pdfStudioFrame" src="" class="preview-unified-frame" title="Pratinjau Cetak Lembar Dokumen"></iframe>
+        <!-- Loader Spinner -->
+        <div id="pdfStudioLoader" style="position: absolute; top:0; left:0; width:100%; height:100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #323639; color: #fff; z-index: 10;">
+          <div class="spinner-border text-info mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+          <div class="font-weight-bold" style="letter-spacing: 0.5px; font-size: 1.1rem;">Menyiapkan Dokumen PDF...</div>
+          <small class="text-muted mt-1">Sedang merender halaman &amp; menyusun data tabel</small>
+        </div>
+        <iframe id="pdfStudioFrame" src="" class="preview-unified-frame" onload="var l = document.getElementById('pdfStudioLoader'); if(l) l.style.display='none';" title="Pratinjau Cetak Lembar Dokumen"></iframe>
       </div>
     </div>
   </div>
@@ -215,6 +221,7 @@ function openFullscreenPreview() {
     }
     document.getElementById('sectionMainData').style.display = 'none';
     document.getElementById('sectionPreviewStudio').style.display = 'block';
+    var l = document.getElementById('pdfStudioLoader'); if(l) l.style.display = 'flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

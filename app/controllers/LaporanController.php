@@ -51,7 +51,14 @@ function laporan_export_pdf_render($data, $filename)
     extract($data); // Extract the data array into individual variables
     include __DIR__ . '/../views/laporan_export_pdf.php';
     $html = ob_get_clean();
-    $dompdf = new Dompdf();
+
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $options->set('isFontSubsettingEnabled', true);
+    $options->set('defaultFont', 'Helvetica');
+
+    $dompdf = new Dompdf($options);
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'landscape');
     $dompdf->render();
