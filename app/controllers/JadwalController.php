@@ -125,6 +125,41 @@ function jadwal_save($pdo)
     redirect('index.php?mod=jadwal&view=kelas&id_kelas=' . $_POST['id_kelas']);
 }
 
+/**
+ * Update Jadwal Handler
+ */
+function jadwal_update($pdo)
+{
+    if (!can_do($pdo, 'jadwal', 'update') && !can_do($pdo, 'jadwal', 'create')) {
+        $_SESSION['pesan_error'] = "Akses ditolak. Anda tidak memiliki izin untuk mengedit jadwal.";
+        redirect('index.php?mod=jadwal&view=kelas&id_kelas=' . ($_POST['id_kelas'] ?? ''));
+        return;
+    }
+
+    $id_ta_aktif = $_SESSION['id_ta_aktif'] ?? 0;
+    if (!$id_ta_aktif)
+        die("Tidak ada TA Aktif untuk menyimpan data.");
+
+    $data = [
+        'old_ids' => $_POST['old_ids'] ?? '',
+        'id_guru_mapel' => $_POST['id_guru_mapel'] ?? 0,
+        'id_kelas' => $_POST['id_kelas'] ?? 0,
+        'hari_kbm' => $_POST['hari_kbm'] ?? '',
+        'mode_kbm' => $_POST['mode_kbm'] ?? 'offline',
+        'id_jam' => $_POST['jam'] ?? [],
+        'id_ta' => $id_ta_aktif
+    ];
+
+    try {
+        JadwalModel::jadwal_update($pdo, $data);
+        $_SESSION['pesan_sukses'] = "Jadwal berhasil diperbarui.";
+    } catch (Exception $e) {
+        $_SESSION['pesan_error'] = "GAGAL UPDATE: " . $e->getMessage();
+    }
+
+    redirect('index.php?mod=jadwal&view=kelas&id_kelas=' . $_POST['id_kelas']);
+}
+
 function jadwal_delete($pdo, $id)
 {
     if (!can_do($pdo, 'jadwal', 'delete')) {

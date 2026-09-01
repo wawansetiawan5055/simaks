@@ -84,10 +84,10 @@ class JadwalModel {
             $jadwal_lengkap[$hari] = [];
 
             $sql = "SELECT 
-                        jp.urutan, jp.jam_mulai, jp.jam_selesai, jp.label_jam_ke,
+                        jp.id_jam, jp.urutan, jp.jam_mulai, jp.jam_selesai, jp.label_jam_ke,
                         jp.jenis_kegiatan AS jenis_jam_pelajaran,
                         mk.nama_kegiatan, mk.jenis_kegiatan AS jenis_master_kegiatan, mk.hari_pelaksanaan,
-                        dm.id_jadwal_mengajar, dm.hari_kbm, dm.mode_kbm,
+                        dm.id_jadwal_mengajar, dm.id_guru_mapel, dm.id_kelas, dm.hari_kbm, dm.mode_kbm,
                         k.tingkat, k.nama_kelas, k.jenis_kelas,
                         m.nama_mapel,
                         g.nama AS nama_guru, g.jenis_guru,
@@ -146,12 +146,14 @@ class JadwalModel {
                     $current['jam_mulai'] = $slot['jam_mulai'];
                     $current['jam_selesai'] = $slot['jam_selesai'];
                     $current['ids_jadwal_mengajar'] = [$slot['id_jadwal_mengajar']];
+                    $current['jam_ids'] = [$slot['id_jam']];
                     $current['guru_list'] = $slot['nama_guru'] ? [$slot['nama_guru']] : [];
                 } else {
                     if ($current['signature'] === $signature) {
                         $current['jam_selesai'] = $slot['jam_selesai'];
                         $current['jp_count']++;
                         $current['ids_jadwal_mengajar'][] = $slot['id_jadwal_mengajar'];
+                        $current['jam_ids'][] = $slot['id_jam'];
                         if ($slot['nama_guru'] && !in_array($slot['nama_guru'], $current['guru_list'])) {
                             $current['guru_list'][] = $slot['nama_guru'];
                         }
@@ -164,6 +166,7 @@ class JadwalModel {
                         $current['jam_mulai'] = $slot['jam_mulai'];
                         $current['jam_selesai'] = $slot['jam_selesai'];
                         $current['ids_jadwal_mengajar'] = [$slot['id_jadwal_mengajar']];
+                        $current['jam_ids'] = [$slot['id_jam']];
                         $current['guru_list'] = $slot['nama_guru'] ? [$slot['nama_guru']] : [];
                     }
                 }
@@ -200,22 +203,23 @@ class JadwalModel {
             throw new Exception("Pilih minimal 1 jam untuk menyimpan jadwal.");
         }
 
-        // --- 1. AMBIL DATA PENDUKUNG ---
-        $stmt_gm = $pdo->prepare("SELECT gm.id_guru, gm.id_mapel, g.jenis_guru FROM guru_mapel gm JOIN guru g ON gm.id_guru = g.id_guru WHERE gm.id_guru_mapel = ?");
-        $stmt_gm->execute([$id_guru_mapel]);
-        $gm_data = $stmt_gm->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$gm_data) {
-            throw new Exception("Data Penugasan Guru Mapel tidak valid.");
-        }
-        $id_guru = $gm_data['id_guru'];
-        $id_mapel = $gm_data['id_mapel'];
-        $jenis_guru = $gm_data['jenis_guru'] ?? 'reguler';
+        $stmt_info = $pdo->prepare("SELECT gm.id_guru, gm.id_mapel, g.jenis_guru, m.nama_mapel, k.jenis_kelas
+                                   FROM guru_mapel gm
+                                   JOIN guru g ON gm.id_guru = g.id_guru
+                                   JOIN mapel m ON gm.id_mapel = m.id_mapel
+                                   JOIN kelas k ON k.id_kelas = ?
+                                   WHERE gm.id_guru_mapel = ?");
+        $stmt_info->execute([$id_kelas, $id_guru_mapel]);
+        $info = $stmt_info->fetch(PDO::FETCH_ASSOC);
 
-        $stmt_k = $pdo->prepare("SELECT tingkat, jenis_kelas FROM kelas WHERE id_kelas = ?");
-        $stmt_k->execute([$id_kelas]);
-        $k_info = $stmt_k->fetch(PDO::FETCH_ASSOC);
-        $tingkat_kelas = $k_info['tingkat'] ?? '';
+        if (!$info) {
+            throw new Exception("Data penugasan guru mapel tidak ditemukan.");
+        }
+
+        $id_guru = $info['id_guru'];
+        $jenis_guru = $info['jenis_guru'];
+        $id_mapel = $info['id_mapel'];
+        $tingkat_kelas = $info['tingkat'] ?? '';
 
         // --- 2. VALIDASI JJM (STRUKTUR KURIKULUM) ---
         $stmt_max_jjm = $pdo->prepare("SELECT alokasi_jp_minggu FROM struktur_kurikulum WHERE id_mapel = ? AND tingkat = ? AND id_ta = ?");
@@ -245,7 +249,7 @@ class JadwalModel {
                  FROM jadwal_mengajar d
                  JOIN guru_mapel gm ON d.id_guru_mapel = gm.id_guru_mapel
                  JOIN kelas k ON d.id_kelas = k.id_kelas
-                 WHERE gm.id_guru = ? AND d.hari_kbm = ? AND d.id_jam = ? AND gm.id_ta = ? AND d.mode_kbm = 'offline'";
+                 WHERE gm.id_guru = ? AND d.hari_kbm = ? AND d.id_jam = ? AND gm.id_ta = ? AND (d.mode_kbm IS NULL OR d.mode_kbm = 'offline')";
         $stmt_cek_guru = $pdo->prepare($sql_cek_guru);
 
         $sql_cek_kelas = "SELECT g.nama 
@@ -266,7 +270,7 @@ class JadwalModel {
                 $stmt_cek_guru->execute([$id_guru, $hari_kbm, $jam_to_insert, $id_ta]);
                 $bentrok_guru = $stmt_cek_guru->fetch(PDO::FETCH_ASSOC);
                 if ($bentrok_guru) {
-                    throw new Exception("Bentrok Jadwal Guru! Guru sudah mengajar di kelas " . $bentrok_guru['nama_kelas'] . " pada hari dan jam yang sama (jam id: $jam_to_insert).");
+                    throw new Exception("Bentrok Jadwal Guru! Guru sudah mengajar di kelas " . $bentrok_guru['nama_kelas'] . " pada hari dan jam yang sama.");
                 }
             }
 
@@ -274,7 +278,7 @@ class JadwalModel {
             $stmt_cek_kelas->execute([$id_kelas, $hari_kbm, $jam_to_insert, $id_ta]);
             $bentrok_kelas = $stmt_cek_kelas->fetch(PDO::FETCH_ASSOC);
             if ($bentrok_kelas) {
-                throw new Exception("Bentrok Jadwal Kelas! Kelas ini sudah diisi oleh " . $bentrok_kelas['nama'] . " pada hari dan jam yang sama (jam id: $jam_to_insert).");
+                throw new Exception("Bentrok Jadwal Kelas! Kelas ini sudah diisi oleh " . $bentrok_kelas['nama'] . " pada hari dan jam yang sama.");
             }
 
             // Insert row
@@ -282,6 +286,16 @@ class JadwalModel {
         }
     }
 
+    /**
+     * UPDATE JADWAL: Hapus slot lama lalu simpan slot baru
+     */
+    public static function jadwal_update($pdo, $data) {
+        $old_ids = $data['old_ids'] ?? '';
+        if (!empty($old_ids)) {
+            self::jadwal_delete($pdo, $old_ids);
+        }
+        self::jadwal_save($pdo, $data);
+    }
 
     public static function jadwal_delete($pdo, $id_detail) {
         if (is_string($id_detail) && strpos($id_detail, ',') !== false) {

@@ -303,12 +303,15 @@
                             <table class="table table-hover mb-0" style="border-collapse: collapse;">
                                 <thead class="bg-light">
                                     <tr class="text-muted" style="font-size: 0.70rem; letter-spacing: 0.5px;">
-                                        <th class="text-center align-middle py-2 border-top-0" style="width: 120px;">WAKTU</th>
-                                        <th class="text-left pl-3 align-middle border-top-0">
-                                            <?= ($view_type === 'guru') ? 'MAPEL & KELAS' : 'MAPEL / GURU PENGAMPU' ?>
-                                        </th>
-                                        <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
-                                            <th class="text-center align-middle border-top-0" style="width: 40px;"><i class="fas fa-cog text-muted"></i></th>
+                                        <th class="text-center align-middle py-2 border-top-0" style="width: 115px;">WAKTU</th>
+                                        <th class="text-left pl-3 align-middle border-top-0">MATA PELAJARAN</th>
+                                        <?php if ($view_type === 'guru'): ?>
+                                            <th class="text-left pl-3 align-middle border-top-0" style="width: 140px;">KELAS / ROMBEL</th>
+                                        <?php else: ?>
+                                            <th class="text-left pl-3 align-middle border-top-0">GURU PENGAMPU</th>
+                                        <?php endif; ?>
+                                        <?php if (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')): ?>
+                                            <th class="text-center align-middle border-top-0" style="width: 70px;">AKSI</th>
                                         <?php endif; ?>
                                     </tr>
                                 </thead>
@@ -320,10 +323,12 @@
                                             $mode_row = $row['mode_kbm'] ?? 'offline';
                                             $display_name = $row['nama_mapel'] ?: ($row['nama_kegiatan_custom'] ?: ($row['nama_kegiatan'] ?? null));
                                             $is_orphan = empty($display_name) && !empty($row['id_jadwal_mengajar']);
+                                            $del_ids = !empty($row['ids_jadwal_mengajar']) ? implode(',', array_filter($row['ids_jadwal_mengajar'])) : ($row['id_jadwal_mengajar'] ?? '');
+                                            $jam_ids_str = !empty($row['jam_ids']) ? implode(',', array_filter($row['jam_ids'])) : ($row['id_jam'] ?? '');
                                         ?>
                                         <tr class="slot-kbm-row <?= $is_kbm ? '' : 'bg-light' ?>">
                                             <!-- KOLOM 1: WAKTU -->
-                                            <td class="align-middle text-center p-2" style="font-size: 0.75rem; white-space: nowrap; color: #475569; border-right: 1px dashed #e2e8f0; width: 120px;">
+                                            <td class="align-middle text-center p-2" style="font-size: 0.75rem; white-space: nowrap; color: #475569; border-right: 1px dashed #e2e8f0; width: 115px;">
                                                 <div class="font-weight-bold text-dark" style="font-size: 0.78rem;">
                                                     <?= substr($row['jam_mulai'], 0, 5) ?> - <?= substr($row['jam_selesai'], 0, 5) ?>
                                                 </div>
@@ -341,56 +346,73 @@
                                                 </div>
                                             </td>
 
-                                            <!-- KOLOM 2: MAPEL / GURU / BADGE KELAS -->
+                                            <!-- KOLOM 2: MATA PELAJARAN -->
                                             <td class="align-middle pl-3 py-2">
                                                 <?php if ($is_orphan): ?>
                                                     <div class="text-danger font-weight-bold" style="font-size: 0.80rem;">
                                                         <i class="fas fa-exclamation-triangle mr-1"></i> Penugasan Diubah di GTK
                                                     </div>
-                                                    <div class="text-muted" style="font-size: 0.70rem;">Hapus slot ini dan tambahkan mapel baru</div>
+                                                    <div class="text-muted small" style="font-size: 0.70rem;">Hapus/edit slot ini dan pilih guru mapel baru</div>
                                                 <?php else: ?>
-                                                    <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
-                                                        <span class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
-                                                            <?= htmlspecialchars($display_name ?? '-') ?>
-                                                        </span>
-                                                        
-                                                        <?php if ($view_type === 'guru' && !empty($row['nama_kelas'])): ?>
-                                                            <!-- BADGE KELAS UNTUK VIEW PER GURU -->
-                                                            <span class="badge badge-primary px-2 py-0.5 font-weight-bold" style="font-size: 0.68rem; border-radius: 6px;">
-                                                                <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
-                                                            </span>
-                                                            <?php if ($jk_row === 'pjj'): ?>
-                                                                <span class="badge badge-success px-1.5 py-0.5" style="font-size: 0.60rem;">TERBUKA</span>
-                                                            <?php elseif ($jk_row === 'menginduk'): ?>
-                                                                <span class="badge badge-warning text-dark px-1.5 py-0.5" style="font-size: 0.60rem;">MENGINDUK</span>
-                                                            <?php endif; ?>
-                                                        <?php endif; ?>
+                                                    <div class="font-weight-bold text-dark" style="font-size: 0.84rem; line-height: 1.3;">
+                                                        <?= htmlspecialchars($display_name ?? '-') ?>
                                                     </div>
-
-                                                    <?php if ($view_type === 'kelas' && !empty($row['nama_guru'])): ?>
-                                                        <!-- NAMA GURU UNTUK VIEW PER KELAS -->
-                                                        <div class="text-muted" style="font-size: 0.74rem; margin-top: 2px;">
-                                                            <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-50"></i><?= htmlspecialchars($row['nama_guru']) ?>
-                                                        </div>
-                                                    <?php elseif (!$is_kbm): ?>
-                                                        <!-- NON KBM (Tadarus, Upacara, Istirahat, Sholat) -->
-                                                        <div class="text-muted font-italic" style="font-size: 0.70rem; margin-top: 1px;">
-                                                            <i class="fas fa-info-circle mr-1 text-info"></i>Kegiatan Sekolah
-                                                        </div>
+                                                    <?php if (!$is_kbm): ?>
+                                                        <span class="badge badge-secondary px-1.5 py-0.5 font-italic" style="font-size: 0.62rem;">Kegiatan Sekolah</span>
                                                     <?php endif; ?>
                                                 <?php endif; ?>
                                             </td>
 
-                                            <!-- KOLOM 3: AKSI HAPUS -->
-                                            <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
-                                            <td class="text-center align-middle p-1" style="width: 40px;">
-                                                <?php 
-                                                    $del_ids = !empty($row['ids_jadwal_mengajar']) ? implode(',', array_filter($row['ids_jadwal_mengajar'])) : ($row['id_jadwal_mengajar'] ?? '');
-                                                ?>
-                                                <?php if (!empty($del_ids)): ?>
-                                                    <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal">
-                                                        <i class="fas fa-times"></i>
-                                                    </a>
+                                            <!-- KOLOM 3: GURU PENGAMPU / KELAS -->
+                                            <?php if ($view_type === 'guru'): ?>
+                                                <td class="align-middle pl-3 py-2" style="width: 140px;">
+                                                    <?php if (!empty($row['nama_kelas'])): ?>
+                                                        <span class="badge badge-primary px-2 py-1 font-weight-bold" style="font-size: 0.72rem; border-radius: 6px;">
+                                                            <i class="fas fa-users mr-1"></i>Kelas <?= htmlspecialchars($row['nama_kelas']) ?>
+                                                        </span>
+                                                        <?php if ($jk_row === 'pjj'): ?>
+                                                            <span class="badge badge-success px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">TERBUKA</span>
+                                                        <?php elseif ($jk_row === 'menginduk'): ?>
+                                                            <span class="badge badge-warning text-dark px-1.5 py-0.5 d-block mt-0.5 text-left" style="font-size: 0.58rem; width: max-content;">MENGINDUK</span>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php else: ?>
+                                                <td class="align-middle pl-3 py-2">
+                                                    <?php if (!empty($row['nama_guru'])): ?>
+                                                        <div class="text-dark font-weight-500" style="font-size: 0.78rem;">
+                                                            <i class="fas fa-chalkboard-teacher mr-1 text-primary opacity-75"></i><?= htmlspecialchars($row['nama_guru']) ?>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endif; ?>
+
+                                            <!-- KOLOM 4: AKSI (EDIT & HAPUS) -->
+                                            <?php if (can_do($pdo, 'jadwal', 'update') || can_do($pdo, 'jadwal', 'delete')): ?>
+                                            <td class="text-center align-middle p-1" style="width: 70px; white-space: nowrap;">
+                                                <?php if (!empty($del_ids) && $is_kbm): ?>
+                                                    <?php if (can_do($pdo, 'jadwal', 'update')): ?>
+                                                        <button type="button" class="btn btn-xs btn-outline-warning border-0 rounded-circle btn-edit-jadwal mr-1" 
+                                                            style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" 
+                                                            data-id="<?= $del_ids ?>"
+                                                            data-id-kelas="<?= $row['id_kelas'] ?? '' ?>"
+                                                            data-id-guru-mapel="<?= $row['id_guru_mapel'] ?? '' ?>"
+                                                            data-hari="<?= $hari_ini ?>"
+                                                            data-mode="<?= $mode_row ?>"
+                                                            data-jam-ids="<?= $jam_ids_str ?>"
+                                                            title="Edit Jadwal">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                    <?php if (can_do($pdo, 'jadwal', 'delete')): ?>
+                                                        <a href="<?= BASE_URL ?>jadwal/delete?id=<?= $del_ids ?>" onclick="return confirmDelete(event)" class="btn btn-xs btn-outline-danger border-0 rounded-circle" style="width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center;" title="Hapus Jadwal">
+                                                            <i class="fas fa-times"></i>
+                                                        </a>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
                                             </td>
                                             <?php endif; ?>
@@ -398,7 +420,7 @@
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="3" class="text-center font-italic text-muted py-4 small bg-light">
+                                            <td colspan="4" class="text-center font-italic text-muted py-4 small bg-light">
                                                 <i class="fas fa-calendar-minus text-muted mb-1 d-block" style="font-size: 1.5rem; opacity: 0.35;"></i>
                                                 Tidak ada jadwal kegiatan untuk hari <?= $hari_ini ?>
                                             </td>
@@ -485,7 +507,7 @@
                                     <a href="#" class="clear-all-jam text-danger ml-1">Reset</a>
                                 </span>
                             </label>
-                            <!-- CHECKBOX BOX DIRECT CONTAINER (Tidak macet/hilang) -->
+                            <!-- CHECKBOX BOX DIRECT CONTAINER -->
                             <div class="border rounded p-2.5 bg-light" style="max-height: 200px; overflow-y: auto; border-color: #cbd5e1 !important;" id="jamCheckboxContainer">
                                 <p class="text-muted small mb-0 font-italic" id="jamPlaceholderInfo">Pilih hari terlebih dahulu untuk melihat slot jam aktif.</p>
                                 <?php foreach ($jam_list as $jam): ?>
@@ -510,10 +532,101 @@
     </div>
 <?php endif; ?>
 
+<!-- MODAL EDIT JADWAL -->
+<?php if (can_do($pdo, 'jadwal', 'update')): ?>
+    <div class="modal fade" id="modalEditJadwal" tabindex="-1" role="dialog" aria-labelledby="modalEditJadwalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title font-weight-bold" id="modalEditJadwalLabel"><i class="fas fa-pencil-alt mr-2"></i>Edit Jadwal KBM</h5>
+                    <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="<?= BASE_URL ?>jadwal/update" method="POST">
+                    <input type="hidden" name="old_ids" id="edit_old_ids">
+                    <div class="modal-body p-4">
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Pilih Kelas / Rombel</label>
+                            <select name="id_kelas" id="edit_id_kelas" class="form-control" required onchange="onEditModalKelasChange(this)">
+                                <option value="">-- Pilih Kelas --</option>
+                                <?php foreach ($kelas_list as $k): ?>
+                                    <?php $jk_tag = ($k['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : (($k['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : ''); ?>
+                                    <option value="<?= $k['id_kelas'] ?>" data-jenis="<?= $k['jenis_kelas'] ?? 'reguler' ?>">
+                                        <?= htmlspecialchars($k['nama_kelas']) ?><?= $jk_tag ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Moda Pembelajaran (Online vs Offline)</label>
+                            <select name="mode_kbm" id="edit_mode_kbm" class="form-control" required>
+                                <option value="offline">🏫 Tatap Muka (Offline di Lokasi)</option>
+                                <option value="online">🌐 Daring / Online LMS (Asinkronus / Mandiri)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Guru &amp; Mapel (Sesuai Penugasan Kelas)</label>
+                            <select name="id_guru_mapel" id="edit_id_guru_mapel" class="form-control" required>
+                                <option value="">-- Pilih Guru & Mapel --</option>
+                                <?php foreach ($guru_mapel_list as $gm): ?>
+                                    <option value="<?= $gm['id_guru_mapel'] ?>" data-kelas="<?= $gm['id_kelas'] ?>"><?= $gm['nama_guru'] ?> (<?= $gm['nama_mapel'] ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small class="form-text text-muted" id="edit_guru_filter_info">Pilih kelas untuk memfilter daftar guru.</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold small text-dark">Hari</label>
+                            <select name="hari_kbm" id="edit_hari_kbm" class="form-control" required>
+                                <option value="">-- Pilih Hari --</option>
+                                <option value="Senin">Senin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Kamis">Kamis</option>
+                                <option value="Jumat">Jumat</option>
+                                <option value="Sabtu">Sabtu</option>
+                                <option value="Minggu">Minggu</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <label class="font-weight-bold small text-dark d-flex justify-content-between align-items-center mb-1">
+                                <span>Jam Pelajaran</span>
+                                <span class="small font-weight-normal">
+                                    <a href="#" class="edit-select-all-jam mr-1 text-primary">Pilih Semua</a> | 
+                                    <a href="#" class="edit-clear-all-jam text-danger ml-1">Reset</a>
+                                </span>
+                            </label>
+                            <div class="border rounded p-2.5 bg-light" style="max-height: 200px; overflow-y: auto; border-color: #cbd5e1 !important;" id="editJamCheckboxContainer">
+                                <p class="text-muted small mb-0 font-italic" id="editJamPlaceholderInfo">Pilih hari terlebih dahulu untuk melihat slot jam aktif.</p>
+                                <?php foreach ($jam_list as $jam): ?>
+                                    <div class="custom-control custom-checkbox edit-jam-row mb-1" style="display: none;" data-hari="<?= htmlspecialchars($jam['hari_pelaksanaan'] ?? '') ?>">
+                                        <input type="checkbox" class="custom-control-input edit-jam-checkbox" id="edit_jam_<?= $jam['id_jam'] ?>" data-value="<?= $jam['id_jam'] ?>">
+                                        <label class="custom-control-label small font-weight-bold" for="edit_jam_<?= $jam['id_jam'] ?>">
+                                            <?= htmlspecialchars($jam['label_jam_ke'] ?? $jam['nama_sesi']) ?> (<?= substr($jam['jam_mulai'],0,5) ?> - <?= substr($jam['jam_selesai'],0,5) ?>)
+                                        </label>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div id="edit-selected-jam-inputs"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-secondary px-3" data-dismiss="modal" style="border-radius: 8px;">Batal</button>
+                        <button type="submit" class="btn btn-warning px-4 font-weight-bold text-dark" style="border-radius: 8px;"><i class="fas fa-save mr-1"></i> Update Jadwal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>
 function selectProgramTab(program) {
     document.getElementById('input_program').value = program;
-    // Clear selected id_kelas so it selects the first class of the new program
     var selectKelas = document.querySelector('select[name="id_kelas"]');
     if (selectKelas) {
         selectKelas.value = "";
@@ -542,6 +655,7 @@ function filterJadwalHari(days, el) {
 }
 
 document.addEventListener('DOMContentLoaded', function(){
+    // --- CREATE MODAL SYNC HIDDEN INPUTS ---
     function syncHiddenInputs() {
         var container = document.getElementById('selected-jam-inputs');
         if (!container) return;
@@ -579,7 +693,43 @@ document.addEventListener('DOMContentLoaded', function(){
 
     syncHiddenInputs();
 
-    // FITUR SAMAR & FILTER JAM SESUAI HARI
+    // --- EDIT MODAL SYNC HIDDEN INPUTS ---
+    function syncEditHiddenInputs() {
+        var container = document.getElementById('edit-selected-jam-inputs');
+        if (!container) return;
+        container.innerHTML = '';
+        document.querySelectorAll('.edit-jam-checkbox:checked').forEach(function(cb){
+            var val = cb.getAttribute('data-value');
+            var inp = document.createElement('input');
+            inp.type = 'hidden';
+            inp.name = 'jam[]';
+            inp.value = val;
+            container.appendChild(inp);
+        });
+    }
+
+    document.addEventListener('change', function(e){
+        if (e.target && e.target.classList && e.target.classList.contains('edit-jam-checkbox')) {
+            syncEditHiddenInputs();
+        }
+    });
+
+    document.addEventListener('click', function(e){
+        if (e.target && e.target.classList && e.target.classList.contains('edit-select-all-jam')) {
+            e.preventDefault();
+            document.querySelectorAll('.edit-jam-row:not([style*="display: none"]) .edit-jam-checkbox:not(:disabled)').forEach(function(cb){ 
+                cb.checked = true; 
+            });
+            syncEditHiddenInputs();
+        }
+        if (e.target && e.target.classList && e.target.classList.contains('edit-clear-all-jam')) {
+            e.preventDefault();
+            document.querySelectorAll('.edit-jam-checkbox').forEach(function(cb){ cb.checked = false; });
+            syncEditHiddenInputs();
+        }
+    });
+
+    // --- MODAL TAMBAH: FITUR SAMAR & FILTER JAM SESUAI HARI ---
     const selectKelas = document.getElementById('modal_id_kelas');
     const selectHari = document.getElementById('modal_hari_kbm');
     const jamCheckboxes = document.querySelectorAll('.jam-checkbox');
@@ -600,20 +750,17 @@ document.addEventListener('DOMContentLoaded', function(){
 
         if (jamPlaceholder) jamPlaceholder.style.display = 'none';
 
-        let visibleCount = 0;
         jamCheckboxes.forEach(cb => {
             const row = cb.closest('.jam-row');
             const label = row ? row.querySelector('label') : null;
             const hariPelaksanaan = row ? (row.getAttribute('data-hari') || "") : "";
             const activeArr = hariPelaksanaan.split(',').map(s => s.trim());
 
-            // 1. Filter jam yang aktif di hari ini
             if (!activeArr.includes(hariKbm) && hariPelaksanaan !== "") {
                 if (row) row.style.display = 'none';
                 cb.checked = false; 
             } else {
                 if (row) row.style.display = 'block';
-                visibleCount++;
             }
 
             cb.disabled = false;
@@ -655,7 +802,7 @@ document.addEventListener('DOMContentLoaded', function(){
         selectHari.addEventListener('change', checkOccupiedSlots);
     }
 
-    // FITUR FILTER GURU BERDASARKAN KELAS
+    // --- MODAL TAMBAH: FILTER GURU BERDASARKAN KELAS ---
     const selectGuruMapel = document.getElementById('modal_id_guru_mapel');
     const guruFilterInfo = document.getElementById('guru_filter_info');
     
@@ -699,42 +846,146 @@ document.addEventListener('DOMContentLoaded', function(){
 
         if (selectKelas) {
             selectKelas.addEventListener('change', filterGuruMapel);
-            // Trigger immediately if class is already selected
             if (selectKelas.value) {
                 filterGuruMapel();
             }
         }
     }
 
-    // Auto-adjust Moda KBM based on PJJ Class & Day
-    const selectModeKbm = document.getElementById('modal_mode_kbm');
-    function autoAdjustModeKbm() {
-        if (!selectKelas || !selectModeKbm) return;
-        const selectedOption = selectKelas.options[selectKelas.selectedIndex];
-        const jenisKelas = selectedOption ? selectedOption.getAttribute('data-jenis') : '';
-        const hari = selectHari ? selectHari.value : '';
+    // --- MODAL EDIT: LOGIKA POPULATE & EVENT LISTENER ---
+    const editSelectKelas = document.getElementById('edit_id_kelas');
+    const editSelectHari = document.getElementById('edit_hari_kbm');
+    const editSelectGuruMapel = document.getElementById('edit_id_guru_mapel');
+    const editSelectModeKbm = document.getElementById('edit_mode_kbm');
+    const editJamCheckboxes = document.querySelectorAll('.edit-jam-checkbox');
+    const editJamPlaceholder = document.getElementById('editJamPlaceholderInfo');
+    const editGuruFilterInfo = document.getElementById('edit_guru_filter_info');
 
-        if (jenisKelas === 'pjj') {
-            if (['Senin', 'Selasa', 'Rabu', 'Kamis'].includes(hari) || !hari) {
-                selectModeKbm.value = 'online';
-            } else if (['Sabtu', 'Minggu'].includes(hari)) {
-                selectModeKbm.value = 'offline';
+    let allEditGuruOptions = [];
+    if (editSelectGuruMapel) {
+        allEditGuruOptions = Array.from(editSelectGuruMapel.options);
+    }
+
+    function filterEditGuruMapel(selectedId = '') {
+        if (!editSelectGuruMapel) return;
+        const idKelas = editSelectKelas ? editSelectKelas.value : '';
+        
+        editSelectGuruMapel.innerHTML = "";
+        editSelectGuruMapel.appendChild(allEditGuruOptions[0].cloneNode(true));
+        
+        let found = 0;
+        allEditGuruOptions.forEach((opt, idx) => {
+            if (idx === 0) return;
+            const kelasId = opt.getAttribute('data-kelas');
+            if (kelasId == idKelas) {
+                const clone = opt.cloneNode(true);
+                if (clone.value == selectedId) {
+                    clone.selected = true;
+                }
+                editSelectGuruMapel.appendChild(clone);
+                found++;
+            }
+        });
+
+        if (editGuruFilterInfo) {
+            if (found === 0) {
+                editGuruFilterInfo.innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle mr-1"></i> Tidak ada penugasan guru untuk kelas ini.</span>';
+            } else {
+                editGuruFilterInfo.innerHTML = '<span class="text-success"><i class="fas fa-check-circle mr-1"></i> Menampilkan ' + found + ' guru pengampu.</span>';
             }
         }
     }
 
-    if (selectKelas && selectModeKbm) {
-        selectKelas.addEventListener('change', autoAdjustModeKbm);
+    function renderEditJamSlots(currentActiveJamIds = []) {
+        const hariKbm = editSelectHari ? editSelectHari.value : '';
+        if (!hariKbm) {
+            if (editJamPlaceholder) editJamPlaceholder.style.display = 'block';
+            editJamCheckboxes.forEach(cb => {
+                const row = cb.closest('.edit-jam-row');
+                if (row) row.style.display = 'none';
+            });
+            return;
+        }
+
+        if (editJamPlaceholder) editJamPlaceholder.style.display = 'none';
+
+        editJamCheckboxes.forEach(cb => {
+            const row = cb.closest('.edit-jam-row');
+            const label = row ? row.querySelector('label') : null;
+            const hariPelaksanaan = row ? (row.getAttribute('data-hari') || "") : "";
+            const activeArr = hariPelaksanaan.split(',').map(s => s.trim());
+            const val = cb.getAttribute('data-value');
+
+            if (!activeArr.includes(hariKbm) && hariPelaksanaan !== "") {
+                if (row) row.style.display = 'none';
+                cb.checked = false;
+            } else {
+                if (row) row.style.display = 'block';
+            }
+
+            cb.disabled = false;
+            if (row) row.style.opacity = '1';
+            if (row) row.title = '';
+            if (label) label.style.textDecoration = 'none';
+
+            if (currentActiveJamIds.includes(val) || currentActiveJamIds.includes(parseInt(val))) {
+                cb.checked = true;
+            }
+        });
+
+        syncEditHiddenInputs();
     }
-    if (selectHari && selectModeKbm) {
-        selectHari.addEventListener('change', autoAdjustModeKbm);
+
+    if (editSelectKelas) {
+        editSelectKelas.addEventListener('change', function() {
+            filterEditGuruMapel();
+        });
     }
+
+    if (editSelectHari) {
+        editSelectHari.addEventListener('change', function() {
+            renderEditJamSlots([]);
+        });
+    }
+
+    // Tombol Edit Jadwal Click Handler
+    $(document).on('click', '.btn-edit-jadwal', function() {
+        const oldIds = $(this).data('id');
+        const idKelas = $(this).data('id-kelas');
+        const idGuruMapel = $(this).data('id-guru-mapel');
+        const hari = $(this).data('hari');
+        const mode = $(this).data('mode') || 'offline';
+        const jamIdsStr = $(this).data('jam-ids') ? $(this).data('jam-ids').toString() : '';
+        const jamIds = jamIdsStr ? jamIdsStr.split(',').map(s => s.trim()) : [];
+
+        $('#edit_old_ids').val(oldIds);
+        if (editSelectKelas) $(editSelectKelas).val(idKelas);
+        if (editSelectModeKbm) $(editSelectModeKbm).val(mode);
+        if (editSelectHari) $(editSelectHari).val(hari);
+
+        filterEditGuruMapel(idGuruMapel);
+        renderEditJamSlots(jamIds);
+
+        $('#modalEditJadwal').modal('show');
+    });
 });
 
 function onModalKelasChange(sel) {
     const opt = sel.options[sel.selectedIndex];
     const jenis = opt ? opt.getAttribute('data-jenis') : 'reguler';
     const modeSel = document.getElementById('modal_mode_kbm');
+
+    if (jenis === 'pjj') {
+        if (modeSel) modeSel.value = 'online';
+    } else {
+        if (modeSel) modeSel.value = 'offline';
+    }
+}
+
+function onEditModalKelasChange(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    const jenis = opt ? opt.getAttribute('data-jenis') : 'reguler';
+    const modeSel = document.getElementById('edit_mode_kbm');
 
     if (jenis === 'pjj') {
         if (modeSel) modeSel.value = 'online';

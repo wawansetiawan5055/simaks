@@ -1411,6 +1411,8 @@ try {
                 jadwal_index($pdo);
             elseif ($act == 'save')
                 jadwal_save($pdo);
+            elseif ($act == 'update')
+                jadwal_update($pdo);
             elseif ($act == 'delete')
                 jadwal_delete($pdo, $_GET['id']);
             else
