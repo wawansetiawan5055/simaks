@@ -24,6 +24,12 @@ use Dompdf\Dompdf;
 function laporan_export_excel_render($data, $filename)
 {
     extract($data); // Extract the data array into individual variables
+    $clean_filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $filename);
+    $clean_filename = preg_replace('/_+/', '_', trim($clean_filename, '_'));
+    if (substr($clean_filename, -5) === '.xlsx') {
+        $clean_filename = substr($clean_filename, 0, -5);
+    }
+    
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
     $sheet->mergeCells('A1:' . chr(64 + count($kolom)) . '1');
@@ -39,7 +45,7 @@ function laporan_export_excel_render($data, $filename)
         $sheet->fromArray($row, null, 'A' . $no++);
     }
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
+    header('Content-Disposition: attachment; filename="' . $clean_filename . '.xlsx"');
     $writer = new Xlsx($spreadsheet);
     $writer->save('php://output');
     exit;
@@ -62,7 +68,12 @@ function laporan_export_pdf_render($data, $filename)
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'landscape');
     $dompdf->render();
-    $dompdf->stream($filename . '.pdf', ["Attachment" => false]);
+    $clean_filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $filename);
+    $clean_filename = preg_replace('/_+/', '_', trim($clean_filename, '_'));
+    if (substr($clean_filename, -4) !== '.pdf') {
+        $clean_filename .= '.pdf';
+    }
+    $dompdf->stream($clean_filename, ["Attachment" => false]);
     exit;
 }
 
@@ -169,7 +180,7 @@ function laporan_siswa_export_excel($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama'], $d['nisn'], $d['nipd'], $d['jk'], $d['nama_kelas'], $d['status_aktif']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_siswa");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Data_Siswa_" . (!empty($_GET['kelas']) ? "Kelas_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_GET['kelas']) : "Semua_Kelas") . "_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_siswa_export_pdf($pdo)
 {
@@ -197,7 +208,7 @@ function laporan_siswa_export_pdf($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama'], $d['nisn'], $d['nipd'], $d['jk'], $d['nama_kelas'], $d['status_aktif']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_siswa");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Data_Siswa_" . (!empty($_GET['kelas']) ? "Kelas_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_GET['kelas']) : "Semua_Kelas") . "_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_siswa_print($pdo)
 {
@@ -247,7 +258,7 @@ function laporan_guru_export_excel($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama'], $d['nuptk'], $d['nik'], $d['jk'], $d['status']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_guru");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Data_Guru_GTK_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_guru_export_pdf($pdo)
 {
@@ -259,7 +270,7 @@ function laporan_guru_export_pdf($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama'], $d['nuptk'], $d['nik'], $d['jk'], $d['status']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_guru");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Data_Guru_GTK_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_guru_print($pdo)
 {
@@ -407,7 +418,7 @@ function laporan_mapel_export_excel($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama_mapel'], $d['kategori_mapel'], $d['kktp']]; // Revisi kkm -> kktp
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_mapel");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Mata_Pelajaran_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_mapel_export_pdf($pdo)
 {
@@ -419,7 +430,7 @@ function laporan_mapel_export_pdf($pdo)
     foreach ($data as $d)
         $rows[] = [$no++, $d['nama_mapel'], $d['kategori_mapel'], $d['kktp']]; // Revisi kkm -> kktp
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_mapel");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Mata_Pelajaran_TA_" . preg_replace('/[^a-zA-Z0-9]/', '_', $_SESSION['nama_ta_viewing'] ?? $_SESSION['nama_ta_aktif'] ?? 'TA'));
 }
 function laporan_mapel_print($pdo)
 {
@@ -2744,7 +2755,7 @@ function laporan_catatan_kasus_export_excel($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal'], $d['nama_kelas'], $d['nama'], $d['kasus'], $d['tindak_lanjut'], $d['status']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_catatan_kasus");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Catatan_Kasus_BK_" . (!empty($_GET['kelas']) ? "Kelas_" . $_GET['kelas'] . "_" : "") . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_catatan_kasus_export_pdf($pdo)
 {
@@ -2772,7 +2783,7 @@ function laporan_catatan_kasus_export_pdf($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal'], $d['nama_kelas'], $d['nama'], $d['kasus'], $d['tindak_lanjut'], $d['status']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_catatan_kasus");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Catatan_Kasus_BK_" . (!empty($_GET['kelas']) ? "Kelas_" . $_GET['kelas'] . "_" : "") . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_catatan_kasus_print($pdo)
 {
@@ -2865,7 +2876,7 @@ function laporan_catatan_kelas_export_excel($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal'], $d['tingkat'] . '-' . $d['nama_kelas'], $d['nama_mapel'], $d['nama_guru_mapel'], $d['catatan_kejadian']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_catatan_kelas");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Catatan_Kejadian_Kelas_" . (!empty($_GET['kelas']) ? "Kelas_" . $_GET['kelas'] . "_" : "") . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_catatan_kelas_export_pdf($pdo)
 {
@@ -2896,7 +2907,7 @@ function laporan_catatan_kelas_export_pdf($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal'], $d['tingkat'] . '-' . $d['nama_kelas'], $d['nama_mapel'], $d['nama_guru_mapel'], $d['catatan_kejadian']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_catatan_kelas");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Catatan_Kejadian_Kelas_" . (!empty($_GET['kelas']) ? "Kelas_" . $_GET['kelas'] . "_" : "") . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_catatan_kelas_print($pdo)
 {
@@ -2979,7 +2990,7 @@ function laporan_mutasi_siswa_export_excel($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal_mutasi'], $d['nama'], $d['nisn'], $d['tingkat'] . '-' . $d['nama_kelas'], $d['jenis_mutasi'], $d['alasan']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_mutasi_siswa");
+    laporan_export_excel_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Mutasi_Siswa_" . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_mutasi_siswa_export_pdf($pdo)
 {
@@ -3006,7 +3017,7 @@ function laporan_mutasi_siswa_export_pdf($pdo)
     foreach ($list as $d)
         $rows[] = [$no++, $d['tanggal_mutasi'], $d['nama'], $d['nisn'], $d['tingkat'] . '-' . $d['nama_kelas'], $d['jenis_mutasi'], $d['alasan']];
     $kop = get_kop_laporan($pdo);
-    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "laporan_mutasi_siswa");
+    laporan_export_pdf_render(['judul' => $judul, 'kolom' => $kolom, 'rows' => $rows, 'kop_nama' => $kop['kop_nama'], 'kop_alamat' => $kop['kop_alamat'], 'kop_npsn' => $kop['kop_npsn']], "Laporan_Mutasi_Siswa_" . (!empty($_GET['tanggal1']) ? $_GET['tanggal1'] . "_sd_" . ($_GET['tanggal2'] ?? "") : "Semua"));
 }
 function laporan_mutasi_siswa_print($pdo)
 {
