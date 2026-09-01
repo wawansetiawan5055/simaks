@@ -32,10 +32,13 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
 ?>
 
 <style>
-    /* UTILITIES */
+    /* UTILITIES & SPACING NORMALIZATION */
     .content-header {
-        padding-top: 15px;
-        padding-bottom: 0;
+        padding-top: 15px !important;
+        padding-bottom: 0 !important;
+    }
+    .content {
+        padding-top: 0 !important;
     }
 
     /* 1. DESKTOP / TABLET: 2-COLUMN SEPARATED CARDS (BANNER KIRI 75% + INFO KANAN 25%) */
@@ -45,7 +48,7 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
         align-items: stretch;
         margin-left: -10px !important;
         margin-right: -10px !important;
-        margin-bottom: 18px !important;
+        margin-bottom: 0 !important;
     }
 
     .banner-col-main {
@@ -53,6 +56,7 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
         max-width: 75%;
         padding-left: 10px !important;
         padding-right: 10px !important;
+        margin-bottom: 20px !important;
         display: flex;
         flex-direction: column;
     }
@@ -62,6 +66,7 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
         max-width: 25%;
         padding-left: 10px !important;
         padding-right: 10px !important;
+        margin-bottom: 20px !important;
         display: flex;
         flex-direction: column;
     }
@@ -1505,7 +1510,7 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
     }
 </style>
 
-<section class="content-header">
+<section class="content pt-3">
     <div class="container-fluid">
 
         <!-- 1. TAMPILAN DESKTOP/LAPTOP/TABLET (CARD SLIDER BANNER & CARD WAKTU TERPISAH SEPERTI SEMULA) -->
@@ -1924,12 +1929,6 @@ $is_guru = (in_array('Guru', $user_roles) || in_array('Admin', $user_roles));
                 </div>
             </div>
         </div>
-
-    </div>
-</section>
-
-<section class="content">
-    <div class="container-fluid">
 
         <div class="row">
             <!-- KARTU: TOTAL SISWA AKTIF -->
