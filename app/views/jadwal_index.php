@@ -166,37 +166,37 @@
         </ul>
     </div>
 
-    <!-- FILTER PER KELAS / PER GURU + TOMBOL FILTER PER 2 HARI -->
+    <!-- FILTER PER KELAS / PER GURU + TOMBOL FILTER PER 2 HARI (1 BARIS RINGKAS & ELEGAN) -->
     <div class="col-md-12 mb-3">
         <div class="card shadow-sm border-0" style="border-radius: 14px; background: #ffffff;">
             <div class="card-body py-2.5 px-3">
-                <form id="formJadwalFilter" method="GET" class="row align-items-center mb-2" style="gap: 6px 0;">
-                    <input type="hidden" name="mod" value="jadwal">
-                    <input type="hidden" name="program" id="input_program" value="<?= htmlspecialchars($program) ?>">
+                <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 10px;">
                     
-                    <div class="col-md-auto col-12 d-flex align-items-center mb-1 mb-md-0">
-                        <span class="badge badge-primary mr-2 px-2 py-1"><i class="fas fa-filter"></i></span>
-                        <span class="font-weight-bold text-dark" style="font-size: 0.82rem;">FILTER:</span>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <select name="view" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
+                    <!-- BAGIAN KIRI: FORM DROPDOWN FILTER KELAS / GURU -->
+                    <form id="formJadwalFilter" method="GET" class="d-flex align-items-center flex-wrap m-0" style="gap: 8px;">
+                        <input type="hidden" name="mod" value="jadwal">
+                        <input type="hidden" name="program" id="input_program" value="<?= htmlspecialchars($program) ?>">
+                        
+                        <div class="d-flex align-items-center">
+                            <span class="badge badge-primary mr-2 px-2 py-1"><i class="fas fa-filter"></i></span>
+                            <span class="font-weight-bold text-dark d-none d-sm-inline" style="font-size: 0.82rem;">FILTER:</span>
+                        </div>
+
+                        <select name="view" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 155px;" onchange="this.form.submit()">
                             <option value="kelas" <?= ($view_type == 'kelas') ? 'selected' : ''; ?>>Per Rombel / Kelas</option>
                             <option value="guru" <?= ($view_type == 'guru') ? 'selected' : ''; ?>>Per Guru Pengampu</option>
                         </select>
-                    </div>
-                    <?php if ($view_type == 'guru'): ?>
-                        <div class="col-md-4 col-6">
-                            <select name="id_guru" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
+
+                        <?php if ($view_type == 'guru'): ?>
+                            <select name="id_guru" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 180px;" onchange="this.form.submit()">
                                 <?php foreach ($guru_list as $g): ?>
                                     <option value="<?= $g['id_guru'] ?>" <?= ($id_guru_filter == $g['id_guru']) ? 'selected' : ''; ?>>
                                         <?= htmlspecialchars($g['nama_guru']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
-                    <?php else: ?>
-                        <div class="col-md-4 col-6">
-                            <select name="id_kelas" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem;" onchange="this.form.submit()">
+                        <?php else: ?>
+                            <select name="id_kelas" class="form-control form-control-sm border bg-light font-weight-bold" style="border-radius: 8px; font-size: 0.78rem; width: auto; min-width: 160px;" onchange="this.form.submit()">
                                 <?php foreach ($filtered_kelas_list as $k): ?>
                                     <?php $jk_suffix = ($k['jenis_kelas'] ?? '') === 'pjj' ? ' (TERBUKA)' : (($k['jenis_kelas'] ?? '') === 'menginduk' ? ' (MENGINDUK)' : ''); ?>
                                     <option value="<?= $k['id_kelas'] ?>" <?= ($id_kelas_filter == $k['id_kelas']) ? 'selected' : ''; ?>>
@@ -204,28 +204,31 @@
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
-                    <?php endif; ?>
-                </form>
+                        <?php endif; ?>
+                    </form>
 
-                <!-- TOMBOL FILTER HARI (PER 2 HARI: SENIN-SELASA, RABU-KAMIS, JUMAT-SABTU, MINGGU, SEMUA HARI) -->
-                <div class="d-flex align-items-center flex-wrap pt-2 border-top" style="gap: 6px;">
-                    <span class="font-weight-bold text-muted mr-1 small"><i class="fas fa-calendar-day mr-1"></i>Pilih Hari:</span>
-                    <button type="button" class="btn btn-sm day-filter-btn active" data-target-days="all" onclick="filterJadwalHari('all', this)">
-                        Semua Hari
-                    </button>
-                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Senin,Selasa" onclick="filterJadwalHari(['Senin', 'Selasa'], this)">
-                        Senin - Selasa
-                    </button>
-                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Rabu,Kamis" onclick="filterJadwalHari(['Rabu', 'Kamis'], this)">
-                        Rabu - Kamis
-                    </button>
-                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Jumat,Sabtu" onclick="filterJadwalHari(['Jumat', 'Sabtu'], this)">
-                        Jumat - Sabtu
-                    </button>
-                    <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Minggu" onclick="filterJadwalHari(['Minggu'], this)">
-                        Minggu
-                    </button>
+                    <!-- BAGIAN KANAN: TOMBOL FILTER HARI (1 BARIS RINGKAS) -->
+                    <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                        <span class="font-weight-bold text-muted mr-1 small d-none d-md-inline"><i class="fas fa-calendar-day mr-1"></i>Hari:</span>
+                        <div class="d-flex align-items-center flex-wrap" style="gap: 4px;">
+                            <button type="button" class="btn btn-sm day-filter-btn active" data-target-days="all" onclick="filterJadwalHari('all', this)">
+                                Semua
+                            </button>
+                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Senin,Selasa" onclick="filterJadwalHari(['Senin', 'Selasa'], this)">
+                                Senin - Selasa
+                            </button>
+                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Rabu,Kamis" onclick="filterJadwalHari(['Rabu', 'Kamis'], this)">
+                                Rabu - Kamis
+                            </button>
+                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Jumat,Sabtu" onclick="filterJadwalHari(['Jumat', 'Sabtu'], this)">
+                                Jumat - Sabtu
+                            </button>
+                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Minggu" onclick="filterJadwalHari(['Minggu'], this)">
+                                Minggu
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
