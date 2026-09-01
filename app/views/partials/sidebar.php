@@ -324,30 +324,16 @@ if (!function_exists('is_menu_active_dynamic')) {
     </a>
 
     <div class="sidebar">
-        <!-- Script Restore Scroll Position (Optimized with Debounce/RequestsAnimationFrame) -->
+        <!-- Script Restore Scroll Position: Instan Tanpa Kedip / Gerakan -->
         <script>
             (function () {
                 var sidebar = document.querySelector('.main-sidebar .sidebar');
                 if (sidebar) {
-                    // 1. Restore Logic
                     var savedPos = localStorage.getItem('sidebarScrollPos');
-                    if (savedPos) {
-                        requestAnimationFrame(function () {
-                            sidebar.scrollTop = savedPos;
-                        });
+                    if (savedPos !== null) {
+                        sidebar.scrollTop = parseInt(savedPos, 10);
                     }
-
-                    // 2. Save Logic (Debounced)
-                    var timeout;
-                    sidebar.addEventListener('scroll', function () {
-                        if (timeout) clearTimeout(timeout);
-                        timeout = setTimeout(function () {
-                            localStorage.setItem('sidebarScrollPos', sidebar.scrollTop);
-                        }, 100);
-                    });
                 }
-
-                // [OPTIMISASI] Script legacy untuk animasi instan dihapus agar animasi default (smooth) berjalan
             })();
         </script>
 
@@ -713,24 +699,23 @@ $(document).ready(function () {
         }
     });
 
-    // 3. [FITUR BARU] Otomatis Scroll & Posisikan Menu Aktif agar Selalu Terlihat di Layar
-    setTimeout(function () {
-        var $activeLink = $('.main-sidebar .nav-sidebar .nav-link.active').last();
-        if ($activeLink.length > 0) {
-            var sidebarEl = document.querySelector('.main-sidebar .sidebar');
-            if (sidebarEl) {
-                // Posisikan menu yang aktif di tengah tampilan scroll sidebar
-                $activeLink[0].scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
-            }
-        }
-    }, 100);
+    // 3. Catat posisi scroll saat pengguna menggulir atau mengklik menu
+    var sidebarEl = document.querySelector('.main-sidebar .sidebar');
+    if (sidebarEl) {
+        sidebarEl.addEventListener('scroll', function () {
+            localStorage.setItem('sidebarScrollPos', sidebarEl.scrollTop);
+        }, { passive: true });
+    }
 
-    // 4. Catat posisi scroll sebelum berpindah halaman agar transisi menu mulus
     $(document).on('click', '.nav-sidebar a.nav-link:not([href="#"]):not([href^="javascript"])', function () {
-        var sidebarEl = document.querySelector('.main-sidebar .sidebar');
         if (sidebarEl) {
             localStorage.setItem('sidebarScrollPos', sidebarEl.scrollTop);
         }
+    });
+
+    // Reset scroll ke atas jika mengklik Dashboard / Logo
+    $(document).on('click', '.brand-link, .nav-sidebar a[href*="dashboard"]', function () {
+        localStorage.setItem('sidebarScrollPos', '0');
     });
 });
 </script>
