@@ -2583,35 +2583,42 @@ class CbtController
         }
 
         // 3. AMBIL DATA UNTUK HUB VIEW
-        $mapelFilter = self::buildMapelFilter($info, 'p');
+        $mapelFilterP = self::buildMapelFilter($info, 'p');
         $stmt_pkt = $pdo->prepare("
-            SELECT p.*, m.nama_mapel, b.nama_bank, g.nama as nama_guru,
+            SELECT p.*, m.nama_mapel, b.nama_bank, 
+                   COALESCE(g.nama, u.nama_pengguna, p.penyusun, 'Guru Pengampu') as nama_guru,
                    (SELECT COUNT(*) FROM cbt_soal WHERE id_bank = p.id_bank) as total_soal
             FROM cbt_paket p
             LEFT JOIN mapel m ON p.id_mapel = m.id_mapel
             LEFT JOIN cbt_bank_soal b ON p.id_bank = b.id_bank
-            LEFT JOIN guru g ON p.id_guru = g.id_guru
-            WHERE {$mapelFilter['clause']}
+            LEFT JOIN pengguna u ON p.id_user = u.id_pengguna
+            LEFT JOIN guru g ON u.id_pengguna = g.id_pengguna
+            WHERE {$mapelFilterP['clause']}
             ORDER BY p.id_paket DESC
         ");
-        $stmt_pkt->execute($mapelFilter['params']);
+        $stmt_pkt->execute($mapelFilterP['params']);
         $paket_list = $stmt_pkt->fetchAll(PDO::FETCH_ASSOC);
 
         // List Agenda / Jadwal Ujian
         $jadwalFilter = self::buildMapelFilter($info, 'j');
         $stmt_jdw = $pdo->prepare("
             SELECT j.*, m.nama_mapel, k.nama_kelas,
+                   DATE(j.tanggal_mulai) as tgl_mulai,
+                   TIME(j.tanggal_mulai) as jam_mulai,
+                   TIME(j.tanggal_selesai) as jam_selesai,
                    (SELECT COUNT(*) FROM cbt_peserta WHERE id_jadwal = j.id_jadwal) as total_peserta
             FROM cbt_jadwal j
-            LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
+            LEFT JOIN cbt_paket p ON j.id_paket = p.id_paket
+            LEFT JOIN mapel m ON p.id_mapel = m.id_mapel
             LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
             WHERE {$jadwalFilter['clause']}
-            ORDER BY j.tgl_mulai DESC, j.id_jadwal DESC
+            ORDER BY j.tanggal_mulai DESC, j.id_jadwal DESC
         ");
         $stmt_jdw->execute($jadwalFilter['params']);
         $jadwal_list = $stmt_jdw->fetchAll(PDO::FETCH_ASSOC);
 
         require_once __DIR__ . '/../views/cbt_administrasi.php';
     }
+
 }
 
