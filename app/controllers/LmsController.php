@@ -12,25 +12,26 @@ function lms_dashboard() {
     
     $data = [];
     
-    if (in_array('Guru', $user_roles) || in_array('Admin', $user_roles) || in_array('Kurikulum', $user_roles)) {
+    $is_siswa = in_array('Siswa', $user_roles) && !in_array('Admin', $user_roles) && !in_array('Guru', $user_roles) && !in_array('Kepala Sekolah', $user_roles);
+    
+    if (!$is_siswa) {
         $id_guru_login = $_SESSION['id_guru_terkait'] ?? null;
-        // Hanya Admin murni (tanpa tautan ke data guru) yang dapat melihat semua materi.
-        // Guru (termasuk yang juga punya role Kurikulum) hanya melihat materi milik sendiri.
-        $is_pure_admin = in_array('Admin', $user_roles) && ((int)$id_guru_login === 0 || $id_guru_login === null);
-        if ($is_pure_admin) {
-            $id_guru_login = null; // Admin murni: lihat semua
+        // Manajemen (Admin, Kepala Sekolah, Kurikulum, TU) atau user tanpa tautan guru dapat memonitor semua materi
+        $is_management = in_array('Admin', $user_roles) || in_array('Kepala Sekolah', $user_roles) || in_array('Kurikulum', $user_roles) || in_array('TU', $user_roles) || empty($id_guru_login);
+        if ($is_management) {
+            $id_guru_login = null; // Lihat semua materi & tugas sekolah
         }
-        // Dashboard Guru LMS
+        // Dashboard Guru / Manajemen LMS
         $data['materi_count'] = LmsModel::countMateriByGuru($pdo, $id_guru_login);
         $data['tugas_count'] = LmsModel::countTugasByGuru($pdo, $id_guru_login);
         $data['pengumpulan_pending'] = LmsModel::countPengumpulanPending($pdo, $id_guru_login);
         $data['active_tasks_progress'] = LmsModel::getActiveTasksProgress($pdo, $id_guru_login);
         include __DIR__ . '/../views/lms_guru_dashboard.php';
-    } elseif (in_array('Siswa', $user_roles)) {
+    } else {
         // Dashboard Siswa LMS
         $id_siswa_login = $_SESSION['id_siswa_terkait'] ?? 0;
         
-        // Fallback jika session belum terisi (misal baru login sebelum patch)
+        // Fallback jika session belum terisi
         if (!$id_siswa_login) {
             $stmt_s = $pdo->prepare("SELECT id_siswa FROM siswa WHERE id_pengguna = ? LIMIT 1");
             $stmt_s->execute([$user_id]);
@@ -45,14 +46,11 @@ function lms_dashboard() {
         $data['tugas_done_count'] = LmsModel::countTugasSelesaiForSiswa($pdo, $id_siswa_login);
         $data['siswa'] = LmsModel::getSiswaDetail($pdo, $id_siswa_login, $id_ta_aktif);
         
-        // --- NEW: Inject Portal Dashboard Summary ---
+        // --- Inject Portal Dashboard Summary ---
         require_once __DIR__ . '/../models/SiswaPortalModel.php';
         $data['portal_summary'] = SiswaPortalModel::getDashboardSummary($pdo, $id_siswa_login, $id_ta_aktif);
         
         include __DIR__ . '/../views/lms_siswa_dashboard.php';
-    } else {
-        $_SESSION['error'] = "Role tidak valid untuk LMS.";
-        redirect('index.php');
     }
 }
 
@@ -67,11 +65,12 @@ function lms_materi_list() {
     $current_guru_id = 0;
     $can_manage_all   = false;
     $id_guru_login = $_SESSION['id_guru_terkait'] ?? null;
-    $is_pure_admin = in_array('Admin', $user_roles) && ((int)$id_guru_login === 0 || $id_guru_login === null);
+    $is_siswa = in_array('Siswa', $user_roles) && !in_array('Admin', $user_roles) && !in_array('Guru', $user_roles) && !in_array('Kepala Sekolah', $user_roles);
+    $is_management = in_array('Admin', $user_roles) || in_array('Kepala Sekolah', $user_roles) || in_array('Kurikulum', $user_roles) || in_array('TU', $user_roles) || empty($id_guru_login);
 
-    if (in_array('Guru', $user_roles) || in_array('Admin', $user_roles) || in_array('Kurikulum', $user_roles)) {
-        if ($is_pure_admin) {
-            $id_guru_login  = null;  // Admin lihat semua
+    if (!$is_siswa) {
+        if ($is_management) {
+            $id_guru_login  = null;  // Manajemen lihat semua
             $can_manage_all = true;
             $stmt_mapel = $pdo->query("SELECT id_mapel, nama_mapel FROM mapel ORDER BY nama_mapel ASC");
             $mapel_list = $stmt_mapel->fetchAll(PDO::FETCH_ASSOC);
@@ -88,7 +87,7 @@ function lms_materi_list() {
             $mapel_list = $stmt_mapel->fetchAll(PDO::FETCH_ASSOC);
         }
         $materi = LmsModel::getMateriByGuru($pdo, $id_guru_login);
-    } elseif (in_array('Siswa', $user_roles)) {
+    } else {
         $id_siswa_login = $_SESSION['id_siswa_terkait'] ?? 0;
         if (!$id_siswa_login) {
             $stmt_s = $pdo->prepare("SELECT id_siswa FROM siswa WHERE id_pengguna = ? LIMIT 1");
@@ -107,9 +106,6 @@ function lms_materi_list() {
         ");
         $stmt_m_s->execute();
         $mapel_list = $stmt_m_s->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        $materi = [];
-        $mapel_list = [];
     }
 
     // Filter parameters
@@ -610,14 +606,15 @@ function lms_tugas_list() {
     $user_id = $_SESSION['user_id'];
     $user_roles = user_roles();
 
-    if (in_array('Guru', $user_roles) || in_array('Admin', $user_roles) || in_array('Kurikulum', $user_roles)) {
+    $is_siswa = in_array('Siswa', $user_roles) && !in_array('Admin', $user_roles) && !in_array('Guru', $user_roles) && !in_array('Kepala Sekolah', $user_roles);
+
+    if (!$is_siswa) {
         $current_guru_id = 0;
         $can_manage_all   = false;
         
         $id_guru_login = $_SESSION['id_guru_terkait'] ?? null;
-        // Hanya Admin murni (tidak terhubung ke data guru) yang dapat melihat semua tugas.
-        $is_pure_admin = in_array('Admin', $user_roles) && ((int)$id_guru_login === 0 || $id_guru_login === null);
-        if ($is_pure_admin) {
+        $is_management = in_array('Admin', $user_roles) || in_array('Kepala Sekolah', $user_roles) || in_array('Kurikulum', $user_roles) || in_array('TU', $user_roles) || empty($id_guru_login);
+        if ($is_management) {
             $id_guru_login = null;
             $can_manage_all = true;
         } elseif ((int)$id_guru_login === 0) {
@@ -626,7 +623,7 @@ function lms_tugas_list() {
         $current_guru_id = (int)$id_guru_login;
         $tugas = LmsModel::getTugasByGuru($pdo, $id_guru_login);
         include __DIR__ . '/../views/lms_tugas_list_guru.php';
-    } elseif (in_array('Siswa', $user_roles)) {
+    } else {
         // Gunakan id_siswa (bukan id_pengguna) untuk query penempatan_siswa
         $id_siswa_login = $_SESSION['id_siswa_terkait'] ?? 0;
         if (!$id_siswa_login) {
@@ -637,9 +634,6 @@ function lms_tugas_list() {
         }
         $tugas = LmsModel::getTugasForSiswa($pdo, $id_siswa_login);
         include __DIR__ . '/../views/lms_tugas_list_siswa.php';
-    } else {
-        $_SESSION['error'] = "Role tidak valid untuk LMS.";
-        redirect('index.php');
     }
 }
 

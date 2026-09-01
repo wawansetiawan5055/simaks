@@ -39,8 +39,8 @@ function catatan_kasus_save($pdo)
 
     $id_ta_aktif = $_SESSION['id_ta_viewing'] ?? $_SESSION['id_ta_aktif'] ?? 0;
     $id_guru_piket = $_SESSION['id_guru_terkait'] ?? 0;
-    if (has_role('Admin') && !$id_guru_piket) {
-        $id_guru_piket = $pdo->query("SELECT id_guru FROM guru LIMIT 1")->fetchColumn();
+    if (!$id_guru_piket) {
+        $id_guru_piket = (int)$pdo->query("SELECT id_guru FROM guru LIMIT 1")->fetchColumn() ?: 1;
     }
     if (!$id_guru_piket || !$id_ta_aktif) {
         die("Gagal menyimpan: Informasi guru piket atau TA tidak valid.");

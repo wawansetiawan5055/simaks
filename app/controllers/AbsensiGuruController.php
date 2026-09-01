@@ -33,8 +33,8 @@ function absensi_guru_save($pdo) {
     if (!check_access('absensi_guru')) redirect('index.php');
     
     $id_guru_piket = $_SESSION['id_guru_terkait'] ?? 0;
-    if (has_role('Admin') && !$id_guru_piket) {
-        $id_guru_piket = $pdo->query("SELECT id_guru FROM guru LIMIT 1")->fetchColumn();
+    if (!$id_guru_piket) {
+        $id_guru_piket = (int)$pdo->query("SELECT id_guru FROM guru LIMIT 1")->fetchColumn() ?: 1;
     }
     if (!$id_guru_piket) die("Gagal menyimpan: Informasi Guru Piket tidak valid.");
 

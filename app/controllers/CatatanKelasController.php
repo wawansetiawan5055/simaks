@@ -5,7 +5,7 @@ require_once __DIR__ . '/../models/KelasModel.php';     // Kita pakai ulang mode
 
 function catatan_kelas_index($pdo)
 {
-    if (!has_role(['Admin', 'Guru']))
+    if (!check_access('catatan_kelas') && !has_role(['Admin', 'Guru', 'Kepala Sekolah', 'Kurikulum']))
         redirect('index.php');
 
     $id_ta_aktif = $_SESSION['id_ta_aktif'] ?? 0;
@@ -13,13 +13,11 @@ function catatan_kelas_index($pdo)
         die("Error: Tidak ada Tahun Ajaran aktif.");
 
     $kelas_diajar = [];
-    if (has_role('Admin')) {
+    $id_guru_login = $_SESSION['id_guru_terkait'] ?? 0;
+    if ($id_guru_login > 0) {
+        $kelas_diajar = JurnalKbmModel::getKelasDiajar($pdo, $id_guru_login, $id_ta_aktif);
+    } else {
         $kelas_diajar = KelasModel::all($pdo, $id_ta_aktif);
-    } elseif (has_role('Guru')) {
-        $id_guru_login = $_SESSION['id_guru_terkait'] ?? 0;
-        if ($id_guru_login > 0) {
-            $kelas_diajar = JurnalKbmModel::getKelasDiajar($pdo, $id_guru_login, $id_ta_aktif);
-        }
     }
 
     // ⭐ INI ADALAH BAGIAN PENTING YANG MENGAMBIL DATA
@@ -33,7 +31,7 @@ function catatan_kelas_index($pdo)
 
 function catatan_kelas_save($pdo)
 {
-    if (!has_role(['Admin', 'Guru']))
+    if (!check_access('catatan_kelas') && !has_role(['Admin', 'Guru', 'Kepala Sekolah', 'Kurikulum']))
         redirect('index.php');
 
     $id_ta_aktif = $_SESSION['id_ta_aktif'] ?? 0;
