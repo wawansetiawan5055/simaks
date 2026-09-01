@@ -1878,6 +1878,10 @@ function dispatch_route($pdo, $mod, $act) {
             case 'cbt_hasil':
                 CbtController::hasil($pdo);
                 break;
+
+            case 'cbt_administrasi':
+                CbtController::administrasi($pdo, $act);
+                break;
     
             case 'chat':
                 chat_index($pdo);

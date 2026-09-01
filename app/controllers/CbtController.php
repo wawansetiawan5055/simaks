@@ -2534,4 +2534,84 @@ class CbtController
         $writer->save('php://output');
         exit;
     }
+
+    // ====================================================
+    // PUSAT ADMINISTRASI & DOKUMEN UJIAN CBT
+    // ====================================================
+    public static function administrasi($pdo, $act = '')
+    {
+        $info = self::getAccessInfo($pdo);
+
+        // 1. AJAX AI KISI-KISI GENERATOR
+        if ($act === 'ai_kisi_kisi') {
+            header('Content-Type: application/json');
+            require_once __DIR__ . '/../models/AIModel.php';
+
+            $mapel = trim($_POST['mapel'] ?? '');
+            $jenis_ujian = trim($_POST['jenis_ujian'] ?? 'Sumatif Akhir Semester (SAS)');
+            $komposisi = trim($_POST['komposisi'] ?? '30 PG, 5 Uraian');
+            $materi = trim($_POST['materi'] ?? '');
+
+            if (empty($mapel) || empty($materi)) {
+                echo json_encode(['success' => false, 'message' => 'Mata pelajaran dan materi harus diisi.']);
+                exit;
+            }
+
+            $prompt = "Buatkan Kisi-Kisi Soal Ujian format tabel / teks rapi untuk:\n"
+                    . "- Mata Pelajaran: $mapel\n"
+                    . "- Jenis Ujian: $jenis_ujian\n"
+                    . "- Komposisi Soal: $komposisi\n"
+                    . "- Topik / Lingkup Materi: $materi\n\n"
+                    . "Format kolom kisi-kisi: No | Capaian Pembelajaran / TP | Materi Pokok | Indikator Soal | Level Kognitif (L1/L2/L3) | Bentuk Soal (PG/Uraian) | No Soal.\n"
+                    . "Sertakan juga pedoman rubrik penskoran singkat.";
+
+            $system_instruction = "Anda adalah Ahli Evaluasi & Asesmen Kurikulum Pendidikan Indonesia. Berikan hasil kisi-kisi yang terstruktur, rapi, dan siap digunakan oleh guru.";
+
+            $res = AIModel::generate($pdo, $prompt, $system_instruction);
+            if (isset($res['success']) && $res['success'] === false) {
+                echo json_encode($res);
+            } else {
+                echo json_encode(['success' => true, 'result' => $res['text'] ?? $res['content'] ?? '']);
+            }
+            exit;
+        }
+
+        // 2. DOKUMEN CETAK KEPANITIAAN UMUM
+        if (in_array($act, ['print_kartu_pengawas', 'print_kartu_panitia', 'print_hadir_pengawas', 'print_hadir_panitia', 'print_tata_tertib', 'print_label_meja'])) {
+            require_once __DIR__ . '/../views/cbt_print_panitia_pengawas.php';
+            exit;
+        }
+
+        // 3. AMBIL DATA UNTUK HUB VIEW
+        $mapelFilter = self::buildMapelFilter($info, 'p');
+        $stmt_pkt = $pdo->prepare("
+            SELECT p.*, m.nama_mapel, b.nama_bank, g.nama as nama_guru,
+                   (SELECT COUNT(*) FROM cbt_soal WHERE id_bank = p.id_bank) as total_soal
+            FROM cbt_paket p
+            LEFT JOIN mapel m ON p.id_mapel = m.id_mapel
+            LEFT JOIN cbt_bank_soal b ON p.id_bank = b.id_bank
+            LEFT JOIN guru g ON p.id_guru = g.id_guru
+            WHERE {$mapelFilter['clause']}
+            ORDER BY p.id_paket DESC
+        ");
+        $stmt_pkt->execute($mapelFilter['params']);
+        $paket_list = $stmt_pkt->fetchAll(PDO::FETCH_ASSOC);
+
+        // List Agenda / Jadwal Ujian
+        $jadwalFilter = self::buildMapelFilter($info, 'j');
+        $stmt_jdw = $pdo->prepare("
+            SELECT j.*, m.nama_mapel, k.nama_kelas,
+                   (SELECT COUNT(*) FROM cbt_peserta WHERE id_jadwal = j.id_jadwal) as total_peserta
+            FROM cbt_jadwal j
+            LEFT JOIN mapel m ON j.id_mapel = m.id_mapel
+            LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+            WHERE {$jadwalFilter['clause']}
+            ORDER BY j.tgl_mulai DESC, j.id_jadwal DESC
+        ");
+        $stmt_jdw->execute($jadwalFilter['params']);
+        $jadwal_list = $stmt_jdw->fetchAll(PDO::FETCH_ASSOC);
+
+        require_once __DIR__ . '/../views/cbt_administrasi.php';
+    }
 }
+
