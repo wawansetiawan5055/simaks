@@ -377,7 +377,7 @@
         </div>
 
         <div style="margin-top: 50px; text-align: center; float: right; width: 30%;">
-            <p>Sukabumi, <?= date('d F Y') ?></p>
+            <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
             <p>Mengetahui,</p>
             <p style="margin-bottom: 80px;"><?= $header_info['signatory_label'] ?? 'Waka Kurikulum' ?></p>
             <p class="font-weight-bold"><u><?= htmlspecialchars($header_info['signatory_name'] ?? $kop['nama_waka_kurikulum'] ?? '.........................') ?></u></p>

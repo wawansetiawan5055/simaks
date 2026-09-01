@@ -127,7 +127,7 @@
                     <td width="80">Nomor</td>
                     <td width="20">:</td>
                     <td><?= $surat['nomor_surat'] ?></td>
-                    <td align="right"><?= date('d F Y', strtotime($surat['tgl_surat'])) ?></td>
+                    <td align="right"><?= tgl_indo($surat['tgl_surat']) ?></td>
                 </tr>
                 <tr>
                     <td>Lampiran</td>
@@ -158,7 +158,7 @@
 
         <!-- Tanda Tangan -->
         <div class="signature-box">
-            <p><?= date('d F Y') ?><br>
+            <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
             Kepala Sekolah,</p>
             <div class="signature-space"></div>
             <p class="signature-name"><?= $sekolah['nama_kepala_sekolah'] ?? 'H. DADUN ABDUL MANAF, S.Pd., M.M.' ?></p>

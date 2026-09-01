@@ -605,7 +605,7 @@ function get_cell_logic_data($row, $day, $jadwal_grid)
                     </div>
                 </td>
                 <td width="30%" valign="top" align="center" style="font-size: 9pt;">
-                    Nagrak, <?= date('d F Y') ?><br>
+                    <?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                     Waka Kurikulum
                     <br><br><br>
                     <b><u><?= htmlspecialchars($kop['nama_waka_kurikulum']) ?></u></b>

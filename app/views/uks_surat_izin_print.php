@@ -137,7 +137,7 @@
             <tr>
                 <td class="label">Tanggal &amp; Waktu Masuk</td>
                 <td class="sep">:</td>
-                <td class="val"><?= date('d F Y', strtotime($kunjungan['tanggal'])) ?>, Pukul <?= substr($kunjungan['jam_masuk'], 0, 5) ?> WIB</td>
+                <td class="val"><?= tgl_indo($kunjungan['tanggal']) ?>, Pukul <?= substr($kunjungan['jam_masuk'], 0, 5) ?> WIB</td>
             </tr>
             <tr>
                 <td class="label">Keluhan / Gejala</td>
@@ -195,7 +195,7 @@
                 <p>( ..................................................... )</p>
             </div>
             <div class="ttd-col">
-                <p><?= htmlspecialchars($sekolah['kota'] ?? 'Tempat') ?>, <?= date('d F Y', strtotime($kunjungan['tanggal'])) ?><br>Petugas UKS / Pemeriksa</p>
+                <p><?= htmlspecialchars($sekolah['kota'] ?? 'Tempat') ?>, <?= tgl_indo($kunjungan['tanggal']) ?><br>Petugas UKS / Pemeriksa</p>
                 <div class="ttd-space"></div>
                 <p><strong><?= htmlspecialchars($kunjungan['petugas_jaga'] ?: 'Petugas UKS') ?></strong></p>
             </div>

@@ -254,7 +254,7 @@ if (!function_exists('format_cbt_math_output')) {
                 <td width="38%"><?= htmlspecialchars($paket['nama_mapel'] ?? '-') ?></td>
                 <td width="16%"><strong>Hari, Tanggal</strong></td>
                 <td width="2%">:</td>
-                <td width="24%"><?= date('l, d F Y') ?></td>
+                <td width="24%"><?= tgl_indo(null, true) ?></td>
             </tr>
             <tr>
                 <td><strong>Tingkat / Kelas</strong></td>

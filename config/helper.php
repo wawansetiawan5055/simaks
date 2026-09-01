@@ -680,3 +680,112 @@ if (!function_exists('render_kop_surat')) {
         include __DIR__ . '/../app/views/partials/kop_surat_universal.php';
     }
 }
+
+// =========================================================================
+// STANDARD INDONESIAN DATE & TIME HELPERS FOR ALL VIEWS & PRINT SUITES
+// =========================================================================
+
+if (!function_exists('hari_indo')) {
+    /**
+     * Get Indonesian day name from date string or timestamp (default: now)
+     */
+    function hari_indo($date = null) {
+        $hari_map = [
+            'Sunday'    => 'Minggu',
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu'
+        ];
+        if ($date === null || $date === '' || $date === 'now') {
+            $ts = time();
+        } elseif (is_numeric($date)) {
+            $ts = (int)$date;
+        } else {
+            $ts = strtotime($date);
+            if (!$ts) return '-';
+        }
+        return $hari_map[date('l', $ts)] ?? '-';
+    }
+}
+
+if (!function_exists('bulan_indo')) {
+    /**
+     * Get Indonesian month name (1-12 or date string, default: current month)
+     */
+    function bulan_indo($month = null, $short = false) {
+        $bulan_map = [
+            1  => 'Januari',   2  => 'Februari',  3  => 'Maret',
+            4  => 'April',     5  => 'Mei',       6  => 'Juni',
+            7  => 'Juli',      8  => 'Agustus',   9  => 'September',
+            10 => 'Oktober',   11 => 'November',  12 => 'Desember'
+        ];
+        $bulan_short_map = [
+            1  => 'Jan', 2  => 'Feb', 3  => 'Mar', 4  => 'Apr',
+            5  => 'Mei', 6  => 'Jun', 7  => 'Jul', 8  => 'Agu',
+            9  => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
+        ];
+
+        if ($month === null || $month === '' || $month === 'now') {
+            $m = (int)date('n');
+        } elseif (is_numeric($month) && $month >= 1 && $month <= 12) {
+            $m = (int)$month;
+        } else {
+            $ts = is_numeric($month) ? (int)$month : strtotime($month);
+            $m = $ts ? (int)date('n', $ts) : (int)date('n');
+        }
+
+        return $short ? ($bulan_short_map[$m] ?? '-') : ($bulan_map[$m] ?? '-');
+    }
+}
+
+if (!function_exists('tgl_indo')) {
+    /**
+     * Format any date string / timestamp into clean standard Indonesian format
+     * 
+     * @param string|int|null $date Date string, timestamp, or null for today
+     * @param bool $with_day Include day name, e.g. "Senin, 01 September 2026"
+     * @param string $format 'long' (1 September 2026), 'short' (1 Sep 2026), 'datetime' (1 September 2026 08:30 WIB)
+     * @return string Formatted Indonesian date
+     */
+    function tgl_indo($date = null, $with_day = false, $format = 'long') {
+        if ($date === null || $date === '' || $date === 'now' || $date === 'today') {
+            $ts = time();
+        } elseif ($date === '0000-00-00' || $date === '0000-00-00 00:00:00') {
+            return '-';
+        } elseif (is_numeric($date)) {
+            $ts = (int)$date;
+        } else {
+            $ts = strtotime($date);
+            if (!$ts) return (string)$date;
+        }
+
+        $d = date('j', $ts); // 1 - 31
+        $m = (int)date('n', $ts);
+        $y = date('Y', $ts);
+        $monthName = ($format === 'short') ? bulan_indo($m, true) : bulan_indo($m, false);
+
+        $result = $d . ' ' . $monthName . ' ' . $y;
+
+        if ($with_day) {
+            $result = hari_indo($ts) . ', ' . $result;
+        }
+
+        if ($format === 'datetime' || $format === 'full_time') {
+            $result .= ' ' . date('H:i', $ts) . ' WIB';
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('format_tanggal_indo')) {
+    /**
+     * Alias for tgl_indo()
+     */
+    function format_tanggal_indo($date = null, $with_day = false) {
+        return tgl_indo($date, $with_day, 'long');
+    }
+}

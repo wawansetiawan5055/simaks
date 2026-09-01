@@ -469,7 +469,7 @@ if ($pct_kehadiran >= 90) {
                                                 <td class="text-center font-weight-bold text-muted" style="font-size: 0.82rem;"><?= $rIdx + 1 ?></td>
                                                 <td>
                                                     <strong class="text-dark d-block" style="font-size: 0.86rem;"><?= date('d M Y', strtotime($log['tanggal'])) ?></strong>
-                                                    <small class="text-muted" style="font-size: 0.72rem;"><?= date('l', strtotime($log['tanggal'])) ?></small>
+                                                    <small class="text-muted" style="font-size: 0.72rem;"><?= hari_indo($log['tanggal']) ?></small>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge <?= $bCls ?> px-2 py-0.5 rounded-pill font-weight-bold" style="font-size: 0.68rem;">
@@ -520,7 +520,7 @@ if ($pct_kehadiran >= 90) {
                                                     <td class="text-center font-weight-bold text-muted" style="font-size: 0.82rem;"><?= $half + $rIdx + 1 ?></td>
                                                     <td>
                                                         <strong class="text-dark d-block" style="font-size: 0.86rem;"><?= date('d M Y', strtotime($log['tanggal'])) ?></strong>
-                                                        <small class="text-muted" style="font-size: 0.72rem;"><?= date('l', strtotime($log['tanggal'])) ?></small>
+                                                        <small class="text-muted" style="font-size: 0.72rem;"><?= hari_indo($log['tanggal']) ?></small>
                                                     </td>
                                                     <td class="text-center">
                                                         <span class="badge <?= $bCls ?> px-2 py-0.5 rounded-pill font-weight-bold" style="font-size: 0.68rem;">

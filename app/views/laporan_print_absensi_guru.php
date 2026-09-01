@@ -216,7 +216,7 @@
             <td width="10">:</td>
             <td style="text-align: left;">
                 <?php if ($jenis_laporan == 'harian'): ?>
-                    <?= date('d F Y', strtotime($tanggal ?? date('Y-m-d'))) ?>
+                    <?= tgl_indo($tanggal ?? null) ?>
                 <?php elseif ($jenis_laporan == 'bulanan'): ?>
                     <?= $header_info['judul_bulan'] ?? '' ?>
                 <?php elseif ($jenis_laporan == 'semester'): ?>
@@ -360,7 +360,7 @@
     <?php endif; ?>
 
     <div style="margin-top: 50px; text-align: center; float: right; width: 30%;">
-        <p>Sukabumi, <?= date('d F Y') ?></p>
+        <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
         <p>Kepala Sekolah,</p>
         <br><br><br><br>
         <p><b><?= $kop['nama_kepala_sekolah'] ?? '.......................' ?></b></p>

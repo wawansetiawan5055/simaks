@@ -18,7 +18,7 @@ $konten = $sambutan['konten'];
 $nama_kepala = $sambutan['nama_kepala'];
 $jabatan = $sambutan['jabatan'];
 $foto = $sambutan['foto'];
-$tanggal = date('d F Y', strtotime($sambutan['tanggal_update'] ?? 'now'));
+$tanggal = tgl_indo($sambutan['tanggal_update'] ?? null);
 
 // Meta tags untuk SEO
 $page_title = $judul . ' - ' . $config['school_name'];

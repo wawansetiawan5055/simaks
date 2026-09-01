@@ -55,7 +55,7 @@ $info = $data['info'] ?? null;
             <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 text-uppercase fw-bold"><?= htmlspecialchars($info['kategori'] ?? 'Pengumuman') ?></span>
             <h1 class="display-5 fw-bold mb-3"><?= htmlspecialchars($info['judul'] ?? 'Informasi') ?></h1>
             <div class="d-flex justify-content-center gap-3 opacity-75">
-                <span><i class="far fa-calendar-alt me-1"></i> <?= date('d F Y', strtotime($info['tanggal_publikasi'] ?? 'now')) ?></span>
+                <span><i class="far fa-calendar-alt me-1"></i> <?= tgl_indo($info['tanggal_publikasi'] ?? null) ?></span>
                 <span><i class="far fa-user me-1"></i> Admin Sekolah</span>
             </div>
         </div>

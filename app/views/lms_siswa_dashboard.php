@@ -344,7 +344,7 @@
                         </div>
                         <div class="profile-info-item">
                             <div class="profile-info-label">Tempat, Tanggal Lahir</div>
-                            <div class="profile-info-value"><?php echo htmlspecialchars(($siswa['tempat_lahir'] ?? '-') . ', ' . (isset($siswa['tanggal_lahir']) ? date('d F Y', strtotime($siswa['tanggal_lahir'])) : '-')); ?></div>
+                            <div class="profile-info-value"><?php echo htmlspecialchars(($siswa['tempat_lahir'] ?? '-') . ', ' . (isset($siswa['tanggal_lahir']) ? tgl_indo($siswa['tanggal_lahir']) : '-')); ?></div>
                         </div>
                         <div class="profile-info-item">
                             <div class="profile-info-label">Kelas Saat Ini</div>

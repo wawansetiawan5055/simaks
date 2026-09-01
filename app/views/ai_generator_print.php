@@ -246,7 +246,7 @@
                 &nbsp;
             </td>
             <td>
-                <?= htmlspecialchars($sekolah['kota'] ?? '...........') ?>, <?= date('d F Y') ?><br>
+                <?= htmlspecialchars($sekolah['kota'] ?? '...........') ?>, <?= tgl_indo() ?><br>
                 Guru Mata Pelajaran
                 <span class="ttd-space"></span>
                 <strong><u><?= htmlspecialchars($nama_guru ?? '..........................') ?></u></strong><br>

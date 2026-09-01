@@ -218,7 +218,7 @@
                         </div>
                         <div class="cv-data-row">
                             <div class="cv-label">Tempat, Tgl Lahir</div>
-                            <div class="cv-val">: <?= htmlspecialchars($siswa['tempat_lahir']) ?>, <?= htmlspecialchars(date('d F Y', strtotime($siswa['tanggal_lahir']))) ?></div>
+                            <div class="cv-val">: <?= htmlspecialchars($siswa['tempat_lahir']) ?>, <?= htmlspecialchars(tgl_indo($siswa['tanggal_lahir'])) ?></div>
                         </div>
                         <div class="cv-data-row">
                             <div class="cv-label">Sekolah Asal</div>

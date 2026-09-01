@@ -245,7 +245,7 @@
         </table>
 
         <div style="margin-top:50px; text-align:right; width:90%;">
-            <p>Sukabumi, <?= date('d F Y') ?></p>
+            <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
             <br><br><br>
             <p>( <?= htmlspecialchars($siswa['nama']) ?> )</p>
         </div>

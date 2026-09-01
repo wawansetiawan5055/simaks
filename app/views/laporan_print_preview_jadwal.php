@@ -462,7 +462,7 @@
             </div>
 
             <div class="sig-box">
-                Nagrak, <?= date('d F Y') ?><br>
+                <?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                 Waka Kurikulum
                 <div class="sig-space"></div>
                 <b><u><?= htmlspecialchars($kop['nama_waka_kurikulum']) ?></u></b>

@@ -214,7 +214,7 @@
                 <tr>
                     <td class="lbl">Hari, Tanggal</td>
                     <td>:</td>
-                    <td class="val"><?= date('l, d F Y', strtotime($jadwal['tanggal_mulai'] ?? date('Y-m-d'))) ?></td>
+                    <td class="val"><?= tgl_indo($jadwal['tanggal_mulai'] ?? null, true) ?></td>
                 </tr>
                 <tr>
                     <td class="lbl">Waktu / Durasi</td>
@@ -283,7 +283,7 @@
                 <p style="font-size: 0.75rem; color: #64748b;">NIP. -</p>
             </div>
             <div class="ttd-card">
-                <p><?= htmlspecialchars($sekolah['kota'] ?? 'Bandung') ?>, <?= date('d F Y') ?></p>
+                <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
                 <p><strong>Pengawas Ruang Ujian</strong></p>
                 <div class="ttd-space"></div>
                 <div class="ttd-name">...................................................</div>

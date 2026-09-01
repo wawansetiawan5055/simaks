@@ -304,7 +304,7 @@
         </table>
 
         <div class="footer">
-            <p>Sukabumi, <?= date('d F Y') ?></p>
+            <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
             <br><br><br>
             <p><b><?= htmlspecialchars($guru['nama']) ?></b></p>
         </div>

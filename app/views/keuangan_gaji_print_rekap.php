@@ -118,7 +118,7 @@
                 <strong>( ............................ )</strong>
             </div>
             <div class="sig-box">
-                <p>Pringsewu, <?= date('d F Y') ?><br>Bendahara</p>
+                <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>Bendahara</p>
                 <br><br><br>
                 <strong>( ............................ )</strong>
             </div>

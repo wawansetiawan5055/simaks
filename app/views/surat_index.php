@@ -147,7 +147,7 @@
                     <div class="card-body p-4 position-relative">
                         <div class="position-relative" style="z-index: 2;">
                             <h2 class="fw-bold mb-0" id="live-clock"><?= date('H:i') ?></h2>
-                            <div class="opacity-75"><?= date('l, d F Y') ?></div>
+                            <div class="opacity-75"><?= tgl_indo(null, true) ?></div>
                         </div>
                         <i class="fas fa-clock position-absolute" style="font-size: 100px; color: rgba(255,255,255,0.05); bottom: -20px; right: -20px;"></i>
                     </div>

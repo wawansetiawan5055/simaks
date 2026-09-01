@@ -520,7 +520,7 @@
 
         <!-- Tanda Tangan -->
         <div style="margin-top: 50px; text-align: center; float: right; width: 30%;">
-            <p>Sukabumi, <?= date('d F Y') ?></p>
+            <p><?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?></p>
             <p style="margin-bottom: 80px;">Guru Mata Pelajaran</p>
             <p class="font-weight-bold">
                 <u><?= htmlspecialchars($header_info['guru'] ?? '.........................') ?></u>

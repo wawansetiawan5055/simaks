@@ -446,7 +446,7 @@
                 <div class="signature-name"><?= htmlspecialchars($info_kepsek) ?></div>
             </div>
             <div class="signature-box">
-                Sukabumi, <?= date('d F Y') ?><br>
+                <?= htmlspecialchars($sekolah['kota'] ?? 'Sukabumi') ?>, <?= tgl_indo() ?><br>
                 <?= htmlspecialchars($right_sig_label) ?>
                 <div class="signature-space"></div>
                 <div class="signature-name"><?= htmlspecialchars($right_sig_name) ?></div>

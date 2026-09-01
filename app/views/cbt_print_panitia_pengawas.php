@@ -8,7 +8,7 @@ $profil = ProfilSekolahModel::getProfil($pdo);
 $mode = $_GET['act'] ?? $_GET['doc'] ?? 'tata_tertib';
 $nama_ujian = $_GET['nama_ujian'] ?? 'PENILAIAN AKHIR SEMESTER (SAS)';
 $tahun_ajaran = $_SESSION['nama_ta_aktif'] ?? date('Y') . '/' . (date('Y') + 1);
-$tanggal_ujian = $_GET['tanggal'] ?? date('d F Y');
+$tanggal_ujian = $_GET['tanggal'] ?? tgl_indo();
 $ruang = $_GET['ruang'] ?? 'Ruang 01';
 $sesi = $_GET['sesi'] ?? 'Sesi 1';
 ?>

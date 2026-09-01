@@ -356,7 +356,7 @@
                                     <h6 class="font-weight-bold mb-0"><?= htmlspecialchars($p['kategori']) ?></h6>
                                     <small class="text-muted">
                                         <i class="fas fa-calendar-alt mr-1"></i>
-                                        <?= date('d F Y', strtotime($p['created_at'])) ?>
+                                        <?= tgl_indo($p['created_at']) ?>
                                         &nbsp;<i class="fas fa-clock mr-1 ml-1"></i>
                                         <?= date('H:i', strtotime($p['created_at'])) ?> WIB
                                     </small>
@@ -396,7 +396,7 @@
                                     $label = $field_labels[$k] ?? ucwords(str_replace('_', ' ', $k));
                                     // Format tanggal
                                     if ($k === 'tanggal_lahir' && $v) {
-                                        $v = date('d F Y', strtotime($v));
+                                        $v = tgl_indo($v);
                                     }
                                 ?>
                                 <li>

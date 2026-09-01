@@ -297,7 +297,7 @@ if (!function_exists('format_cbt_math_output')) {
                     NIP. <?= htmlspecialchars($sekolah['nip_kepala_sekolah'] ?? '19700101XXXXXXXXXX') ?>
                 </td>
                 <td width="50%">
-                    <?= htmlspecialchars($sekolah['kota'] ?? 'Kota') ?>, <?= date('d F Y') ?><br>
+                    <?= htmlspecialchars($sekolah['kota'] ?? 'Kota') ?>, <?= tgl_indo() ?><br>
                     Guru Mata Pelajaran
                     <br><br><br><br>
                     <strong><u><?= htmlspecialchars($paket['penyusun'] ?? $paket['nama_guru'] ?? 'Guru Pengampu, S.Pd') ?></u></strong><br>
