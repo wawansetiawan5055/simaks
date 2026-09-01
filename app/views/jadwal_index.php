@@ -209,23 +209,25 @@
                         </form>
                     </div>
 
-                    <!-- 50% KANAN: TOMBOL FILTER HARI (SENIN-SELASA, RABU-KAMIS, DLL) -->
-                    <div class="col-lg-6 col-12 d-flex align-items-center justify-content-lg-end justify-content-start flex-wrap" style="gap: 5px;">
-                        <span class="font-weight-bold text-muted mr-1 small d-none d-xl-inline"><i class="fas fa-calendar-day mr-1"></i>Hari:</span>
-                        <div class="d-flex align-items-center flex-wrap" style="gap: 4px;">
-                            <button type="button" class="btn btn-sm day-filter-btn active" data-target-days="all" onclick="filterJadwalHari('all', this)">
+                    <!-- 50% KANAN: TOMBOL FILTER HARI (PROPORSIONAL MENGISI SETENGAH AREA) -->
+                    <div class="col-lg-6 col-12 d-flex align-items-center justify-content-start mt-2 mt-lg-0">
+                        <span class="font-weight-bold text-dark mr-3 small flex-shrink-0 d-none d-sm-inline" style="font-size: 0.82rem;">
+                            <i class="fas fa-calendar-day text-primary mr-1"></i>Hari:
+                        </span>
+                        <div class="d-flex align-items-center flex-grow-1 flex-wrap" style="gap: 6px;">
+                            <button type="button" class="btn btn-sm day-filter-btn flex-fill text-center active" data-target-days="all" onclick="filterJadwalHari('all', this)" style="padding: 0.35rem 0.45rem;">
                                 Semua
                             </button>
-                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Senin,Selasa" onclick="filterJadwalHari(['Senin', 'Selasa'], this)">
+                            <button type="button" class="btn btn-sm day-filter-btn flex-fill text-center" data-target-days="Senin,Selasa" onclick="filterJadwalHari(['Senin', 'Selasa'], this)" style="padding: 0.35rem 0.45rem;">
                                 Senin - Selasa
                             </button>
-                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Rabu,Kamis" onclick="filterJadwalHari(['Rabu', 'Kamis'], this)">
+                            <button type="button" class="btn btn-sm day-filter-btn flex-fill text-center" data-target-days="Rabu,Kamis" onclick="filterJadwalHari(['Rabu', 'Kamis'], this)" style="padding: 0.35rem 0.45rem;">
                                 Rabu - Kamis
                             </button>
-                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Jumat,Sabtu" onclick="filterJadwalHari(['Jumat', 'Sabtu'], this)">
+                            <button type="button" class="btn btn-sm day-filter-btn flex-fill text-center" data-target-days="Jumat,Sabtu" onclick="filterJadwalHari(['Jumat', 'Sabtu'], this)" style="padding: 0.35rem 0.45rem;">
                                 Jumat - Sabtu
                             </button>
-                            <button type="button" class="btn btn-sm day-filter-btn" data-target-days="Minggu" onclick="filterJadwalHari(['Minggu'], this)">
+                            <button type="button" class="btn btn-sm day-filter-btn flex-fill text-center" data-target-days="Minggu" onclick="filterJadwalHari(['Minggu'], this)" style="padding: 0.35rem 0.45rem;">
                                 Minggu
                             </button>
                         </div>
